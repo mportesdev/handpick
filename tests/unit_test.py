@@ -17,6 +17,10 @@ def is_int(obj):
     return isinstance(obj, int)
 
 
+def is_str(obj):
+    return isinstance(obj, str)
+
+
 params = (
     pytest.param(FLAT,
                  bool,
@@ -29,11 +33,11 @@ params = (
                  ([0], [1], [2]),
                  id='flat - is int'),
     pytest.param(FLAT,
-                 lambda obj: isinstance(obj, str),
+                 is_str,
                  ([3], [4], [7]),
                  id='flat - is str'),
     pytest.param(STRINGS,
-                 lambda obj: isinstance(obj, str),
+                 is_str,
                  ([0], [1, 0], [1, 1], [2, 'foo'], [2, 'bar'], [3]),
                  id='strings - is str'),
     pytest.param(NESTED_LIST,
@@ -110,7 +114,7 @@ def test_pick(data, predicate, routes_to_expected):
     'data, predicate, expected',
     (
         pytest.param(STRINGS,
-                     lambda obj: isinstance(obj, str),
+                     is_str,
                      ['foot', '', 'foobar', 'foo', 'bar', 'bar', 'fool',
                       'good food'],
                      id='strings - is str'),
