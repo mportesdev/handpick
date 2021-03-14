@@ -131,3 +131,67 @@ def test_pick(data, predicate, routes_to_expected):
 )
 def test_pick_including_dict_keys(data, predicate, expected):
     assert list(pick(data, predicate, dict_keys=True)) == expected
+
+
+@pytest.mark.parametrize(
+    'root, expected',
+    (
+            pytest.param(['str'], ['str'], id='flat'),
+            pytest.param((['ab'], 'cd'), ['ab', 'cd'], id='nested'),
+            pytest.param({'ef': 'gh'}, ['ef', 'gh'], id='dict'),
+            pytest.param('str', [], id='str'),
+    )
+)
+def test_strings_not_iterated_by_default(root, expected):
+    assert list(pick(root, is_str,
+                     dict_keys=True)) == expected
+
+
+@pytest.mark.parametrize(
+    'root, expected',
+    (
+            pytest.param(['str'], ['str', 's', 't', 'r'], id='flat'),
+            pytest.param((['ab'], 'cd'), ['ab', 'a', 'b', 'cd', 'c', 'd'],
+                         id='nested'),
+            pytest.param({'ef': 'gh'}, ['ef', 'e', 'f', 'gh', 'g', 'h'],
+                         id='dict'),
+            pytest.param('str', ['s', 't', 'r'], id='str'),
+    )
+)
+def test_strings_iterated_optionally(root, expected):
+    assert list(pick(root, is_str,
+                     dict_keys=True, strings=True)) == expected
+
+
+@pytest.mark.parametrize(
+    'root, expected',
+    (
+            pytest.param(b'01', [], id='bytes'),
+            pytest.param([b'AB'], [], id='flat'),
+            pytest.param((0, [[bytearray([1, 2])], b'12'], 1), [0, 1],
+                         id='nested'),
+            pytest.param({bytes([1, 2]): bytearray(b'\003\004')}, [],
+                         id='dict'),
+            pytest.param(bytearray(b'ab'), [], id='bytearray'),
+    )
+)
+def test_bytes_like_not_iterated_by_default(root, expected):
+    result = list(pick(root, is_int, dict_keys=True))
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    'root, expected',
+    (
+            pytest.param(b'01', [48, 49], id='bytes'),
+            pytest.param([b'AB'], [65, 66], id='flat'),
+            pytest.param((0, [[bytearray([1, 2])], b'12'], 1),
+                         [0, 1, 2, 49, 50, 1], id='nested'),
+            pytest.param({bytes([1, 2]): bytearray(b'\003\004')}, [1, 2, 3, 4],
+                         id='dict'),
+            pytest.param(bytearray(b'ab'), [97, 98], id='bytearray'),
+    )
+)
+def test_bytes_like_iterated_optionally(root, expected):
+    result = list(pick(root, is_int, dict_keys=True, bytes_like=True))
+    assert result == expected
