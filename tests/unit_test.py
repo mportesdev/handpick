@@ -14,6 +14,23 @@ NESTED_LIST = [[1, 2, 100.0], [3, 'Py', [{}, 4], 5]]
 ONES = [1, [1., [2, 1]], [{'id': 1, 'data': [0, 1.0]}, 1, [{}, [1]], 0]]
 NESTED_DICT_1 = {'key': {'str': 'Py', 'n': 1}, '_key': {'_str': '_Py', '_n': 2}}
 
+NESTED_DICT_2 = {
+    '1': {
+        'dict': {
+            'list': [],
+            'tuple': (),
+        },
+        'list': [1, [2, [3, {}]]],
+    },
+    '2': {
+        'dict': {
+            'list': [],
+            'tuple': (),
+        },
+        'tuple': ({}, [], ()),
+    },
+}
+
 
 def is_int(obj):
     return isinstance(obj, int)
@@ -50,6 +67,22 @@ params = (
                  lambda obj: isinstance(obj, list),
                  ([0], [1], [1, 2]),
                  id='nested list - is list'),
+    pytest.param(NESTED_DICT_2,
+                 lambda obj: isinstance(obj, dict),
+                 (['1'], ['1', 'dict'], ['1', 'list', 1, 1, 1], ['2'],
+                  ['2', 'dict'], ['2', 'tuple', 0]),
+                 id='nested dict 2 - is dict'),
+    pytest.param(NESTED_DICT_2,
+                 lambda obj: isinstance(obj, list),
+                 (['1', 'dict', 'list'], ['1', 'list'], ['1', 'list', 1],
+                  ['1', 'list', 1, 1], ['2', 'dict', 'list'],
+                  ['2', 'tuple', 1]),
+                 id='nested dict 2 - is list'),
+    pytest.param(NESTED_DICT_2,
+                 is_str,
+                 # only keys are strings
+                 [],
+                 id='nested dict 2 - is str'),
 
     # int, float (can raise ValueError, TypeError)
     pytest.param(NUM_STRINGS,
@@ -61,13 +94,13 @@ params = (
                  ([0], [1, 1], [2, ' 1 ']),
                  id='num strings - float 1'),
 
-    # index (can raise IndexError, KeyError)
+    # subscript (can raise IndexError, KeyError)
     pytest.param(NESTED_LIST,
                  lambda obj: obj[2] is not None,
                  ([0], [1]),
                  id='nested list - item 2'),
 
-    # len (can raise AttributeError)
+    # len (can raise TypeError)
     pytest.param(FLAT,
                  lambda obj: len(obj) == 0,
                  ([4], [6]),
@@ -88,6 +121,17 @@ params = (
                  lambda obj: hasattr(obj, '__iter__'),
                  ([3], [4], [6], [7]),
                  id='flat - has __iter__'),
+    pytest.param(NESTED_DICT_2,
+                 lambda obj: hasattr(obj, 'items'),
+                 (['1'], ['1', 'dict'], ['1', 'list', 1, 1, 1], ['2'],
+                  ['2', 'dict'], ['2', 'tuple', 0]),
+                 id='nested dict 2 - has items'),
+
+    # composite predicate
+    pytest.param(NESTED_DICT_2,
+                 lambda obj: isinstance(obj, dict) and obj,
+                 (['1'], ['1', 'dict'], ['2'], ['2', 'dict']),
+                 id='nested dict 2 - non-empty dict'),
 )
 
 
@@ -145,6 +189,11 @@ def test_pick(data, predicate, routes_to_expected):
 @pytest.mark.parametrize(
     'data, predicate, expected',
     (
+        pytest.param(NESTED_DICT_2,
+                     is_str,
+                     ['1', 'dict', 'list', 'tuple', 'list', '2', 'dict', 'list',
+                      'tuple', 'tuple'],
+                     id='nested dict 2 - is str'),
         pytest.param(STRINGS,
                      is_str,
                      ['foot', '', 'foobar', 'foo', 'bar', 'bar', 'fool',
@@ -163,6 +212,48 @@ def test_pick(data, predicate, routes_to_expected):
 )
 def test_pick_including_dict_keys(data, predicate, expected):
     assert list(pick(data, predicate, dict_keys=True)) == expected
+
+
+@pytest.mark.parametrize(
+    'root',
+    (
+        pytest.param([], id='list'),
+        pytest.param((), id='tuple'),
+        pytest.param({}, id='dict'),
+    )
+)
+def test_empty_root_yields_nothing(root):
+    assert list(pick(root, lambda x: True)) == []
+
+
+@pytest.mark.parametrize(
+    'root',
+    (
+        pytest.param(0, id='int'),
+        pytest.param(1.0, id='float'),
+        pytest.param(True, id='bool'),
+        pytest.param(None, id='None'),
+        pytest.param(hash, id='builtin'),
+    )
+)
+def test_non_iterable_root_yields_nothing(root):
+    assert list(pick(root, lambda x: True)) == []
+
+
+@pytest.mark.parametrize(
+    'root, predicate, expected_len',
+    (
+        pytest.param([1, 2, 3], 1, 1, id='1'),
+        pytest.param([1, 2, 3], None, 0, id='None'),
+        pytest.param([[1, 2], [2, 3]], 2, 2, id='2'),
+        pytest.param(DICT, 1, 0, id='simple dict 1'),
+        pytest.param(DICT, 2, 2, id='simple dict 2'),
+        pytest.param(DICT, {}, 3, id='simple dict {}'),
+        pytest.param(ONES, 1.0, 7, id='ones'),
+    )
+)
+def test_non_callable_predicate(root, predicate, expected_len):
+    assert list(pick(root, predicate)) == [predicate] * expected_len
 
 
 @pytest.mark.parametrize(
