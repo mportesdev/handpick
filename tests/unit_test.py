@@ -11,6 +11,8 @@ STRINGS = ['foot', ['', 'foobar'], {'foo': 'bar', 'bar': 'fool'}, 'good food']
 NUM_STRINGS = ['1', [' +2', '+1 '], {'-1': '.2', ' 1 ': '1.'}, '', ' - 0.3 ']
 DICT = {1: [{}, 2], 2: [{}, [2, {}]]}
 NESTED_LIST = [[1, 2, 100.0], [3, 'Py', [{}, 4], 5]]
+ONES = [1, [1., [2, 1]], [{'id': 1, 'data': [0, 1.0]}, 1, [{}, [1]], 0]]
+NESTED_DICT_1 = {'key': {'str': 'Py', 'n': 1}, '_key': {'_str': '_Py', '_n': 2}}
 
 
 def is_int(obj):
@@ -87,6 +89,36 @@ params = (
                  ([3], [4], [6], [7]),
                  id='flat - has __iter__'),
 )
+
+
+@pytest.mark.parametrize(
+    'data, predicate, expected',
+    (
+        pytest.param(NESTED_LIST, lambda n: n > 3, [100.0, 4, 5],
+                     id='greater than 3'),
+        pytest.param(NESTED_LIST, lambda n: n > 3 and isinstance(n, int),
+                     [4, 5], id='int greater than 3'),
+        pytest.param(NESTED_LIST, lambda seq: len(seq) == 2, ['Py', [{}, 4]],
+                     id='len 2'),
+        pytest.param(ONES, 1, [1] * 7, id='ones'),
+    )
+)
+def test_simple_case(data, predicate, expected):
+    """Test examples from README."""
+    assert list(pick(data, predicate)) == expected
+
+
+@pytest.mark.parametrize(
+    'dict_keys, expected',
+    (
+        pytest.param(False, ['_Py'], id='without keys'),
+        pytest.param(True, ['_key', '_str', '_Py', '_n'], id='with keys'),
+    )
+)
+def test_simple_case_dict_keys(dict_keys, expected):
+    """Test examples from README."""
+    result = list(pick(NESTED_DICT_1, lambda s: s.startswith('_'), dict_keys))
+    assert result == expected
 
 
 def retrieve_items(obj, getitem_paths):
