@@ -5,6 +5,8 @@ find all objects that meet certain criteria.
 
 from collections.abc import Mapping, Iterable
 
+_ERRORS = (TypeError, ValueError, IndexError, KeyError, AttributeError)
+
 
 def pick(root, predicate, dict_keys=False, strings=False, bytes_like=False):
     """Yield all objects recursively from `root` for which
@@ -48,7 +50,7 @@ def pick(root, predicate, dict_keys=False, strings=False, bytes_like=False):
             try:
                 if predicate(obj):
                     yield obj
-            except Exception:
+            except _ERRORS:
                 # exception indicates that object does not meet predicate
                 pass
         elif obj == predicate:
