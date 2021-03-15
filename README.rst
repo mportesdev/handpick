@@ -1,3 +1,5 @@
+|pytest| |release| |license| |pyversions| |format|
+
 Handpick
 ========
 
@@ -80,3 +82,14 @@ handpick.pick(root, predicate, dict_keys=False, strings=False, bytes_like=False)
     By default, bytes-like sequences (bytes and bytearrays) are not
     considered containers and therefore not visited by the recursive
     algorithm. This can be changed by setting ``bytes_like`` to True.
+
+.. |pytest| image:: https://github.com/mportesdev/handpick/workflows/pytest/badge.svg
+    :target: https://github.com/mportesdev/handpick/actions
+.. |release| image:: https://img.shields.io/github/v/release/mportesdev/handpick
+    :target: https://github.com/mportesdev/handpick/releases/latest
+.. |license| image:: https://img.shields.io/github/license/mportesdev/handpick
+    :target: https://github.com/mportesdev/handpick/blob/main/LICENSE
+.. |pyversions| image:: https://img.shields.io/pypi/pyversions/handpick
+    :target: https://pypi.org/project/handpick
+.. |format| image:: https://img.shields.io/pypi/format/handpick
+    :target: https://pypi.org/project/handpick/#files
