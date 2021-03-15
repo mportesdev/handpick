@@ -1,9 +1,17 @@
 [tool.poetry]
 name = "handpick"
-version = "0.1.0"
+version = "0.2.0"
 description = "Inspect nested data structures recursively."
+license = "MIT"
 authors = ["Michal Porteš <michalportes1@gmail.com>"]
-license = "MIT License"
+readme = "README.rst"
+homepage = "https://github.com/mportesdev/handpick"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 
 [tool.poetry.dependencies]
 python = "^3.6"
