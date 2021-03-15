@@ -240,6 +240,37 @@ def test_non_iterable_root_yields_nothing(root):
     assert list(pick(root, lambda x: True)) == []
 
 
+NESTED_DATA = {
+    1: (
+        {
+            'f': (2.8419, 0.0923, 645.0, 1),
+            'r': (2.8551, 0.0910, 1),
+            'l': (2.8488, 0.0914, 1),
+            'p': (2.8419, 0.0923, 645.0, 1.0),
+        },
+        [None, [[0., 1., 0., None], None]],
+    ),
+    2: (
+        {
+            'f': (2.7806, 0.0627, 642.0, 2),
+            'r': (5.6047, 0.0606, 2),
+            'l': (5.5805, 0.0614, 2),
+            'p': (2.7806, 0.0627, 642.0, 2.0),
+        },
+        [None, [[0., 0., 1., 0., 0.], None, [0., 0., None, 0., 1., 0.]]],
+    ),
+    3: (
+        {
+            'f': (2.1251, 0.0958, 639.0, 3),
+            'r': (6.4452, 0.0918, 3),
+            'l': (6.4132, 0.0931, 3),
+            'p': (2.1251, 0.0958, 639.0, 3.0),
+        },
+        [None, [[0., 1., 0.], None, [0., 1., 0.], [0., None, [0., None], 1.]]],
+    ),
+}
+
+
 @pytest.mark.parametrize(
     'root, predicate, expected_len',
     (
@@ -250,6 +281,9 @@ def test_non_iterable_root_yields_nothing(root):
         pytest.param(DICT, 2, 2, id='simple dict 2'),
         pytest.param(DICT, {}, 3, id='simple dict {}'),
         pytest.param(ONES, 1.0, 7, id='ones'),
+        pytest.param(NESTED_DATA, 0.0606, 1, id='float'),
+        pytest.param(NESTED_DATA, 1, 10, id='float'),
+        pytest.param(NESTED_DATA, None, 10, id='float'),
     )
 )
 def test_non_callable_predicate(root, predicate, expected_len):
