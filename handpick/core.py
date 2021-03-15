@@ -1,3 +1,8 @@
+"""
+Handpick is a tool to inspect nested data structures recursively and
+find all objects that meet certain criteria.
+"""
+
 from collections.abc import Mapping, Iterable
 
 
