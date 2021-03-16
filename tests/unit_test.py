@@ -1,10 +1,14 @@
 from functools import reduce
 import itertools
+import json
 import operator
+from pathlib import Path
 
 import pytest
 
 from handpick import pick
+
+TEST_DATA_PATH = Path(__file__).parent / 'data'
 
 FLAT = (6268, 0, True, 'food', '', None, [], 'foo')
 STRINGS = ['foot', ['', 'foobar'], {'foo': 'bar', 'bar': 'fool'}, 'good food']
@@ -38,6 +42,12 @@ def is_int(obj):
 
 def is_str(obj):
     return isinstance(obj, str)
+
+
+def from_json(filename):
+    with open(TEST_DATA_PATH / filename) as f:
+        data = json.load(f)
+    return data
 
 
 params = (
