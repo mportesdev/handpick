@@ -37,16 +37,17 @@ def pick(root, predicate, dict_keys=False, strings=False, bytes_like=False):
     if isinstance(root, (bytes, bytearray)) and not bytes_like:
         return
 
-    is_mapping = isinstance(root, Mapping)
+    root_is_mapping = isinstance(root, Mapping)
+    predicate_callable = callable(predicate)
     for obj in root:
-        if is_mapping:
+        if root_is_mapping:
             if dict_keys:
                 # process key
                 yield from pick([obj], predicate,
                                 dict_keys, strings, bytes_like)
             # switch from key to value and proceed
             obj = root[obj]
-        if callable(predicate):
+        if predicate_callable:
             try:
                 if predicate(obj):
                     yield obj
