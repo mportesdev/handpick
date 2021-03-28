@@ -63,7 +63,7 @@ class Predicate:
     """Decorator wrapping a function in a Predicate object.
 
     Decorated function can be combined with other predicates using the
-    bitwise operators `&` and `|`.
+    bitwise operators `&`, `|` and `~`.
     """
     def __init__(self, func):
         self.func = func
@@ -88,3 +88,9 @@ class Predicate:
             return self.func(obj) or other.func(obj)
 
         return self.__class__(_or)
+
+    def __invert__(self):
+        def _not(obj):
+            return not self.func(obj)
+
+        return self.__class__(_not)

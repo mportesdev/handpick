@@ -422,3 +422,38 @@ def test_predicate_or_non_predicate_not_implemented():
 
     with pytest.raises(TypeError, match='unsupported operand type'):
         pick([], is_str | callable)
+
+
+def test_not_predicate():
+    """Test the overloaded `~` operation with a Predicate."""
+
+    @Predicate
+    def is_long(s):
+        return len(s) > 2
+
+    is_short = ~is_long
+
+    data = [('1', [0, 1], None), {'long': '2'}, range(2), 'long', {3, False, 1}]
+    result = list(pick(data, is_short))
+    assert result == ['1', [0, 1], {'long': '2'}, '2', range(2)]
+
+
+def test_compound_predicate():
+    """Test a compound predicate using the overloaded operations
+    `&`, `|` and `~`.
+    """
+    @Predicate
+    def is_int(n):
+        return isinstance(n, int)
+
+    @Predicate
+    def is_even(n):
+        return n % 2 == 0
+
+    falsey = ~Predicate(bool)
+
+    odd_or_zero_int = is_int & (~is_even | falsey)
+
+    data = [[4, [5.0, 1], 3.0], [[15, []], {17: 7}], 9, [[8], 0, {13, ''}], 97]
+    result = list(pick(data, odd_or_zero_int))
+    assert result == [1, 15, 7, 9, 0, 13, 97]
