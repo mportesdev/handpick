@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "handpick"
 version = "0.2.0"
-description = "Inspect nested data structures recursively."
+description = "Inspect nested data structures."
 license = "MIT"
 authors = ["Michal Porteš <michalportes1@gmail.com>"]
 readme = "README.rst"
