@@ -57,3 +57,34 @@ def pick(root, predicate, dict_keys=False, strings=False, bytes_like=False):
         elif obj == predicate:
             yield obj
         yield from pick(obj, predicate, dict_keys, strings, bytes_like)
+
+
+class Predicate:
+    """Decorator wrapping a function in a Predicate object.
+
+    Decorated function can be combined with other predicates using the
+    bitwise operators `&` and `|`.
+    """
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, obj):
+        return self.func(obj)
+
+    def __and__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        def _and(obj):
+            return self.func(obj) and other.func(obj)
+
+        return self.__class__(_and)
+
+    def __or__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        def _or(obj):
+            return self.func(obj) or other.func(obj)
+
+        return self.__class__(_or)

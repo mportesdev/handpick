@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from handpick import pick
+from handpick import pick, Predicate
 
 TEST_DATA_PATH = Path(__file__).parent / 'data'
 
@@ -362,3 +362,63 @@ def test_bytes_like_not_iterated_by_default(root, expected):
 def test_bytes_like_iterated_optionally(root, expected):
     result = list(pick(root, is_int, dict_keys=True, bytes_like=True))
     assert result == expected
+
+
+def test_predicate_and_predicate():
+    """Test the overloaded `&` operation between two Predicates."""
+
+    @Predicate
+    def is_str(s):
+        return isinstance(s, str)
+
+    @Predicate
+    def is_short(s):
+        return len(s) < 3
+
+    short_string = is_str & is_short
+
+    data = [('1', [0, 1]), {'long': {(2,), '2'}}, range(2), 'long', {3: 'long'}]
+    result = list(pick(data, short_string))
+    assert result == ['1', '2']
+
+
+def test_predicate_and_non_predicate_not_implemented():
+    """Test the overloaded `&` operation between a Predicate and
+    a regular function.
+    """
+    @Predicate
+    def is_str(s):
+        return isinstance(s, str)
+
+    with pytest.raises(TypeError, match='unsupported operand type'):
+        pick([], is_str & len)
+
+
+def test_predicate_or_predicate():
+    """Test the overloaded `|` operation between two Predicates."""
+
+    @Predicate
+    def is_int(n):
+        return isinstance(n, int)
+
+    @Predicate
+    def is_roundable(obj):
+        return hasattr(obj, '__round__')
+
+    can_be_int = is_int | is_roundable
+
+    data = [('1', [None, 9.51]), {'': {2., '2'}}, range(5, 7), '2', {3: True}]
+    result = list(pick(data, can_be_int))
+    assert result == [9.51, 2., 5, 6, True]
+
+
+def test_predicate_or_non_predicate_not_implemented():
+    """Test the overloaded `|` operation between a Predicate and
+    a regular function.
+    """
+    @Predicate
+    def is_str(s):
+        return isinstance(s, str)
+
+    with pytest.raises(TypeError, match='unsupported operand type'):
+        pick([], is_str | callable)
