@@ -60,6 +60,31 @@ Example 3: handling dictionary keys
     >>> list(with_keys)
     ['_key', '_str', '_Py', '_n']
 
+Example 4: compound predicate
+-----------------------------
+
+.. code-block:: python
+
+    from handpick import pick, predicate
+
+    @predicate
+    def is_int(n):
+        return isinstance(n, int)
+
+    @predicate
+    def is_even(n):
+        return n % 2 == 0
+
+    data = [[4, [5.0, 1], 3.0], [[15, []], {17: 7}], 9, [[8], 0, {13, ''}], 97]
+
+    non_even_int = is_int & ~is_even
+    odd_integers = pick(data, non_even_int)
+
+.. code::
+
+    >>> list(odd_integers)
+    [1, 15, 7, 9, 13, 97]
+
 API reference
 -------------
 
@@ -84,6 +109,14 @@ handpick.pick(root, predicate, dict_keys=False, strings=False, bytes_like=False)
     By default, bytes-like sequences (bytes and bytearrays) are not
     considered containers and thus not visited by the recursive
     algorithm. This can be changed by setting ``bytes_like`` to True.
+
+@handpick.predicate(func)
+    """Decorator wrapping a function with a predicate object.
+
+    The decorated function can be combined with other predicates using
+    the operators ``&`` (and), ``|`` (or) and ``~`` (not). The resulting
+    object can be passed as the ``predicate`` argument to ``pick``.
+
 
 .. |pytest| image:: https://github.com/mportesdev/handpick/workflows/pytest/badge.svg
     :target: https://github.com/mportesdev/handpick/actions

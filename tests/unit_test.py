@@ -438,6 +438,24 @@ def test_not_predicate():
     assert result == ['1', [0, 1], {'long': '2'}, '2', range(2)]
 
 
+def test_simple_compound_predicate():
+    """Test example from README."""
+
+    @predicate
+    def is_int(n):
+        return isinstance(n, int)
+
+    @predicate
+    def is_even(n):
+        return n % 2 == 0
+
+    non_even_int = is_int & ~is_even
+
+    data = [[4, [5.0, 1], 3.0], [[15, []], {17: 7}], 9, [[8], 0, {13, ''}], 97]
+    result = list(pick(data, non_even_int))
+    assert result == [1, 15, 7, 9, 13, 97]
+
+
 def test_compound_predicate():
     """Test a compound predicate using the overloaded operations
     `&`, `|` and `~`.
