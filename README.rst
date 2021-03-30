@@ -111,7 +111,7 @@ handpick.pick(root, predicate, dict_keys=False, strings=False, bytes_like=False)
     algorithm. This can be changed by setting ``bytes_like`` to True.
 
 @handpick.predicate(func)
-    """Decorator wrapping a function with a predicate object.
+    Decorator wrapping a function with a predicate object.
 
     The decorated function can be combined with other predicates using
     the operators ``&`` (and), ``|`` (or) and ``~`` (not). The resulting
