@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from handpick import pick, Predicate
+from handpick import pick, predicate
 
 TEST_DATA_PATH = Path(__file__).parent / 'data'
 
@@ -367,11 +367,11 @@ def test_bytes_like_iterated_optionally(root, expected):
 def test_predicate_and_predicate():
     """Test the overloaded `&` operation between two Predicates."""
 
-    @Predicate
+    @predicate
     def is_str(s):
         return isinstance(s, str)
 
-    @Predicate
+    @predicate
     def is_short(s):
         return len(s) < 3
 
@@ -383,10 +383,10 @@ def test_predicate_and_predicate():
 
 
 def test_predicate_and_non_predicate_not_implemented():
-    """Test the overloaded `&` operation between a Predicate and
+    """Test the overloaded `&` operation between a predicate and
     a regular function.
     """
-    @Predicate
+    @predicate
     def is_str(s):
         return isinstance(s, str)
 
@@ -397,11 +397,11 @@ def test_predicate_and_non_predicate_not_implemented():
 def test_predicate_or_predicate():
     """Test the overloaded `|` operation between two Predicates."""
 
-    @Predicate
+    @predicate
     def is_int(n):
         return isinstance(n, int)
 
-    @Predicate
+    @predicate
     def is_roundable(obj):
         return hasattr(obj, '__round__')
 
@@ -413,10 +413,10 @@ def test_predicate_or_predicate():
 
 
 def test_predicate_or_non_predicate_not_implemented():
-    """Test the overloaded `|` operation between a Predicate and
+    """Test the overloaded `|` operation between a predicate and
     a regular function.
     """
-    @Predicate
+    @predicate
     def is_str(s):
         return isinstance(s, str)
 
@@ -425,9 +425,9 @@ def test_predicate_or_non_predicate_not_implemented():
 
 
 def test_not_predicate():
-    """Test the overloaded `~` operation with a Predicate."""
+    """Test the overloaded `~` operation with a predicate."""
 
-    @Predicate
+    @predicate
     def is_long(s):
         return len(s) > 2
 
@@ -442,15 +442,15 @@ def test_compound_predicate():
     """Test a compound predicate using the overloaded operations
     `&`, `|` and `~`.
     """
-    @Predicate
+    @predicate
     def is_int(n):
         return isinstance(n, int)
 
-    @Predicate
+    @predicate
     def is_even(n):
         return n % 2 == 0
 
-    falsey = ~Predicate(bool)
+    falsey = ~predicate(bool)
 
     odd_or_zero_int = is_int & (~is_even | falsey)
 

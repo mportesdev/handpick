@@ -59,12 +59,17 @@ def pick(root, predicate, dict_keys=False, strings=False, bytes_like=False):
         yield from pick(obj, predicate, dict_keys, strings, bytes_like)
 
 
-class Predicate:
-    """Decorator wrapping a function in a Predicate object.
+def predicate(func):
+    """Decorator wrapping a function with a predicate object.
 
-    Decorated function can be combined with other predicates using the
-    bitwise operators `&`, `|` and `~`.
+    The decorated function can be combined with other predicates using
+    the operators `&` (and), `|` (or) and `~` (not). The resulting
+    object can be passed as the `predicate` argument to `pick`.
     """
+    return _Predicate(func)
+
+
+class _Predicate:
     def __init__(self, func):
         self.func = func
 

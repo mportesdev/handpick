@@ -1,5 +1,5 @@
-from .core import pick, Predicate
+from .core import pick, predicate
 
 __version__ = '0.2.0'
 
-__all__ = ['__version__', 'pick', 'Predicate']
+__all__ = ['__version__', 'pick', 'predicate']
