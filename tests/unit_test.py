@@ -76,6 +76,27 @@ NESTED_WITH_SETS = (
     },
 )
 
+LIST_5_LEVELS = [
+    [
+        [
+            '2',
+            [
+                ['4'],
+                '3',
+            ],
+        ],
+        '1',
+    ],
+    '0',
+    [
+        [
+            '2',
+            ['3'],
+        ],
+        '1',
+    ],
+]
+
 
 def is_int(obj):
     return isinstance(obj, int)
@@ -148,6 +169,11 @@ params = (
                  lambda obj: float(obj) == 1,
                  ([0], [1, 1], [2, ' 1 ']),
                  id='num strings - float 1'),
+    pytest.param(LIST_5_LEVELS,
+                 lambda obj: int(obj) >= 0,
+                 ([0, 0, 0], [0, 0, 1, 0, 0], [0, 0, 1, 1], [0, 1], [1],
+                  [2, 0, 0], [2, 0, 1, 0], [2, 1]),
+                 id='list 5 levels - int'),
 
     # subscript (can raise IndexError, KeyError)
     pytest.param(NESTED_LIST,
@@ -224,7 +250,7 @@ params = (
 
 
 @pytest.mark.parametrize(
-    'data, predicate, expected',
+    'root, predicate, expected',
     (
         pytest.param(NESTED_LIST, lambda n: n > 3, [100.0, 4, 5],
                      id='greater than 3'),
@@ -235,9 +261,9 @@ params = (
         pytest.param(ONES, 1, [1] * 7, id='ones'),
     )
 )
-def test_simple_case(data, predicate, expected):
+def test_simple_case(root, predicate, expected):
     """Test examples from README."""
-    assert list(pick(data, predicate)) == expected
+    assert list(pick(root, predicate)) == expected
 
 
 @pytest.mark.parametrize(
@@ -253,6 +279,19 @@ def test_simple_case_dict_keys(dict_keys, expected):
     assert result == expected
 
 
+@pytest.mark.parametrize(
+    'root, predicate, expected',
+    (
+        pytest.param(LIST_5_LEVELS, lambda obj: int(obj) >= 0,
+                     ['2', '4', '3', '1', '0', '2', '3', '1'],
+                     id='list 5 levels - int'),
+    )
+)
+def test_pick(root, predicate, expected):
+    """Test yielded objects by value."""
+    assert list(pick(root, predicate)) == expected
+
+
 def retrieve_items(obj, getitem_paths):
     yield from (
         reduce(operator.getitem, [obj, *getitem_path])
@@ -260,10 +299,11 @@ def retrieve_items(obj, getitem_paths):
     )
 
 
-@pytest.mark.parametrize('data, predicate, routes_to_expected', params)
-def test_pick(data, predicate, routes_to_expected):
-    result = pick(data, predicate)
-    expected_items = retrieve_items(data, routes_to_expected)
+@pytest.mark.parametrize('root, predicate, routes_to_expected', params)
+def test_pick_yields_actual_objects(root, predicate, routes_to_expected):
+    """Test yielded objects by identity."""
+    result = pick(root, predicate)
+    expected_items = retrieve_items(root, routes_to_expected)
 
     # Unique object to make the assertion fail if `actual` and
     # `expected` are of unequal length
@@ -275,7 +315,7 @@ def test_pick(data, predicate, routes_to_expected):
 
 
 @pytest.mark.parametrize(
-    'data, predicate, expected',
+    'root, predicate, expected',
     (
         pytest.param(NESTED_DICT_2,
                      is_str,
@@ -298,10 +338,11 @@ def test_pick(data, predicate, routes_to_expected):
                      id='simple dict 1-2'),
     )
 )
-def test_pick_including_dict_keys(data, predicate, expected):
-    assert list(pick(data, predicate, dict_keys=True)) == expected
+def test_pick_including_dict_keys(root, predicate, expected):
+    assert list(pick(root, predicate, dict_keys=True)) == expected
 
 
+@pytest.mark.parametrize('predicate', (lambda x: True, bool, abs))
 @pytest.mark.parametrize(
     'root',
     (
@@ -310,22 +351,21 @@ def test_pick_including_dict_keys(data, predicate, expected):
         pytest.param({}, id='dict'),
     )
 )
-def test_empty_root_yields_nothing(root):
-    assert list(pick(root, lambda x: True)) == []
+def test_empty_root_yields_nothing(root, predicate):
+    assert list(pick(root, predicate)) == []
 
 
+@pytest.mark.parametrize('predicate', (lambda x: True, bool, abs))
 @pytest.mark.parametrize(
     'root',
     (
         pytest.param(0, id='int'),
-        pytest.param(1.0, id='float'),
-        pytest.param(True, id='bool'),
         pytest.param(None, id='None'),
         pytest.param(hash, id='builtin'),
     )
 )
-def test_non_iterable_root_yields_nothing(root):
-    assert list(pick(root, lambda x: True)) == []
+def test_non_iterable_root_yields_nothing(root, predicate):
+    assert list(pick(root, predicate)) == []
 
 
 NESTED_DATA = {
@@ -455,8 +495,8 @@ def test_predicate_and_predicate():
 
     short_string = is_str & is_short
 
-    data = [('1', [0, 1]), {'long': {(2,), '2'}}, range(2), 'long', {3: 'long'}]
-    result = list(pick(data, short_string))
+    root = [('1', [0, 1]), {'long': {(2,), '2'}}, range(2), 'long', {3: 'long'}]
+    result = list(pick(root, short_string))
     assert result == ['1', '2']
 
 
@@ -485,8 +525,8 @@ def test_predicate_or_predicate():
 
     can_be_int = is_int | is_roundable
 
-    data = [('1', [None, 9.51]), {'': {2., '2'}}, range(5, 7), '2', {3: True}]
-    result = list(pick(data, can_be_int))
+    root = [('1', [None, 9.51]), {'': {2., '2'}}, range(5, 7), '2', {3: True}]
+    result = list(pick(root, can_be_int))
     assert result == [9.51, 2., 5, 6, True]
 
 
@@ -511,8 +551,8 @@ def test_not_predicate():
 
     is_short = ~is_long
 
-    data = [('1', [0, 1], None), {'long': '2'}, range(2), 'long', {3, False, 1}]
-    result = list(pick(data, is_short))
+    root = [('1', [0, 1], None), {'long': '2'}, range(2), 'long', {3, False, 1}]
+    result = list(pick(root, is_short))
     assert result == ['1', [0, 1], {'long': '2'}, '2', range(2)]
 
 
