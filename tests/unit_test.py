@@ -14,9 +14,12 @@ FLAT = (6268, 0, True, 'food', '', None, [], 'foo')
 STRINGS = ['foot', ['', 'foobar'], {'foo': 'bar', 'bar': 'fool'}, 'good food']
 NUM_STRINGS = ['1', [' +2', '+1 '], {'-1': '.2', ' 1 ': '1.'}, '', ' - 0.3 ']
 DICT = {1: [{}, 2], 2: [{}, [2, {}]]}
+
+# Example data from README
 NESTED_LIST = [[1, 2, 100.0], [3, 'Py', [{}, 4], 5]]
 ONES = [1, [1., [2, 1]], [{'id': 1, 'data': [0, 1.0]}, 1, [{}, [1]], 0]]
 NESTED_DICT_1 = {'key': {'str': 'Py', 'n': 1}, '_key': {'_str': '_Py', '_n': 2}}
+LIST_NUMS = [[4, [5.0, 1], 3.0], [[15, []], {17: 7}], 9, [[8], 0, {13, ''}], 97]
 
 NESTED_DICT_2 = {
     '1': {
@@ -34,6 +37,44 @@ NESTED_DICT_2 = {
         'tuple': ({}, [], ()),
     },
 }
+
+SIMPLE_NESTED = [
+    [
+        None,
+        (
+            (1, 2, 3),
+            3
+        ),
+        0
+    ],
+    ('foo', 'bar')
+]
+
+NESTED_WITH_SETS = (
+    (),
+    [
+        (
+            {2, 4, 6},
+            (True, False, 0),    # [1][0][1]
+        ),
+        [
+            (2, 2.0, 2),
+            (2 ** 30, round(1e38), sum(range(1000))),    # [1][1][1]
+        ],
+        {
+            '': ('123', 42.42, (1, 1, 1))    # [1][2][''][2]
+        },
+        {1, 2, 3},
+    ],
+    {
+        (0, 1, 2): (3, 4, 5),    # [2][(0, 1, 2)]
+        (6, 7, 8.0): [
+            (9.5, 10.5, 11.5),
+            (9, 10, 11),    # [2][(6, 7, 8.0)][1]
+            {0.09, 0.10, 0.11},
+        ],
+    },
+)
 
 
 def is_int(obj):
@@ -69,6 +110,10 @@ params = (
                  is_str,
                  ([0], [1, 0], [1, 1], [2, 'foo'], [2, 'bar'], [3]),
                  id='strings - is str'),
+    pytest.param(SIMPLE_NESTED,
+                 lambda obj: isinstance(obj, tuple),
+                 ([0, 1], [0, 1, 0], [1]),
+                 id='mix 1 - is tuple'),
     pytest.param(NESTED_LIST,
                  is_int,
                  ([0, 0], [0, 1], [1, 0], [1, 2, 1], [1, 3]),
@@ -115,6 +160,17 @@ params = (
                  lambda obj: len(obj) == 0,
                  ([4], [6]),
                  id='flat - len 0'),
+    pytest.param(SIMPLE_NESTED,
+                 lambda obj: len(obj) == 3,
+                 ([0], [0, 1, 0], [1, 0], [1, 1]),
+                 id='mix 1 - len 3'),
+    pytest.param(NESTED_WITH_SETS,
+                 lambda obj: len(obj) == 3,
+                 ([1, 0, 0], [1, 0, 1], [1, 1, 0], [1, 1, 1], [1, 2, ''],
+                  [1, 2, '', 0], [1, 2, '', 2], [1, 3], [2, (0, 1, 2)],
+                  [2, (6, 7, 8.0)], [2, (6, 7, 8.0), 0], [2, (6, 7, 8.0), 1],
+                  [2, (6, 7, 8.0), 2]),
+                 id='mix 2 - len 3'),
 
     # contains (can raise TypeError)
     pytest.param(FLAT,
@@ -125,6 +181,10 @@ params = (
                  lambda obj: 'foo' in obj,
                  ([0], [1, 1], [2], [2, 'bar'], [3]),
                  id='strings - contains "foo"'),
+    pytest.param(SIMPLE_NESTED,
+                 lambda obj: 3 in obj,
+                 ([0, 1], [0, 1, 0]),
+                 id='mix 1 - contains 3'),
 
     # hasattr
     pytest.param(FLAT,
@@ -138,6 +198,24 @@ params = (
                  id='nested dict 2 - has items'),
 
     # composite predicate
+    pytest.param(NESTED_WITH_SETS,
+                 lambda obj: isinstance(obj, tuple) and len(obj) == 3,
+                 ([1, 0, 1], [1, 1, 0], [1, 1, 1], [1, 2, ''], [1, 2, '', 2],
+                  [2, (0, 1, 2)], [2, (6, 7, 8.0), 0], [2, (6, 7, 8.0), 1]),
+                 id='mix 2 - tuple of 3 items'),
+    pytest.param(NESTED_WITH_SETS,
+                 lambda obj: (isinstance(obj, tuple) and len(obj) == 3
+                              and all(isinstance(i, (int, float, complex))
+                                      for i in obj)),
+                 ([1, 0, 1], [1, 1, 0], [1, 1, 1], [1, 2, '', 2],
+                  [2, (0, 1, 2)], [2, (6, 7, 8.0), 0], [2, (6, 7, 8.0), 1]),
+                 id='mix 2 - tuple of 3 numbers'),
+    pytest.param(NESTED_WITH_SETS,
+                 lambda obj: (isinstance(obj, tuple) and len(obj) == 3
+                              and all(isinstance(i, int) for i in obj)),
+                 ([1, 0, 1], [1, 1, 1], [1, 2, '', 2], [2, (0, 1, 2)],
+                  [2, (6, 7, 8.0), 1]),
+                 id='mix 2 - tuple of 3 ints'),
     pytest.param(NESTED_DICT_2,
                  lambda obj: isinstance(obj, dict) and obj,
                  (['1'], ['1', 'dict'], ['2'], ['2', 'dict']),
@@ -451,8 +529,7 @@ def test_simple_compound_predicate():
 
     non_even_int = is_int & ~is_even
 
-    data = [[4, [5.0, 1], 3.0], [[15, []], {17: 7}], 9, [[8], 0, {13, ''}], 97]
-    result = list(pick(data, non_even_int))
+    result = list(pick(LIST_NUMS, non_even_int))
     assert result == [1, 15, 7, 9, 13, 97]
 
 
@@ -472,6 +549,5 @@ def test_compound_predicate():
 
     odd_or_zero_int = is_int & (~is_even | falsey)
 
-    data = [[4, [5.0, 1], 3.0], [[15, []], {17: 7}], 9, [[8], 0, {13, ''}], 97]
-    result = list(pick(data, odd_or_zero_int))
+    result = list(pick(LIST_NUMS, odd_or_zero_int))
     assert result == [1, 15, 7, 9, 0, 13, 97]
