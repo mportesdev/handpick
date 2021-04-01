@@ -13,13 +13,13 @@ TEST_DATA_PATH = Path(__file__).parent / 'data'
 FLAT = (6268, 0, True, 'food', '', None, [], 'foo')
 STRINGS = ['foot', ['', 'foobar'], {'foo': 'bar', 'bar': 'fool'}, 'good food']
 NUM_STRINGS = ['1', [' +2', '+1 '], {'-1': '.2', ' 1 ': '1.'}, '', ' - 0.3 ']
-DICT = {1: [{}, 2], 2: [{}, [2, {}]]}
 
 # Example data from README
 NESTED_LIST = [[1, 2, 100.0], [3, 'Py', [{}, 4], 5]]
 ONES = [1, [1., [2, 1]], [{'id': 1, 'data': [0, 1.0]}, 1, [{}, [1]], 0]]
 NESTED_DICT_1 = {'key': {'str': 'Py', 'n': 1}, '_key': {'_str': '_Py', '_n': 2}}
 LIST_NUMS = [[4, [5.0, 1], 3.0], [[15, []], {17: 7}], 9, [[8], 0, {13, ''}], 97]
+DCT_LST_TPL = {1: [{}, (2, '3')], 4: [{}, [5, ()]]}
 
 NESTED_DICT_2 = {
     '1': {
@@ -79,19 +79,19 @@ NESTED_WITH_SETS = (
 LIST_5_LEVELS = [
     [
         [
-            '2',
+            bytearray(b'2'),
             [
                 ['4'],
                 '3',
             ],
         ],
-        '1',
+        b'1',
     ],
     '0',
     [
         [
             '2',
-            ['3'],
+            [b'3'],
         ],
         '1',
     ],
@@ -297,7 +297,7 @@ def test_simple_case_dict_keys(dict_keys, expected):
     'root, predicate, expected',
     (
         pytest.param(LIST_5_LEVELS, lambda obj: int(obj) >= 0,
-                     ['2', '4', '3', '1', '0', '2', '3', '1'],
+                     [bytearray(b'2'), '4', '3', b'1', '0', '2', b'3', '1'],
                      id='list 5 levels - int'),
     )
 )
@@ -346,10 +346,9 @@ def test_pick_yields_actual_objects(root, predicate, routes_to_expected):
                      ['foot', 'foobar', {'foo': 'bar', 'bar': 'fool'},
                       'foo', 'fool', 'good food'],
                      id='strings - contains "foo"'),
-        pytest.param(DICT, 1, [1], id='simple dict 1'),
-        pytest.param(DICT, 2, [2, 2, 2], id='simple dict 2'),
-        pytest.param(DICT, lambda n: 1 <= n <= 2, [1, 2, 2, 2],
-                     id='simple dict 1-2'),
+        pytest.param(DCT_LST_TPL, 1, [1], id='dct-lst-tpl 1'),
+        pytest.param(DCT_LST_TPL, lambda n: 2 <= n <= 4, [2, 4],
+                     id='dct-lst-tpl 2-4'),
     )
 )
 def test_pick_including_dict_keys(root, predicate, expected):
@@ -419,9 +418,9 @@ NESTED_DATA = {
         pytest.param([1, 2, 3], 1, 1, id='1'),
         pytest.param([1, 2, 3], None, 0, id='None'),
         pytest.param([[1, 2], [2, 3]], 2, 2, id='2'),
-        pytest.param(DICT, 1, 0, id='simple dict 1'),
-        pytest.param(DICT, 2, 2, id='simple dict 2'),
-        pytest.param(DICT, {}, 3, id='simple dict {}'),
+        pytest.param(DCT_LST_TPL, 1, 0, id='dct-lst-tpl 1'),
+        pytest.param(DCT_LST_TPL, 2, 1, id='dct-lst-tpl 2'),
+        pytest.param(DCT_LST_TPL, {}, 2, id='dct-lst-tpl {}'),
         pytest.param(ONES, 1.0, 7, id='ones'),
         pytest.param(NESTED_DATA, 0.0606, 1, id='float'),
         pytest.param(NESTED_DATA, 1, 10, id='float'),
@@ -611,16 +610,16 @@ def test_compound_predicate():
     'root, expected',
     (
         pytest.param(LIST_5_LEVELS,
-                     ['2', '4', '3', '1', '0', '2', '3', '1'],
+                     [bytearray(b'2'), '4', '3', b'1', '0', '2', b'3', '1'],
                      id='list 5 levels - no containers'),
         pytest.param(DICT_5_LEVELS,
                      ['0_value1', '2_value1', '4_value', '3_value2',
                       '1_value2'],
                      id='dict 5 levels - no containers'),
-        pytest.param(DICT, [2, 2], id='dict - no containers'),
+        pytest.param(DCT_LST_TPL, [2, '3', 5], id='dct-lst-tpl no containers'),
     )
 )
-def test_no_iter_predicate(root, expected):
+def test_no_containers_predicate(root, expected):
     assert list(pick(root, NO_CONTAINERS)) == expected
 
 
@@ -628,13 +627,14 @@ def test_no_iter_predicate(root, expected):
     'root, expected',
     (
         pytest.param(LIST_5_LEVELS,
-                     ['2', '4', '3', '1', '0', '2', '3', '1'],
+                     [bytearray(b'2'), '4', '3', b'1', '0', '2', b'3', '1'],
                      id='list 5 levels - no list/dict'),
         pytest.param(DICT_5_LEVELS,
                      ['0_value1', '2_value1', '4_value', '3_value2',
                       '1_value2'],
                      id='dict 5 levels - no list/dict'),
-        pytest.param(DICT, [2, 2], id='dict - no list/dict'),
+        pytest.param(DCT_LST_TPL, [(2, '3'), 2, '3', 5, ()],
+                     id='dct-lst-tpl no list/dict'),
     )
 )
 def test_no_list_dict_predicate(root, expected):
