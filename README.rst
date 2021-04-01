@@ -3,6 +3,7 @@
 Handpick is a tool to traverse nested data structures recursively and
 find all objects that meet certain criteria.
 
+
 Example 1: simple predicate functions
 -------------------------------------
 
@@ -10,17 +11,18 @@ Example 1: simple predicate functions
 
     from handpick import pick
 
-    data = [[1, 2, 100.0], [3, 'Py', [{}, 4], 5]]
+    root = [[1, 2, 100.0], [3, 'Py', [{}, 4], 5]]
 
-    print(list(pick(data, lambda n: n > 3)))
-    print(list(pick(data, lambda n: n > 3 and isinstance(n, int))))
-    print(list(pick(data, lambda seq: len(seq) == 2)))
+    print(list(pick(root, lambda n: n > 3)))
+    print(list(pick(root, lambda n: n > 3 and isinstance(n, int))))
+    print(list(pick(root, lambda seq: len(seq) == 2)))
 
 .. code::
 
     [100.0, 4, 5]
     [4, 5]
     ['Py', [{}, 4]]
+
 
 Example 2: non-callable predicate
 ---------------------------------
@@ -32,36 +34,43 @@ the nested depth.
 
     from handpick import pick
 
-    data = [1, [1., [2, 1]], [{'id': 1, 'data': [0, 1.0]}, 1, [{}, [1]], 0]]
+    root = [1, [1., [2, 1]], [{'id': 1, 'data': [0, 1.0]}, 1, [{}, [1]], 0]]
 
-    ones = pick(data, 1)
+    ones = pick(root, 1)
 
 .. code::
 
     >>> len(list(ones))
     7
 
+
 Example 3: handling dictionary keys
 -----------------------------------
+
+You can configure whether or not dictionary keys will be yielded by ``pick``.
 
 .. code-block:: python
 
     from handpick import pick
 
-    data = {'key': {'str': 'Py', 'n': 1}, '_key': {'_str': '_Py', '_n': 2}}
+    root = {'key': {'str': 'Py', 'n': 1}, '_key': {'_str': '_Py', '_n': 2}}
 
-    no_keys = pick(data, lambda s: s.startswith('_'))
-    with_keys = pick(data, lambda s: s.startswith('_'), dict_keys=True)
+    data = pick(root, lambda s: s.startswith('_'))
+    data_with_keys = pick(root, lambda s: s.startswith('_'), dict_keys=True)
 
 .. code::
 
-    >>> list(no_keys)
+    >>> list(data)
     ['_Py']
-    >>> list(with_keys)
+    >>> list(data_with_keys)
     ['_key', '_str', '_Py', '_n']
 
-Example 4: compound predicate
------------------------------
+
+Example 4: the ``predicate`` decorator and combining predicates
+---------------------------------------------------------------
+
+The ``predicate`` decorator returns objects that can be combined using
+the operators ``&`` (and), ``|`` (or) and ``~`` (not).
 
 .. code-block:: python
 
@@ -75,10 +84,10 @@ Example 4: compound predicate
     def is_even(n):
         return n % 2 == 0
 
-    data = [[4, [5.0, 1], 3.0], [[15, []], {17: 7}], 9, [[8], 0, {13, ''}], 97]
+    root = [[4, [5.0, 1], 3.0], [[15, []], {17: 7}], 9, [[8], 0, {13, ''}], 97]
 
     non_even_int = is_int & ~is_even
-    odd_integers = pick(data, non_even_int)
+    odd_integers = pick(root, non_even_int)
 
 .. code::
 
