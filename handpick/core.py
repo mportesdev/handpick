@@ -99,3 +99,19 @@ class _Predicate:
             return not self.func(obj)
 
         return self.__class__(_not)
+
+
+# predefined predicates
+
+@predicate
+def _no_iter(obj):
+    return not isinstance(obj, Iterable)
+
+
+@predicate
+def _no_list_dict(obj):
+    return not isinstance(obj, (list, dict))
+
+
+NO_ITER = _no_iter
+NO_LIST_DICT = _no_list_dict

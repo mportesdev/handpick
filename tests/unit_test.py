@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from handpick import pick, predicate
+from handpick import pick, predicate, NO_ITER, NO_LIST_DICT
 
 TEST_DATA_PATH = Path(__file__).parent / 'data'
 
@@ -96,6 +96,20 @@ LIST_5_LEVELS = [
         '1',
     ],
 ]
+
+DICT_5_LEVELS = {
+    '0_key1': '0_value1',
+    '0_key2': {
+        '1_key1': {
+            '2_key1': '2_value1',
+            '2_key2': {
+                '3_key1': {'4_key': '4_value'},
+                '3_key2': '3_value2'
+            },
+        },
+        '1_key2': '1_value2',
+    },
+}
 
 
 def is_int(obj):
@@ -591,3 +605,41 @@ def test_compound_predicate():
 
     result = list(pick(LIST_NUMS, odd_or_zero_int))
     assert result == [1, 15, 7, 9, 0, 13, 97]
+
+
+@pytest.mark.parametrize(
+    'root, expected',
+    (
+        pytest.param(LIST_5_LEVELS,
+                     ['2', '4', '3', '1', '0', '2', '3', '1'],
+                     id='list 5 levels - no iterables',
+                     marks=pytest.mark.xfail(reason='todo: exclude str/bytes-'
+                                                    'like from iterables')),
+        pytest.param(DICT_5_LEVELS,
+                     ['0_value1', '2_value1', '4_value', '3_value2',
+                      '1_value2'],
+                     id='dict 5 levels - no iterables',
+                     marks=pytest.mark.xfail(reason='todo: exclude str/bytes-'
+                                                    'like from iterables')),
+        pytest.param(DICT, [2, 2], id='dict - no iterables'),
+    )
+)
+def test_no_iter_predicate(root, expected):
+    assert list(pick(root, NO_ITER)) == expected
+
+
+@pytest.mark.parametrize(
+    'root, expected',
+    (
+        pytest.param(LIST_5_LEVELS,
+                     ['2', '4', '3', '1', '0', '2', '3', '1'],
+                     id='list 5 levels - no list/dict'),
+        pytest.param(DICT_5_LEVELS,
+                     ['0_value1', '2_value1', '4_value', '3_value2',
+                      '1_value2'],
+                     id='dict 5 levels - no list/dict'),
+        pytest.param(DICT, [2, 2], id='dict - no list/dict'),
+    )
+)
+def test_no_list_dict_predicate(root, expected):
+    assert list(pick(root, NO_LIST_DICT)) == expected
