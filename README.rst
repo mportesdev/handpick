@@ -85,6 +85,24 @@ Example 4: compound predicate
     >>> list(odd_integers)
     [1, 15, 7, 9, 13, 97]
 
+
+Example 5: predefined predicate
+-------------------------------
+
+.. code-block:: python
+
+    from handpick import pick, NO_CONTAINERS
+
+    root = {1: [{}, (2, '3')], 4: [{}, [5, ()]]}
+
+    data = pick(root, NO_CONTAINERS)
+
+.. code::
+
+    >>> list(data)
+    [2, '3', 5]
+
+
 API reference
 -------------
 
@@ -116,6 +134,14 @@ handpick.pick(root, predicate, dict_keys=False, strings=False, bytes_like=False)
     The decorated function can be combined with other predicates using
     the operators ``&`` (and), ``|`` (or) and ``~`` (not). The resulting
     object can be passed as the ``predicate`` argument to ``pick``.
+
+handpick.NO_CONTAINERS
+    Predicate that returns False for all iterable objects except
+    strings and bytes-like objects.
+
+handpick.NO_LIST_DICT
+    Predicate that returns False for instances of ``list`` and
+    ``dict``.
 
 
 .. |pytest| image:: https://github.com/mportesdev/handpick/workflows/pytest/badge.svg

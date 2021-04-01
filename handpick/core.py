@@ -105,12 +105,18 @@ class _Predicate:
 
 @predicate
 def _no_containers(obj):
+    """Predicate that returns False for all iterable objects except
+    strings and bytes-like objects.
+    """
     return not isinstance(obj, Iterable) \
            or isinstance(obj, (str, bytes, bytearray))
 
 
 @predicate
 def _no_list_dict(obj):
+    """Predicate that returns False for instances of `list` and
+    `dict`.
+    """
     return not isinstance(obj, (list, dict))
 
 
