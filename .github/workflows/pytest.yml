@@ -1,16 +1,12 @@
-name: pytest
+name: Tests
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  build:
+  testing:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -28,6 +24,5 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install pytest
-    - name: Test with pytest
-      run: |
-        pytest
+    - name: Run pytest
+      run: pytest
