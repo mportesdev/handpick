@@ -104,7 +104,7 @@ class _Predicate:
 # predefined predicates
 
 @predicate
-def _no_iter(obj):
+def _no_containers(obj):
     return not isinstance(obj, Iterable) \
            or isinstance(obj, (str, bytes, bytearray))
 
@@ -114,5 +114,5 @@ def _no_list_dict(obj):
     return not isinstance(obj, (list, dict))
 
 
-NO_ITER = _no_iter
+NO_CONTAINERS = _no_containers
 NO_LIST_DICT = _no_list_dict
