@@ -105,7 +105,8 @@ class _Predicate:
 
 @predicate
 def _no_iter(obj):
-    return not isinstance(obj, Iterable)
+    return not isinstance(obj, Iterable) \
+           or isinstance(obj, (str, bytes, bytearray))
 
 
 @predicate

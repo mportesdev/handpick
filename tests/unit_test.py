@@ -612,15 +612,11 @@ def test_compound_predicate():
     (
         pytest.param(LIST_5_LEVELS,
                      ['2', '4', '3', '1', '0', '2', '3', '1'],
-                     id='list 5 levels - no iterables',
-                     marks=pytest.mark.xfail(reason='todo: exclude str/bytes-'
-                                                    'like from iterables')),
+                     id='list 5 levels - no iterables'),
         pytest.param(DICT_5_LEVELS,
                      ['0_value1', '2_value1', '4_value', '3_value2',
                       '1_value2'],
-                     id='dict 5 levels - no iterables',
-                     marks=pytest.mark.xfail(reason='todo: exclude str/bytes-'
-                                                    'like from iterables')),
+                     id='dict 5 levels - no iterables'),
         pytest.param(DICT, [2, 2], id='dict - no iterables'),
     )
 )
