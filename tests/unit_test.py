@@ -623,6 +623,12 @@ def test_no_containers_predicate(root, expected):
     assert list(pick(root, NO_CONTAINERS)) == expected
 
 
+def test_no_containers_predicate_with_generated_data():
+    root = from_json('list_of_int.json')
+    for n in pick(root, NO_CONTAINERS):
+        assert is_int(n)
+
+
 @pytest.mark.parametrize(
     'root, expected',
     (
@@ -639,3 +645,9 @@ def test_no_containers_predicate(root, expected):
 )
 def test_no_list_dict_predicate(root, expected):
     assert list(pick(root, NO_LIST_DICT)) == expected
+
+
+def test_no_list_dict_predicate_with_generated_data():
+    root = from_json('list_of_int.json')
+    for n in pick(root, NO_LIST_DICT):
+        assert is_int(n)

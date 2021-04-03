@@ -104,7 +104,7 @@ def _no_containers(obj):
     strings and bytes-like objects.
     """
     return not isinstance(obj, Iterable) \
-           or isinstance(obj, (str, bytes, bytearray))
+        or isinstance(obj, (str, bytes, bytearray))
 
 
 @predicate
