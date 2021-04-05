@@ -69,8 +69,9 @@ You can configure whether or not dictionary keys will be yielded by ``pick``.
 Example 4: the ``predicate`` decorator and combining predicates
 ---------------------------------------------------------------
 
-The ``predicate`` decorator returns objects that can be combined using
-the operators ``&`` (and), ``|`` (or) and ``~`` (not).
+The ``predicate`` decorator returns objects that can be combined with other
+predicates using the operators ``&`` (and) and ``|`` (or), as well as negated
+using the operator ``~`` (not).
 
 .. code-block:: python
 
@@ -94,9 +95,30 @@ the operators ``&`` (and), ``|`` (or) and ``~`` (not).
     >>> list(odd_integers)
     [1, 15, 7, 9, 13, 97]
 
+Additionally, the ``&`` and ``|`` operations are supported between predicates
+and regular functions.
 
-Example 5: predefined predicate
--------------------------------
+.. code-block:: python
+
+    from handpick import pick, predicate
+
+    @predicate
+    def is_list(obj):
+        return isinstance(obj, list)
+
+    root = [('1', [2]), {('x',): [(3, [4]), '5']}, ['x', [['6']]], {7: ('x',)}]
+
+    short_list = (lambda obj: len(obj) < 2) & is_list
+    short_lists = pick(root, short_list)
+
+.. code::
+
+    >>> list(short_lists)
+    [[2], [4], [['6']], ['6']]
+
+
+Example 5: built-in predicates
+------------------------------
 
 .. code-block:: python
 

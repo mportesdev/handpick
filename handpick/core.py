@@ -104,7 +104,7 @@ class _Predicate:
         return self.__class__(_not)
 
 
-# predefined predicates
+# built-in predicates
 
 @predicate
 def _no_containers(obj):
