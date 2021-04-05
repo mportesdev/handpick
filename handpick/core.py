@@ -72,20 +72,22 @@ class _Predicate:
         return self.func(obj)
 
     def __and__(self, other):
-        if not isinstance(other, self.__class__):
+        if not callable(other):
             return NotImplemented
+        other_func = other.func if isinstance(other, self.__class__) else other
 
         def _and(obj):
-            return self.func(obj) and other.func(obj)
+            return self.func(obj) and other_func(obj)
 
         return self.__class__(_and)
 
     def __or__(self, other):
-        if not isinstance(other, self.__class__):
+        if not callable(other):
             return NotImplemented
+        other_func = other.func if isinstance(other, self.__class__) else other
 
         def _or(obj):
-            return self.func(obj) or other.func(obj)
+            return self.func(obj) or other_func(obj)
 
         return self.__class__(_or)
 

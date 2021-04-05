@@ -496,41 +496,44 @@ def test_bytes_like_iterated_optionally(root, expected):
 
 
 def test_predicate_and_predicate():
-    """Test the overloaded `&` operation between two Predicates."""
+    """Test the overloaded `&` operation between two predicates."""
 
     @predicate
-    def is_str(s):
-        return isinstance(s, str)
+    def is_str(obj):
+        return isinstance(obj, str)
 
     @predicate
-    def is_short(s):
-        return len(s) < 3
+    def is_short(obj):
+        return len(obj) < 3
 
     short_string = is_str & is_short
 
-    root = [('1', [0, 1]), {'long': {(2,), '2'}}, range(2), 'long', {3: 'long'}]
+    root = [('1', [0, ['py']]), {'foo': {(2,), '2'}}, {b'A'}, 'foo', {3: 'foo'}]
     result = list(pick(root, short_string))
-    assert result == ['1', '2']
+    assert result == ['1', 'py', '2']
 
 
-def test_predicate_and_non_predicate_not_implemented():
-    """Test the overloaded `&` operation between a predicate and
-    a regular function.
-    """
+def test_predicate_and_function():
+    """Test predicate & function."""
+
     @predicate
-    def is_str(s):
-        return isinstance(s, str)
+    def is_tuple(obj):
+        return isinstance(obj, tuple)
 
-    with pytest.raises(TypeError, match='unsupported operand type'):
-        pick([], is_str & len)
+    tuple_containing_2 = is_tuple & (lambda obj: 2 in obj)
+
+    root = [('2', [2]), {'long': {(2,), '2'}}, range(2), 'long', {2: 'long'}]
+
+    result = list(pick(root, tuple_containing_2))
+    assert result == [(2,)]
 
 
 def test_predicate_or_predicate():
-    """Test the overloaded `|` operation between two Predicates."""
+    """Test the overloaded `|` operation between two predicates."""
 
     @predicate
-    def is_int(n):
-        return isinstance(n, int)
+    def is_int(obj):
+        return isinstance(obj, int)
 
     @predicate
     def is_roundable(obj):
@@ -543,24 +546,27 @@ def test_predicate_or_predicate():
     assert result == [9.51, 2., 5, 6, True]
 
 
-def test_predicate_or_non_predicate_not_implemented():
-    """Test the overloaded `|` operation between a predicate and
-    a regular function.
-    """
-    @predicate
-    def is_str(s):
-        return isinstance(s, str)
+def test_predicate_or_function():
+    """Test predicate | function."""
 
-    with pytest.raises(TypeError, match='unsupported operand type'):
-        pick([], is_str | callable)
+    @predicate
+    def is_tuple(obj):
+        return isinstance(obj, tuple)
+
+    tuple_or_contains_3 = is_tuple | (lambda obj: 3 in obj)
+
+    root = [['1', 3], {'long': {(2,), '2'}}, range(4), 'long', {3: 'long'}]
+
+    result = list(pick(root, tuple_or_contains_3))
+    assert result == [['1', 3], (2,), range(4), {3: 'long'}]
 
 
 def test_not_predicate():
     """Test the overloaded `~` operation with a predicate."""
 
     @predicate
-    def is_long(s):
-        return len(s) > 2
+    def is_long(obj):
+        return len(obj) > 2
 
     is_short = ~is_long
 
@@ -573,12 +579,12 @@ def test_simple_compound_predicate():
     """Test example from README."""
 
     @predicate
-    def is_int(n):
-        return isinstance(n, int)
+    def is_int(obj):
+        return isinstance(obj, int)
 
     @predicate
-    def is_even(n):
-        return n % 2 == 0
+    def is_even(obj):
+        return obj % 2 == 0
 
     non_even_int = is_int & ~is_even
 
@@ -591,12 +597,12 @@ def test_compound_predicate():
     `&`, `|` and `~`.
     """
     @predicate
-    def is_int(n):
-        return isinstance(n, int)
+    def is_int(obj):
+        return isinstance(obj, int)
 
     @predicate
-    def is_even(n):
-        return n % 2 == 0
+    def is_even(obj):
+        return obj % 2 == 0
 
     falsey = ~predicate(bool)
 
