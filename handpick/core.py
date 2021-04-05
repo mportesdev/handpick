@@ -81,6 +81,9 @@ class _Predicate:
 
         return self.__class__(_and)
 
+    def __rand__(self, other):
+        return self & other
+
     def __or__(self, other):
         if not callable(other):
             return NotImplemented
@@ -90,6 +93,9 @@ class _Predicate:
             return self.func(obj) or other_func(obj)
 
         return self.__class__(_or)
+
+    def __ror__(self, other):
+        return self | other
 
     def __invert__(self):
         def _not(obj):

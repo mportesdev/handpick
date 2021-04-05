@@ -528,6 +528,21 @@ def test_predicate_and_function():
     assert result == [(2,)]
 
 
+def test_function_and_predicate():
+    """Test `pick` with `function & predicate`."""
+
+    @predicate
+    def is_list(obj):
+        return isinstance(obj, list)
+
+    short_list = (lambda obj: len(obj) < 2) & is_list
+
+    root = [('1', [1]), {('foo',): [(2, [3]), '2']}, ['foo', [{4}]], {2: 'foo'}]
+
+    result = list(pick(root, short_list))
+    assert result == [[1], [3], [{4}]]
+
+
 def test_predicate_or_predicate():
     """Test the overloaded `|` operation between two predicates."""
 
@@ -554,6 +569,21 @@ def test_predicate_or_function():
         return isinstance(obj, tuple)
 
     tuple_or_contains_3 = is_tuple | (lambda obj: 3 in obj)
+
+    root = [['1', 3], {'long': {(2,), '2'}}, range(4), 'long', {3: 'long'}]
+
+    result = list(pick(root, tuple_or_contains_3))
+    assert result == [['1', 3], (2,), range(4), {3: 'long'}]
+
+
+def test_function_or_predicate():
+    """Test function | predicate."""
+
+    @predicate
+    def is_tuple(obj):
+        return isinstance(obj, tuple)
+
+    tuple_or_contains_3 = (lambda obj: 3 in obj) | is_tuple
 
     root = [['1', 3], {'long': {(2,), '2'}}, range(4), 'long', {3: 'long'}]
 
@@ -610,6 +640,24 @@ def test_compound_predicate():
 
     result = list(pick(LIST_NUMS, odd_or_zero_int))
     assert result == [1, 15, 7, 9, 0, 13, 97]
+
+
+def test_compound_predicate_with_functions():
+    """Test a compound predicate combining predicates and functions."""
+
+    @predicate
+    def is_str(obj):
+        return isinstance(obj, str)
+
+    @predicate
+    def is_set(obj):
+        return isinstance(obj, set)
+
+    p = NO_LIST_DICT & ((bool & is_str) | (~is_set & (lambda n: len(n) > 1)))
+
+    root = (['', 0, 'foo'], {0: '', 1: (0, 'x')}, [{1, 2}, b'\\'], {'a', ()})
+    result = list(pick(root, p))
+    assert result == ['foo', (0, 'x'), 'x', 'a']
 
 
 @pytest.mark.parametrize(
