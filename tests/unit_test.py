@@ -1,4 +1,7 @@
+import functools
+import itertools
 import json
+import operator
 from pathlib import Path
 
 import pytest
@@ -113,6 +116,13 @@ def from_json(filename):
     return data
 
 
+def retrieve_items(obj, routes):
+    yield from (
+        functools.reduce(operator.getitem, [obj, *route])
+        for route in routes
+    )
+
+
 class TestPick:
 
     @pytest.mark.parametrize(
@@ -220,12 +230,41 @@ class TestPick:
                          [],
                          id='flat - odd float'),
             pytest.param(NESTED_DICT,
-                         lambda obj: isinstance(obj, dict) and not obj, [{}, {}],
+                         lambda obj: isinstance(obj, dict) and not obj,
+                         [{}, {}],
                          id='nested dict - empty dict'),
         )
     )
     def test_composite(self, root, predicate, expected):
         assert list(pick(root, predicate)) == expected
+
+    @pytest.mark.parametrize(
+        'root, predicate, routes',
+        (
+            pytest.param(FLAT, lambda obj: float(obj) < 50, [[1], [2]],
+                         id='flat - float < 50'),
+            pytest.param(NESTED_LIST, lambda obj: obj[1],
+                         [[0], [1], [1, 1], [1, 2]],
+                         id='nested list - item 3'),
+            pytest.param(LIST_TUPLE, lambda obj: 3 in obj, [[0, 1], [0, 1, 0]],
+                         id='list tuple - contains 3'),
+            pytest.param(NESTED_DICT,
+                         lambda obj: isinstance(obj, dict) and not obj,
+                         [['1', 'list', 1, 1, 1], ['2', 'tuple', 0]],
+                         id='nested dict - empty dict'),
+        )
+    )
+    def test_picked_objects_by_identity(self, root, predicate, routes):
+        result = pick(root, predicate)
+        expected_items = retrieve_items(root, routes)
+
+        # Unique object to make the assertion fail if `actual` and
+        # `expected` are of unequal length
+        sentinel = object()
+
+        for actual, expected in itertools.zip_longest(result, expected_items,
+                                                      fillvalue=sentinel):
+            assert actual is expected
 
 
 class TestPickDictKeysHandling:
@@ -364,8 +403,8 @@ class TestPickStringsAndBytesLike:
         (
             pytest.param(b'01', [48, 49], id='bytes'),
             pytest.param([b'AB'], [65, 66], id='flat'),
-            pytest.param((0, [[bytearray([1, 2])], b'12'], 1), [0, 1, 2, 49, 50, 1],
-                         id='nested'),
+            pytest.param((0, [[bytearray([1, 2])], b'12'], 1),
+                         [0, 1, 2, 49, 50, 1], id='nested'),
             pytest.param({bytes([1, 2]): bytearray(b'\003\004')}, [1, 2, 3, 4],
                          id='dict'),
             pytest.param(bytearray(b'ab'), [97, 98], id='bytearray'),
@@ -391,7 +430,8 @@ class TestPredicates:
 
         short_string = is_str & is_short
 
-        root = [('1', [0, ['py']]), {'foo': {(2,), '2'}}, {b'A'}, 'foo', {3: 'foo'}]
+        root = [('1', [0, ['py']]), {'foo': {(2,), '2'}}, {b'A'}, 'foo',
+                {3: 'foo'}]
         result = list(pick(root, short_string))
         assert result == ['1', 'py', '2']
 
@@ -404,7 +444,8 @@ class TestPredicates:
 
         tuple_containing_2 = is_tuple & (lambda obj: 2 in obj)
 
-        root = [('2', [2]), {'long': {(2,), '2'}}, range(2), 'long', {2: 'long'}]
+        root = [('2', [2]), {'long': {(2,), '2'}}, range(2), 'long',
+                {2: 'long'}]
 
         result = list(pick(root, tuple_containing_2))
         assert result == [(2,)]
@@ -418,7 +459,8 @@ class TestPredicates:
                          [False, True, False, True, False, True]),
         )
     )
-    def test_function_and_predicate(self, function, predicate, values, expected):
+    def test_function_and_predicate(self, function, predicate, values,
+                                    expected):
         """Test function & predicate."""
         compound_predicate = function & predicate
 
@@ -434,7 +476,8 @@ class TestPredicates:
 
         can_be_int = predicate(is_int) | is_roundable
 
-        root = [('1', [None, 9.51]), {'': {2., '2'}}, range(5, 7), '2', {3: True}]
+        root = [('1', [None, 9.51]), {'': {2., '2'}}, range(5, 7), '2',
+                {3: True}]
         result = list(pick(root, can_be_int))
         assert result == [9.51, 2., 5, 6, True]
 
@@ -475,7 +518,8 @@ class TestPredicates:
 
         is_short = ~is_long
 
-        root = [('1', [0, 1], None), {'long': '2'}, range(2), 'long', {3, False, 1}]
+        root = [('1', [0, 1], None), {'long': '2'}, range(2), 'long',
+                {3, False, 1}]
         result = list(pick(root, is_short))
         assert result == ['1', [0, 1], {'long': '2'}, '2', range(2)]
 
@@ -505,10 +549,14 @@ class TestPredicates:
         def is_set(obj):
             return isinstance(obj, set)
 
-        p = NO_LIST_DICT & ((bool & is_str) | (~is_set & (lambda obj: len(obj) > 1)))
+        pred = (
+            NO_LIST_DICT
+            & ((bool & is_str) | (~is_set & (lambda obj: len(obj) > 1)))
+        )
 
-        root = (['', 0, ['a']], {0: '', 1: (0, 'b')}, [{1, 2}, b'c'], {(), ('\\',)})
-        result = list(pick(root, p))
+        root = (['', 0, ['a']], {0: '', 1: (0, 'b')}, [{1, 2}, b'c'],
+                {(), ('\\',)})
+        result = list(pick(root, pred))
         assert result == ['a', (0, 'b'), 'b', '\\']
 
 
@@ -631,7 +679,8 @@ class TestReadmeExamples:
         def is_list(obj):
             return isinstance(obj, list)
 
-        root = [('1', [2]), {('x',): [(3, [4]), '5']}, ['x', [['6']]], {7: ('x',)}]
+        root = [('1', [2]), {('x',): [(3, [4]), '5']}, ['x', [['6']]],
+                {7: ('x',)}]
 
         short_list = (lambda obj: len(obj) < 2) & is_list
         short_lists = pick(root, short_list)
