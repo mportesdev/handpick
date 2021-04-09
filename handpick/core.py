@@ -57,10 +57,6 @@ def pick(root, predicate, dict_keys=False, strings=False, bytes_like=False):
         yield from pick(obj, predicate, dict_keys, strings, bytes_like)
 
 
-def flat(data):
-    ...
-
-
 def predicate(func):
     """Decorator wrapping a function with a predicate object.
 
@@ -135,3 +131,15 @@ def _no_list_dict(obj):
 
 NO_CONTAINERS = _no_containers
 NO_LIST_DICT = _no_list_dict
+
+
+def flat(data):
+    """Flatten `data`.
+
+    Yield a sequence of objects from a (presumably nested) data
+    structure `data`. Only non-iterable objects, strings and bytes-like
+    objects are yielded.
+
+    When traversing a mapping, only its values are considered.
+    """
+    yield from pick(data, NO_CONTAINERS)
