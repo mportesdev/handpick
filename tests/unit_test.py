@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from handpick import pick, predicate, NO_CONTAINERS, NO_LIST_DICT
+from handpick import pick, flat, predicate, NO_CONTAINERS, NO_LIST_DICT
 
 TEST_DATA_PATH = Path(__file__).parent / 'data'
 
@@ -605,6 +605,33 @@ class TestBuiltinPredicates:
         root = from_json('list_of_int.json')
         for n in pick(root, NO_LIST_DICT):
             assert is_int(n)
+
+
+class TestFlat:
+
+    @pytest.mark.parametrize(
+        'data, expected',
+        (
+            pytest.param(FLAT, [62, 0.0, True, 'food', '', None, 'foo'],
+                         id='flat'),
+            pytest.param(NESTED_LIST, [1, 2, 100.0, 3, 'Py', 4, 5],
+                         id='nested list'),
+            pytest.param(DICT_LIST, [2, '3', 5],
+                         id='dict list'),
+            pytest.param(LIST_TUPLE, [None, 1, 2, 3, 3, 0, 'foo', 'bar'],
+                         id='list tuple'),
+            pytest.param(NESTED_DICT, [1, 2, 3],
+                         id='nested dict'),
+            pytest.param(LIST_5_LEVELS, [bytearray(b'2'), '4', 3.5, b'1', '0',
+                                         '2', b'3', '1', 2],
+                         id='list 5 levels'),
+            pytest.param(DICT_5_LEVELS, ['0_value1', '2_value1', '4_value',
+                                         '4_value2', '1_value2'],
+                         id='dict 5 levels'),
+        )
+    )
+    def test_flat(self, data, expected):
+        assert list(flat(data)) == expected
 
 
 class TestReadmeExamples:

@@ -57,6 +57,10 @@ def pick(root, predicate, dict_keys=False, strings=False, bytes_like=False):
         yield from pick(obj, predicate, dict_keys, strings, bytes_like)
 
 
+def flat(data):
+    ...
+
+
 def predicate(func):
     """Decorator wrapping a function with a predicate object.
 
