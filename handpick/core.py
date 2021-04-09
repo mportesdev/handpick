@@ -4,14 +4,17 @@ _ERRORS = (TypeError, ValueError, IndexError, KeyError, AttributeError)
 
 
 def pick(root, predicate, dict_keys=False, strings=False, bytes_like=False):
-    """Yield all objects recursively from `root` for which
+    """Pick objects from `root` based on `predicate`.
+
+    Traverse `root` recursively and yield all objects for which
     `predicate(obj)` is true.
 
-    `root` should be an iterable container. `predicate` should be a
-    callable taking one object as argument and returning a Boolean
-    value. If `predicate` is not callable, equality will be used as the
-    picking criteria, i.e. objects for which `obj == predicate` is true
-    will be yielded.
+    `root` should be an iterable container.
+
+    `predicate` should be a callable taking one argument and returning
+    a Boolean value. If `predicate` is not callable, equality will be
+    used as the picking criteria, i.e. objects for which
+    `obj == predicate` is true will be yielded.
 
     When traversing a mapping, only its values are inspected by
     default. If `dict_keys` is set to True, both keys and values of the
@@ -58,8 +61,11 @@ def predicate(func):
     """Decorator wrapping a function with a predicate object.
 
     The decorated function can be combined with other predicates using
-    the operators `&` (and), `|` (or) and `~` (not). The resulting
-    object can be passed as the `predicate` argument to `pick`.
+    the operators `&` (and) and `|` (or), as well as negated using the
+    operator `~` (not).
+
+    Predicate objects are intended to be used as the `predicate`
+    argument to the `pick` function.
     """
     return _Predicate(func)
 
