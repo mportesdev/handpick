@@ -113,6 +113,13 @@ class _Predicate:
 # built-in predicates
 
 @predicate
+def _all(obj):
+    """Predicate that returns True for all objects."""
+
+    return True
+
+
+@predicate
 def _no_containers(obj):
     """Predicate that returns False for all iterable objects except
     strings and bytes-like objects.
@@ -129,5 +136,6 @@ def _no_list_dict(obj):
     return not isinstance(obj, (list, dict))
 
 
+ALL = _all
 NO_CONTAINERS = _no_containers
 NO_LIST_DICT = _no_list_dict

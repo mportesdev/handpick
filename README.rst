@@ -172,6 +172,9 @@ handpick.pick(root, predicate, dict_keys=False, strings=False, bytes_like=False)
     Predicate objects are intended to be used as the ``predicate``
     argument to the ``pick`` function.
 
+handpick.ALL
+    Predicate that returns True for all objects.
+
 handpick.NO_CONTAINERS
     Predicate that returns False for all iterable objects except
     strings and bytes-like objects.

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from handpick import pick, predicate, NO_CONTAINERS, NO_LIST_DICT
+from handpick import pick, predicate, ALL, NO_CONTAINERS, NO_LIST_DICT
 
 TEST_DATA_PATH = Path(__file__).parent / 'data'
 
@@ -561,6 +561,19 @@ class TestPredicates:
 
 
 class TestBuiltinPredicates:
+
+    @pytest.mark.parametrize(
+        'root, expected',
+        (
+            pytest.param(FLAT, list(FLAT), id='flat - all'),
+            pytest.param(DICT_LIST,
+                         [[{}, (2, '3')], {}, (2, '3'), 2, '3',
+                          [{}, [5, ()]], {}, [5, ()], 5, ()],
+                         id='dict list - all'),
+        )
+    )
+    def test_all_predicate(self, root, expected):
+        assert list(pick(root, ALL)) == expected
 
     @pytest.mark.parametrize(
         'root, expected',
