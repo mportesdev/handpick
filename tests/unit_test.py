@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from handpick import pick, predicate, ALL, NO_CONTAINERS, NO_LIST_DICT
+from handpick import pick, flat, predicate, ALL, NO_CONTAINERS, NO_LIST_DICT
 
 TEST_DATA_PATH = Path(__file__).parent / 'data'
 
@@ -620,6 +620,33 @@ class TestBuiltinPredicates:
             assert is_int(n)
 
 
+class TestFlat:
+
+    @pytest.mark.parametrize(
+        'data, expected',
+        (
+            pytest.param(FLAT, [62, 0.0, True, 'food', '', None, 'foo'],
+                         id='flat'),
+            pytest.param(NESTED_LIST, [1, 2, 100.0, 3, 'Py', 4, 5],
+                         id='nested list'),
+            pytest.param(DICT_LIST, [2, '3', 5],
+                         id='dict list'),
+            pytest.param(LIST_TUPLE, [None, 1, 2, 3, 3, 0, 'foo', 'bar'],
+                         id='list tuple'),
+            pytest.param(NESTED_DICT, [1, 2, 3],
+                         id='nested dict'),
+            pytest.param(LIST_5_LEVELS, [bytearray(b'2'), '4', 3.5, b'1', '0',
+                                         '2', b'3', '1', 2],
+                         id='list 5 levels'),
+            pytest.param(DICT_5_LEVELS, ['0_value1', '2_value1', '4_value',
+                                         '4_value2', '1_value2'],
+                         id='dict 5 levels'),
+        )
+    )
+    def test_flat(self, data, expected):
+        assert list(flat(data)) == expected
+
+
 class TestReadmeExamples:
     """Test examples from README."""
 
@@ -635,6 +662,8 @@ class TestReadmeExamples:
         [[8], 0, {13, ''}],
         97
     ]
+
+    LIST_OF_INT = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
 
     @pytest.mark.parametrize(
         'predicate, expected',
@@ -705,3 +734,7 @@ class TestReadmeExamples:
         data = pick(root, NO_CONTAINERS)
 
         assert list(data) == [2, '3', 5]
+
+    def test_example_6(self):
+        data = self.LIST_OF_INT
+        assert list(flat(data)) == [0, 1, 2, 3, 4, 5]

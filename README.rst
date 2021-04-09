@@ -133,6 +133,20 @@ Example 5: built-in predicates
     >>> list(data)
     [2, '3', 5]
 
+Example 6: the ``flat`` shortcut function
+-----------------------------------------
+
+.. code-block:: python
+
+    from handpick import flat
+
+    data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
+    flat_data = flat(data)
+
+.. code::
+
+    >>> list(flat_data)
+    [0, 1, 2, 3, 4, 5]
 
 API reference
 -------------
@@ -183,6 +197,14 @@ handpick.NO_LIST_DICT
     Predicate that returns False for instances of ``list`` and
     ``dict``.
 
+def flat(data):
+    Flatten ``data``.
+
+    Yield a sequence of objects from a (presumably nested) data
+    structure ``data``. Only non-iterable objects, strings and bytes-like
+    objects are yielded.
+
+    When traversing a mapping, only its values are considered.
 
 .. |pytest| image:: https://github.com/mportesdev/handpick/workflows/pytest/badge.svg
     :target: https://github.com/mportesdev/handpick/actions
