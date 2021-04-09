@@ -124,17 +124,19 @@ Example 5: built-in predicates
 
     from handpick import pick, NO_CONTAINERS
 
-    root = {1: [{}, (2, '3')], 4: [{}, [5, ()]]}
-
-    data = pick(root, NO_CONTAINERS)
+    data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
+    flat_data = pick(data, NO_CONTAINERS)
 
 .. code::
 
-    >>> list(data)
-    [2, '3', 5]
+    >>> list(flat_data)
+    [0, 1, 2, 3, 4, 5]
 
 Example 6: the ``flat`` shortcut function
 -----------------------------------------
+
+To flatten a nested data structure as in the previous example,
+the ``flat`` shortcut function can be used.
 
 .. code-block:: python
 
@@ -197,7 +199,7 @@ handpick.NO_LIST_DICT
     Predicate that returns False for instances of ``list`` and
     ``dict``.
 
-def flat(data):
+handpick.flat(data)
     Flatten ``data``.
 
     Yield a sequence of objects from a (presumably nested) data
