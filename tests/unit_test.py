@@ -650,6 +650,8 @@ class TestReadmeExamples:
         97
     ]
 
+    LIST_OF_INT = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
+
     @pytest.mark.parametrize(
         'predicate, expected',
         (
@@ -719,3 +721,7 @@ class TestReadmeExamples:
         data = pick(root, NO_CONTAINERS)
 
         assert list(data) == [2, '3', 5]
+
+    def test_example_6(self):
+        data = self.LIST_OF_INT
+        assert list(flat(data)) == [0, 1, 2, 3, 4, 5]
