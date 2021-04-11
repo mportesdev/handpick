@@ -136,12 +136,20 @@ def _no_list_dict(obj):
     return not isinstance(obj, (list, dict))
 
 
-def is_type():
-    ...
+def is_type(type_or_types):
+    @predicate
+    def _pred(obj):
+        return isinstance(obj, type_or_types)
+
+    return _pred
 
 
-def not_type():
-    ...
+def not_type(type_or_types):
+    @predicate
+    def _pred(obj):
+        return not isinstance(obj, type_or_types)
+
+    return _pred
 
 
 ALL = _all
