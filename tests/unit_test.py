@@ -541,7 +541,7 @@ class TestPredicates:
             return obj % 2 == 0
 
         falsey = ~predicate(bool)
-        odd_or_zero_int = predicate(is_int) & (~is_even | falsey)
+        odd_or_zero_int = is_type(int) & (~is_even | falsey)
 
         root = [[4, [5.0, 11], 3], [[12, [0]], {17: 6}], 9, [[8], 0, {13, '1'}]]
         result = list(pick(root, odd_or_zero_int))
@@ -551,16 +551,12 @@ class TestPredicates:
         """Test a compound predicate combining predicates and functions."""
 
         @predicate
-        def is_str(obj):
-            return isinstance(obj, str)
-
-        @predicate
         def is_set(obj):
             return isinstance(obj, set)
 
         pred = (
             NO_LIST_DICT
-            & ((bool & is_str) | (~is_set & (lambda obj: len(obj) > 1)))
+            & ((bool & is_type(str)) | (~is_set & (lambda obj: len(obj) > 1)))
         )
 
         root = (['', 0, ['a']], {0: '', 1: (0, 'b')}, [{1, 2}, b'c'],
@@ -772,7 +768,7 @@ class TestReadmeExamples:
 
         assert list(odd_integers) == [1, 15, 7, 9, 13, 97]
 
-    def test_example_4_2(self):
+    def test_example_5(self):
         @predicate
         def is_list(obj):
             return isinstance(obj, list)
@@ -785,12 +781,19 @@ class TestReadmeExamples:
 
         assert list(short_lists) == [[2], [4], [['6']], ['6']]
 
-    def test_example_5(self):
-        root = DICT_LIST
-        data = pick(root, NO_CONTAINERS)
-
-        assert list(data) == [2, '3', 5]
-
     def test_example_6(self):
         data = self.LIST_OF_INT
-        assert list(flat(data)) == [0, 1, 2, 3, 4, 5]
+        flat_data = pick(data, NO_CONTAINERS)
+
+        assert list(flat_data) == [0, 1, 2, 3, 4, 5]
+
+    def test_example_7(self):
+        data = self.LIST_OF_INT
+        flat_data = flat(data)
+        assert list(flat_data) == [0, 1, 2, 3, 4, 5]
+
+    def test_example_8(self):
+        root = [[1.0, [2, True], False], [False, [3]], [[4.5], '6', {7, True}]]
+        integers_only = pick(root, is_type(int) & not_type(bool))
+
+        assert list(integers_only) == [2, 3, 7]
