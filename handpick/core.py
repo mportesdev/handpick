@@ -137,6 +137,11 @@ def _no_list_dict(obj):
 
 
 def is_type(type_or_types):
+    """Predicate factory. Return a predicate that returns True if
+    object is an instance of specified type(s).
+
+    `type_or_types` must be a type or tuple of types.
+    """
     @predicate
     def _pred(obj):
         return isinstance(obj, type_or_types)
@@ -145,6 +150,11 @@ def is_type(type_or_types):
 
 
 def not_type(type_or_types):
+    """Predicate factory. Return a predicate that returns True if
+    object is not an instance of specified type(s).
+
+    `type_or_types` must be a type or tuple of types.
+    """
     @predicate
     def _pred(obj):
         return not isinstance(obj, type_or_types)

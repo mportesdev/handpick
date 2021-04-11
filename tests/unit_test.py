@@ -628,7 +628,8 @@ class TestBuiltinPredicates:
             pytest.param(NESTED_DICT, tuple, [(), (), ({}, [], ()), ()],
                          id='nested dict - tuple'),
             pytest.param(NESTED_DICT, (list, int),
-                         [[], [1, [2, [3, {}]]], [2, [3, {}]], [3, {}], [], []],
+                         [[], [1, [2, [3, {}]]], 1, [2, [3, {}]], 2, [3, {}], 3,
+                          [], []],
                          id='nested dict - list, int'),
         )
     )
@@ -644,8 +645,8 @@ class TestBuiltinPredicates:
                          [62, 0.0, True, 'food', '', None, 'foo'],
                          id='flat - list, dict'),
             pytest.param(LIST_TUPLE, list,
-                         [None, ((1, 2, 3), 3), (1, 2, 3), 3, 0, ('foo', 'bar'),
-                          'foo', 'bar'],
+                         [None, ((1, 2, 3), 3), (1, 2, 3), 1, 2, 3, 3, 0,
+                          ('foo', 'bar'), 'foo', 'bar'],
                          id='list tuple - list'),
             pytest.param(LIST_TUPLE, (str, tuple, list),
                          [None, 1, 2, 3, 3, 0],
@@ -657,6 +658,14 @@ class TestBuiltinPredicates:
     )
     def test_not_type_predicate(self, root, type_or_types, expected):
         assert list(pick(root, not_type(type_or_types))) == expected
+
+    def test_combined_builtin_predicates(self):
+        no_dict_or_array = NO_LIST_DICT & not_type(tuple)
+        no_str_or_binary = ~is_type((str, bytes, bytearray))
+
+        root = LIST_5_LEVELS
+        result = list(pick(root, no_dict_or_array & no_str_or_binary))
+        assert result == [3.5, 2]
 
 
 class TestFlat:
