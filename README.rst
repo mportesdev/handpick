@@ -4,8 +4,11 @@ Handpick is a tool to traverse nested data structures recursively and
 find all objects that meet certain criteria.
 
 
-Example 1: simple predicate functions
--------------------------------------
+The ``pick`` generator
+----------------------
+
+Simple predicate functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -24,8 +27,8 @@ Example 1: simple predicate functions
     ['Py', [{}, 4]]
 
 
-Example 2: non-callable predicate
----------------------------------
+Non-callable predicate
+~~~~~~~~~~~~~~~~~~~~~~
 
 This can be used e.g. to count occurrences of a value regardless of
 the nested depth.
@@ -44,8 +47,8 @@ the nested depth.
     7
 
 
-Example 3: handling dictionary keys
------------------------------------
+Handling dictionary keys
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can configure whether or not dictionary keys will be yielded by ``pick``.
 
@@ -66,8 +69,8 @@ You can configure whether or not dictionary keys will be yielded by ``pick``.
     ['_key', '_str', '_Py', '_n']
 
 
-Example 4: the ``predicate`` decorator and combining predicates
----------------------------------------------------------------
+The ``predicate`` decorator and combining predicates
+----------------------------------------------------
 
 The ``predicate`` decorator returns objects that can be combined with other
 predicates using the operators ``&`` (and) and ``|`` (or), as well as negated
@@ -117,8 +120,8 @@ and regular functions.
     [[2], [4], [['6']], ['6']]
 
 
-Example 5: built-in predicates
-------------------------------
+Built-in predicates
+-------------------
 
 .. code-block:: python
 
@@ -132,8 +135,9 @@ Example 5: built-in predicates
     >>> list(flat_data)
     [0, 1, 2, 3, 4, 5]
 
-Example 6: the ``flat`` shortcut function
------------------------------------------
+
+The ``flat`` shortcut function
+------------------------------
 
 To flatten a nested data structure as in the previous example,
 the ``flat`` shortcut function can be used.
@@ -149,6 +153,26 @@ the ``flat`` shortcut function can be used.
 
     >>> list(flat_data)
     [0, 1, 2, 3, 4, 5]
+
+
+Predicate factories
+-------------------
+
+The ``is_type`` and ``not_type`` functions can be used to create predicates
+based on an object's type.
+
+.. code-block:: python
+
+    from handpick import pick, is_type, not_type
+
+    root = [[1.0, [2, True], False], [False, [3]], [[4.5], '6', {7, True}]]
+    integers_only = pick(root, is_type(int) & not_type(bool))
+
+.. code::
+
+    >>> list(integers_only)
+    [2, 3, 7]
+
 
 API reference
 -------------
@@ -198,6 +222,18 @@ handpick.NO_CONTAINERS
 handpick.NO_LIST_DICT
     Predicate that returns False for instances of ``list`` and
     ``dict``.
+
+handpick.is_type(type_or_types)
+    Predicate factory. Return a predicate that returns True if
+    object is an instance of specified type(s).
+
+    ``type_or_types`` must be a type or tuple of types.
+
+handpick.not_type(type_or_types)
+    Predicate factory. Return a predicate that returns True if
+    object is not an instance of specified type(s).
+
+    ``type_or_types`` must be a type or tuple of types.
 
 handpick.flat(data)
     Flatten ``data``.
