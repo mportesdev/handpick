@@ -1,4 +1,4 @@
-|pytest| |release| |license| |pyversions| |format| |downloads|
+|pytest| |codecov| |release| |license| |pyversions| |format| |downloads|
 
 Handpick is a tool to traverse nested data structures recursively and
 find all objects that meet certain criteria.
@@ -246,6 +246,8 @@ handpick.flat(data)
 
 .. |pytest| image:: https://github.com/mportesdev/handpick/workflows/pytest/badge.svg
     :target: https://github.com/mportesdev/handpick/actions
+.. |codecov| image:: https://codecov.io/gh/mportesdev/handpick/branch/main/graph/badge.svg
+    :target: https://codecov.io/gh/mportesdev/handpick
 .. |release| image:: https://img.shields.io/github/v/release/mportesdev/handpick
     :target: https://github.com/mportesdev/handpick/releases/latest
 .. |license| image:: https://img.shields.io/github/license/mportesdev/handpick
