@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "handpick"
-version = "0.6.1"
+version = "0.7.0"
 description = "Inspect nested data structures."
 license = "MIT"
 authors = ["Michal Porteš <michalportes1@gmail.com>"]
