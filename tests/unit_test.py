@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from handpick import pick, flat, predicate, ALL, NO_CONTAINERS, NO_LIST_DICT
+from handpick.core import is_type, not_type
 
 TEST_DATA_PATH = Path(__file__).parent / 'data'
 
@@ -618,6 +619,44 @@ class TestBuiltinPredicates:
         root = from_json('list_of_int.json')
         for n in pick(root, NO_LIST_DICT):
             assert is_int(n)
+
+    @pytest.mark.parametrize(
+        'root, type_or_types, expected',
+        (
+            pytest.param(FLAT, str, ['food', '', 'foo'], id='flat - str'),
+            pytest.param(FLAT, (list, dict), [[], {}], id='flat - list, dict'),
+            pytest.param(NESTED_DICT, tuple, [(), (), ({}, [], ()), ()],
+                         id='nested dict - tuple'),
+            pytest.param(NESTED_DICT, (list, int),
+                         [[], [1, [2, [3, {}]]], [2, [3, {}]], [3, {}], [], []],
+                         id='nested dict - list, int'),
+        )
+    )
+    def test_is_type_predicate(self, root, type_or_types, expected):
+        assert list(pick(root, is_type(type_or_types))) == expected
+
+    @pytest.mark.parametrize(
+        'root, type_or_types, expected',
+        (
+            pytest.param(FLAT, str, [62, 0.0, True, None, [], {}],
+                         id='flat - str'),
+            pytest.param(FLAT, (list, dict),
+                         [62, 0.0, True, 'food', '', None, 'foo'],
+                         id='flat - list, dict'),
+            pytest.param(LIST_TUPLE, list,
+                         [None, ((1, 2, 3), 3), (1, 2, 3), 3, 0, ('foo', 'bar'),
+                          'foo', 'bar'],
+                         id='list tuple - list'),
+            pytest.param(LIST_TUPLE, (str, tuple, list),
+                         [None, 1, 2, 3, 3, 0],
+                         id='list tuple - str, tuple'),
+            pytest.param(NESTED_DICT, (dict, list),
+                         [(), 1, 2, 3, (), ({}, [], ()), ()],
+                         id='nested dict - dict, list'),
+        )
+    )
+    def test_not_type_predicate(self, root, type_or_types, expected):
+        assert list(pick(root, not_type(type_or_types))) == expected
 
 
 class TestFlat:

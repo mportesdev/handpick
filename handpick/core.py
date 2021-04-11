@@ -136,6 +136,14 @@ def _no_list_dict(obj):
     return not isinstance(obj, (list, dict))
 
 
+def is_type():
+    ...
+
+
+def not_type():
+    ...
+
+
 ALL = _all
 NO_CONTAINERS = _no_containers
 NO_LIST_DICT = _no_list_dict
