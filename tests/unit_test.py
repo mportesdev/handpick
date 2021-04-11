@@ -6,8 +6,16 @@ from pathlib import Path
 
 import pytest
 
-from handpick import pick, flat, predicate, ALL, NO_CONTAINERS, NO_LIST_DICT
-from handpick.core import is_type, not_type
+from handpick import (
+    pick,
+    predicate,
+    ALL,
+    NO_CONTAINERS,
+    NO_LIST_DICT,
+    is_type,
+    not_type,
+    flat
+)
 
 TEST_DATA_PATH = Path(__file__).parent / 'data'
 

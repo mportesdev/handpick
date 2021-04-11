@@ -136,6 +136,13 @@ def _no_list_dict(obj):
     return not isinstance(obj, (list, dict))
 
 
+ALL = _all
+NO_CONTAINERS = _no_containers
+NO_LIST_DICT = _no_list_dict
+
+
+# predicate factories
+
 def is_type(type_or_types):
     """Predicate factory. Return a predicate that returns True if
     object is an instance of specified type(s).
@@ -162,10 +169,7 @@ def not_type(type_or_types):
     return _pred
 
 
-ALL = _all
-NO_CONTAINERS = _no_containers
-NO_LIST_DICT = _no_list_dict
-
+# shortcut functions
 
 def flat(data):
     """Flatten `data`.
