@@ -476,6 +476,16 @@ class TestPredicates:
         for value, result in zip(values, expected):
             assert compound_predicate(value) is result
 
+    def test_predicate_and_non_callable_raises_error(self):
+        """Test predicate & non-callable."""
+
+        @predicate
+        def is_dunder_name(string):
+            return string.startswith('__') and string.endswith('__')
+
+        with pytest.raises(TypeError):
+            is_dunder_name & True
+
     def test_predicate_or_predicate(self):
         """Test the overloaded `|` operation between two predicates."""
 
@@ -517,6 +527,16 @@ class TestPredicates:
 
         result = list(pick(root, tuple_or_contains_3))
         assert result == [['1', 3], (2,), range(4), {3: 'long'}]
+
+    def test_predicate_or_non_callable_raises_error(self):
+        """Test predicate | non-callable."""
+
+        @predicate
+        def is_dunder_name(string):
+            return string.startswith('__') and string.endswith('__')
+
+        with pytest.raises(TypeError):
+            is_dunder_name | True
 
     def test_not_predicate(self):
         """Test the overloaded `~` operation with a predicate."""
