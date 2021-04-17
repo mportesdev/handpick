@@ -616,8 +616,12 @@ class TestBuiltinPredicates:
     def test_no_containers_predicate(self, root, expected):
         assert list(pick(root, NO_CONTAINERS)) == expected
 
-    def test_no_containers_predicate_with_generated_data(self):
-        root = from_json('list_of_int.json')
+    @pytest.mark.parametrize(
+        'json_file',
+        ('list_of_int.json', 'dict_of_int.json')
+    )
+    def test_no_containers_predicate_with_generated_data(self, json_file):
+        root = from_json(json_file)
         for n in pick(root, NO_CONTAINERS):
             assert is_int(n)
 
@@ -639,8 +643,12 @@ class TestBuiltinPredicates:
     def test_no_list_dict_predicate(self, root, expected):
         assert list(pick(root, NO_LIST_DICT)) == expected
 
-    def test_no_list_dict_predicate_with_generated_data(self):
-        root = from_json('list_of_int.json')
+    @pytest.mark.parametrize(
+        'json_file',
+        ('list_of_int.json', 'dict_of_int.json')
+    )
+    def test_no_list_dict_predicate_with_generated_data(self, json_file):
+        root = from_json(json_file)
         for n in pick(root, NO_LIST_DICT):
             assert is_int(n)
 
