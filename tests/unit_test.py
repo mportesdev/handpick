@@ -874,3 +874,10 @@ class TestReadmeExamples:
         integers_only = pick(root, is_type(int) & not_type(bool))
 
         assert list(integers_only) == [2, 3, 7]
+
+    def test_example_9(self):
+        nested_list = [0, [1, [2]]]
+        nested_dict = {0: {1: {2: {3: [4]}}}}
+
+        assert max_depth(nested_list) == 2
+        assert max_depth(nested_dict) == 4

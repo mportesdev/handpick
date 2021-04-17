@@ -174,6 +174,23 @@ based on an object's type.
     [2, 3, 7]
 
 
+The ``max_depth`` function
+--------------------------
+
+.. code-block:: python
+
+    from handpick import max_depth
+
+    nested_list = [0, [1, [2]]]
+    nested_dict = {0: {1: {2: {3: [4]}}}}
+
+.. code::
+
+    >>> max_depth(nested_list)
+    2
+    >>> max_depth(nested_dict)
+    4
+
 API reference
 -------------
 
