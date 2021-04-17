@@ -14,9 +14,10 @@ from handpick import (
     NO_LIST_DICT,
     is_type,
     not_type,
-    flat
+    flat,
+    max_depth,
 )
-from handpick.core import max_depth, _iter_depth
+from handpick.core import _iter_depth
 
 TEST_DATA_PATH = Path(__file__).parent / 'data'
 

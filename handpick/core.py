@@ -110,24 +110,6 @@ class _Predicate:
         return self.__class__(_not)
 
 
-def max_depth(root):
-    return max(_iter_depth(root))
-
-
-def _iter_depth(root, depth=0):
-    if not isinstance(root, Iterable) \
-            or isinstance(root, (str, bytes, bytearray)):
-        return
-
-    yield depth
-
-    root_is_mapping = isinstance(root, Mapping)
-    for obj in root:
-        if root_is_mapping:
-            # switch from key to value and proceed
-            obj = root[obj]
-        yield from _iter_depth(obj, depth=depth + 1)
-
 # built-in predicates
 
 @predicate
@@ -187,7 +169,7 @@ def not_type(type_or_types):
     return _pred
 
 
-# shortcut functions
+# useful functions
 
 def flat(data):
     """Flatten `data`.
@@ -199,3 +181,22 @@ def flat(data):
     When traversing a mapping, only its values are considered.
     """
     yield from pick(data, NO_CONTAINERS)
+
+
+def max_depth(root):
+    return max(_iter_depth(root))
+
+
+def _iter_depth(root, depth=0):
+    if not isinstance(root, Iterable) \
+            or isinstance(root, (str, bytes, bytearray)):
+        return
+
+    yield depth
+
+    root_is_mapping = isinstance(root, Mapping)
+    for obj in root:
+        if root_is_mapping:
+            # switch from key to value and proceed
+            obj = root[obj]
+        yield from _iter_depth(obj, depth=depth + 1)
