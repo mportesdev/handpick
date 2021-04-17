@@ -192,10 +192,9 @@ def _iter_depth(root, depth=0):
             or isinstance(root, (str, bytes, bytearray)):
         return
 
-    yield depth
-
     root_is_mapping = isinstance(root, Mapping)
     for obj in root:
+        yield depth
         if root_is_mapping:
             # switch from key to value and proceed
             obj = root[obj]

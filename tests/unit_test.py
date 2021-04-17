@@ -587,53 +587,6 @@ class TestPredicates:
         assert result == ['a', (0, 'b'), 'b', '\\']
 
 
-class TestMaxDepthIterDepth:
-
-    @pytest.mark.parametrize(
-        'root, expected',
-        (
-            pytest.param(FLAT, 1, id='flat'),
-            pytest.param(NESTED_LIST, 3, id='nested_list'),
-            pytest.param(DICT_LIST, 3, id='dict_list'),
-            pytest.param(LIST_TUPLE, 3, id='list_tuple'),
-            pytest.param(NESTED_DICT, 5, id='nested_dict'),
-            pytest.param(LIST_5_LEVELS, 4, id='list_5_levels'),
-            pytest.param(DICT_5_LEVELS, 4, id='dict_5_levels'),
-        )
-    )
-    def test_max_depth(self, root, expected):
-        assert max_depth(root) == expected
-
-    @pytest.mark.parametrize(
-        'json_file, expected',
-        (
-            pytest.param('list_of_int.json', 12),
-            pytest.param('dict_of_int.json', 5),
-        )
-    )
-    def test_max_depth_with_generated_data(self, json_file, expected):
-        root = from_json(json_file)
-        assert max_depth(root) == expected
-
-    @pytest.mark.parametrize(
-        'root, expected',
-        (
-            pytest.param(FLAT, [0, 1, 1], id='flat'),
-            pytest.param(NESTED_LIST, [0, 1, 1, 2, 3], id='nested_list'),
-            pytest.param(DICT_LIST, [0, 1, 2, 2, 1, 2, 2, 3], id='dict_list'),
-            pytest.param(LIST_TUPLE, [0, 1, 2, 3, 1], id='list_tuple'),
-            pytest.param(NESTED_DICT,
-                         [0, 1, 2, 3, 3, 2, 3, 4, 5, 1, 2, 3, 3, 2, 3, 3, 3],
-                         id='nested_dict'),
-            pytest.param(LIST_5_LEVELS, [0, 1, 2, 3, 4, 1, 2, 3, 2],
-                         id='list_5_levels'),
-            pytest.param(DICT_5_LEVELS, [0, 1, 2, 3, 4, 4], id='dict_5_levels'),
-        )
-    )
-    def test_iter_depth(self, root, expected):
-        assert list(_iter_depth(root)) == expected
-
-
 class TestBuiltinPredicates:
 
     @pytest.mark.parametrize(
@@ -774,6 +727,58 @@ class TestFlat:
     )
     def test_flat(self, data, expected):
         assert list(flat(data)) == expected
+
+
+class TestMaxDepthIterDepth:
+
+    @pytest.mark.parametrize(
+        'root, expected',
+        (
+            pytest.param(FLAT, 0, id='flat'),
+            pytest.param(NESTED_LIST, 2, id='nested_list'),
+            pytest.param(DICT_LIST, 2, id='dict_list'),
+            pytest.param(LIST_TUPLE, 3, id='list_tuple'),
+            pytest.param(NESTED_DICT, 4, id='nested_dict'),
+            pytest.param(LIST_5_LEVELS, 4, id='list_5_levels'),
+            pytest.param(DICT_5_LEVELS, 4, id='dict_5_levels'),
+        )
+    )
+    def test_max_depth(self, root, expected):
+        assert max_depth(root) == expected
+
+    @pytest.mark.parametrize(
+        'json_file, expected',
+        (
+            pytest.param('list_of_int.json', 11),
+            pytest.param('dict_of_int.json', 5),
+        )
+    )
+    def test_max_depth_with_generated_data(self, json_file, expected):
+        root = from_json(json_file)
+        assert max_depth(root) == expected
+
+    @pytest.mark.parametrize(
+        'root, expected',
+        (
+            pytest.param(FLAT, [0]*9, id='flat'),
+            pytest.param(NESTED_LIST, [0, 1, 1, 1, 0, 1, 1, 1, 2, 2, 1],
+                         id='nested_list'),
+            pytest.param(DICT_LIST, [0, 1, 1, 2, 2, 0, 1, 1, 2, 2],
+                         id='dict_list'),
+            pytest.param(LIST_TUPLE, [0, 1, 1, 2, 3, 3, 3, 2, 1, 0, 1, 1],
+                         id='list_tuple'),
+            pytest.param(NESTED_DICT,
+                         [0, 1, 2, 2, 1, 2, 2, 3, 3, 4, 4, 0, 1, 2, 2, 1, 2, 2, 2],
+                         id='nested_dict'),
+            pytest.param(LIST_5_LEVELS,
+                         [0, 1, 2, 2, 3, 4, 3, 1, 0, 0, 1, 2, 2, 3, 1, 1, 2],
+                         id='list_5_levels'),
+            pytest.param(DICT_5_LEVELS, [0, 0, 1, 2, 2, 3, 4, 3, 4, 1],
+                         id='dict_5_levels'),
+        )
+    )
+    def test_iter_depth(self, root, expected):
+        assert list(_iter_depth(root)) == expected
 
 
 class TestReadmeExamples:
