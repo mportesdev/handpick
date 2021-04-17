@@ -587,7 +587,7 @@ class TestPredicates:
         assert result == ['a', (0, 'b'), 'b', '\\']
 
 
-class TestMaxDepth:
+class TestMaxDepthIterDepth:
 
     @pytest.mark.parametrize(
         'root, expected',
@@ -614,9 +614,6 @@ class TestMaxDepth:
     def test_max_depth_with_generated_data(self, json_file, expected):
         root = from_json(json_file)
         assert max_depth(root) == expected
-
-
-class TestIterDepth:
 
     @pytest.mark.parametrize(
         'root, expected',
