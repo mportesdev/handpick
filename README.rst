@@ -261,6 +261,14 @@ handpick.flat(data)
 
     When traversing a mapping, only its values are considered.
 
+handpick.max_depth(root)
+    Return maximum nested depth of ``root``.
+
+    ``root`` should be an iterable container. Direct elements of ``root``
+    are considered to be in depth 0. Empty containers do not constitute
+    another level of nested depth.
+
+
 .. |pytest| image:: https://github.com/mportesdev/handpick/workflows/pytest/badge.svg
     :target: https://github.com/mportesdev/handpick/actions
 .. |coverage| image:: https://img.shields.io/codecov/c/gh/mportesdev/handpick

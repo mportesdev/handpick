@@ -184,6 +184,12 @@ def flat(data):
 
 
 def max_depth(root):
+    """Return maximum nested depth of `root`.
+
+    `root` should be an iterable container. Direct elements of `root`
+    are considered to be in depth 0. Empty containers do not constitute
+    another level of nested depth.
+    """
     return max(_iter_depth(root))
 
 
