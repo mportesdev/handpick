@@ -190,7 +190,7 @@ def max_depth(root):
     are considered to be in depth 0. Empty containers do not constitute
     another level of nested depth.
     """
-    return max(_iter_depth(root))
+    return max(_iter_depth(root), default=0)
 
 
 def _iter_depth(root, depth=0):

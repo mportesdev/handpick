@@ -741,6 +741,9 @@ class TestMaxDepthIterDepth:
             pytest.param(NESTED_DICT, 4, id='nested_dict'),
             pytest.param(LIST_5_LEVELS, 4, id='list_5_levels'),
             pytest.param(DICT_5_LEVELS, 4, id='dict_5_levels'),
+            pytest.param([], 0, id='[]'),
+            pytest.param([[]], 0, id='[[]]'),
+            pytest.param([[[]]], 1, id='[[[]]]'),
         )
     )
     def test_max_depth(self, root, expected):
@@ -775,6 +778,9 @@ class TestMaxDepthIterDepth:
                          id='list_5_levels'),
             pytest.param(DICT_5_LEVELS, [0, 0, 1, 2, 2, 3, 4, 3, 4, 1],
                          id='dict_5_levels'),
+            pytest.param([], [], id='[]'),
+            pytest.param([[]], [0], id='[[]]'),
+            pytest.param([[[]]], [0, 1], id='[[]]'),
         )
     )
     def test_iter_depth(self, root, expected):
