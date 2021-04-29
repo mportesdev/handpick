@@ -1,80 +1,101 @@
 |pytest| |coverage| |release| |license| |pyversions| |format| |downloads|
 
-Handpick is a tool to traverse nested data structures recursively and
-find all objects that meet certain criteria.
+========
+Handpick
+========
+
+Handpick is a tool to traverse nested data structures and pick all
+objects that meet certain criteria.
 
 
-The ``pick`` generator
-----------------------
+The ``pick`` function
+=====================
+
+The ``pick`` generator function is the core of the package. It performs
+the recursive traversal of a (presumably nested) data structure and
+applies the picking criteria provided in the form of a predicate
+function (see below for various examples).
+
 
 Simple predicate functions
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
+
+In simple cases, lambda functions can be used as predicates.
 
 .. code-block:: python
 
     from handpick import pick
 
-    root = [[1, 2, 100.0], [3, 'Py', [{}, 4], 5]]
+    data = [[1, 'Py'], [2, ['', 3.0]], 4]
 
-    print(list(pick(root, lambda n: n > 3)))
-    print(list(pick(root, lambda n: n > 3 and isinstance(n, int))))
-    print(list(pick(root, lambda seq: len(seq) == 2)))
+    two_or_more = pick(data, lambda n: n >= 2)
+    non_empty_strings = pick(data, lambda s: isinstance(s, str) and s)
 
 .. code::
 
-    [100.0, 4, 5]
-    [4, 5]
-    ['Py', [{}, 4]]
+    >>> list(two_or_more)
+    [2, 3.0, 4]
+    >>> list(non_empty_strings)
+    ['Py']
 
 
-Non-callable predicate
-~~~~~~~~~~~~~~~~~~~~~~
+Non-callable predicates
+-----------------------
 
-This can be used e.g. to count occurrences of a value regardless of
-the nested depth.
+If ``predicate`` is not callable, equality will be used as the picking
+criteria.
 
 .. code-block:: python
 
     from handpick import pick
 
-    root = [1, [1., [2, 1]], [{'id': 1, 'data': [0, 1.0]}, 1, [{}, [1]], 0]]
+    data = [1, [1.0, [2, 1.]], [{'1': 1}, [3]]]
 
-    ones = pick(root, 1)
+    ones = pick(data, 1)    # equivalent to pick(data, lambda n: n == 1)
 
 .. code::
 
-    >>> len(list(ones))
-    7
+    >>> list(ones)
+    [1, 1.0, 1.0, 1]
 
 
 Handling dictionary keys
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
-You can configure whether or not dictionary keys will be yielded by ``pick``.
+You can configure whether or not ``pick`` will inspect dictionary keys
+by specifying the ``dict_keys`` keyword argument. Default is False.
 
 .. code-block:: python
 
     from handpick import pick
 
-    root = {'key': {'str': 'Py', 'n': 1}, '_key': {'_str': '_Py', '_n': 2}}
+    data = {'key': {'name': 'foo'}, '_key': {'_name': '_bar'}}
 
-    data = pick(root, lambda s: s.startswith('_'))
-    data_with_keys = pick(root, lambda s: s.startswith('_'), dict_keys=True)
+    default = pick(data, lambda s: s.startswith('_'))
+    keys_included = pick(data, lambda s: s.startswith('_'), dict_keys=True)
 
 .. code::
 
-    >>> list(data)
-    ['_Py']
-    >>> list(data_with_keys)
-    ['_key', '_str', '_Py', '_n']
+    >>> list(default)
+    ['_bar']
+    >>> list(keys_included)
+    ['_key', '_name', '_bar']
 
 
-The ``predicate`` decorator and combining predicates
-----------------------------------------------------
+Predicates
+==========
+
+
+The ``predicate`` decorator
+---------------------------
 
 The ``predicate`` decorator returns objects that can be combined with other
 predicates using the operators ``&`` (and) and ``|`` (or), as well as negated
 using the operator ``~`` (not).
+
+
+Combining predicates
+--------------------
 
 .. code-block:: python
 
@@ -88,15 +109,21 @@ using the operator ``~`` (not).
     def is_even(n):
         return n % 2 == 0
 
-    root = [[4, [5.0, 1], 3.0], [[15, []], {17: 7}], 9, [[8], 0, {13, ''}], 97]
+    data = [[4, [5.0, 1], 3.0], [[15, []], {17: [7, [8], 0]}]]
 
+    # compound predicate
     non_even_int = is_int & ~is_even
-    odd_integers = pick(root, non_even_int)
+
+    odd_integers = pick(data, non_even_int)
 
 .. code::
 
     >>> list(odd_integers)
-    [1, 15, 7, 9, 13, 97]
+    [1, 15, 7]
+
+
+Combining predicates with functions
+-----------------------------------
 
 Additionally, the ``&`` and ``|`` operations are supported between predicates
 and regular functions.
@@ -109,38 +136,73 @@ and regular functions.
     def is_list(obj):
         return isinstance(obj, list)
 
-    root = [('1', [2]), {('x',): [(3, [4]), '5']}, ['x', [['6']]], {7: ('x',)}]
+    data = [('1', [2]), {('x',): [(3, [4]), '5']}, ['x', ['6']], {7: ('x',)}]
 
+    # compound predicate
     short_list = (lambda obj: len(obj) < 2) & is_list
-    short_lists = pick(root, short_list)
+
+    short_lists = pick(data, short_list)
 
 .. code::
 
     >>> list(short_lists)
-    [[2], [4], [['6']], ['6']]
+    [[2], [4], ['6']]
 
 
 Built-in predicates
 -------------------
 
+Handpick provides some predefined predicates to be used in common
+scenarios. For example:
+
 .. code-block:: python
 
-    from handpick import pick, NO_CONTAINERS
+    from handpick import pick, ALL, NO_CONTAINERS
 
-    data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
-    flat_data = pick(data, NO_CONTAINERS)
+    data = [[], [0], [[1], 2]]
+
+    # pick all objects encountered during recursive traversal of data
+    everything = pick(data, ALL)
+
+    # pick only objects that are not containers of other objects
+    only_values = pick(data, NO_CONTAINERS)
 
 .. code::
 
-    >>> list(flat_data)
-    [0, 1, 2, 3, 4, 5]
+    >>> list(everything)
+    [[], [0], 0, [[1], 2], [1], 1, 2]
+    >>> list(only_values)
+    [0, 1, 2]
 
 
-The ``flat`` shortcut function
-------------------------------
+Predicate factories
+-------------------
 
-To flatten a nested data structure as in the previous example,
-the ``flat`` shortcut function can be used.
+The ``is_type`` and ``not_type`` functions can be used to create predicates
+based on an object's type.
+
+.. code-block:: python
+
+    from handpick import pick, is_type, not_type
+
+    data = [[1.0, [2, True]], [False, [3]], ['4', {5, True}]]
+
+    integers_only = pick(data, is_type(int) & not_type(bool))
+
+.. code::
+
+    >>> list(integers_only)
+    [2, 3, 5]
+
+
+Useful functions
+================
+
+
+The ``flat`` function
+---------------------
+
+This function can be used to flatten a nested data structure. For example:
 
 .. code-block:: python
 
@@ -154,28 +216,20 @@ the ``flat`` shortcut function can be used.
     >>> list(flat_data)
     [0, 1, 2, 3, 4, 5]
 
-
-Predicate factories
--------------------
-
-The ``is_type`` and ``not_type`` functions can be used to create predicates
-based on an object's type.
-
-.. code-block:: python
-
-    from handpick import pick, is_type, not_type
-
-    root = [[1.0, [2, True], False], [False, [3]], [[4.5], '6', {7, True}]]
-    integers_only = pick(root, is_type(int) & not_type(bool))
+When traversing a mapping, only its values are inspected. For example:
 
 .. code::
 
-    >>> list(integers_only)
-    [2, 3, 7]
+    >>> list(flat({1: 2, 3: {4: 5}}))
+    [2, 5]
+
+**Note:** ``flat(data)`` is a shortcut for ``pick(data, NO_CONTAINERS)``.
 
 
 The ``max_depth`` function
 --------------------------
+
+This function returns the maximum nested depth of a data structure.
 
 .. code-block:: python
 
@@ -191,8 +245,20 @@ The ``max_depth`` function
     >>> max_depth(nested_dict)
     4
 
+Please note that this function is implemented such that empty containers
+do not constitute another level of nested depth. For example:
+
+    >>> data = [0, [1, []]]
+    >>> max_depth(data)
+    1
+    >>> max_depth(data[1])
+    0
+    >>> max_depth(data[1][1])
+    0
+
+
 API reference
--------------
+=============
 
 handpick.pick(root, predicate, dict_keys=False, strings=False, bytes_like=False)
     Pick objects from ``root`` based on ``predicate``.

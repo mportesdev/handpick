@@ -790,57 +790,37 @@ class TestMaxDepthIterDepth:
 class TestReadmeExamples:
     """Test examples from README."""
 
-    DICT = {
-        'key': {'str': 'Py', 'n': 1},
-        '_key': {'_str': '_Py', '_n': 2}
-    }
+    def test_example_1(self):
+        """Example from 'Simple predicate functions'."""
 
-    LIST = [
-        [4, [5.0, 1], 3.0],
-        [[15, []], {17: 7}],
-        9,
-        [[8], 0, {13, ''}],
-        97
-    ]
+        data = [[1, 'Py'], [2, ['', 3.0]], 4]
+        two_or_more = pick(data, lambda n: n >= 2)
+        non_empty_strings = pick(data, lambda s: isinstance(s, str) and s)
 
-    LIST_OF_INT = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
-
-    @pytest.mark.parametrize(
-        'predicate, expected',
-        (
-            pytest.param(lambda n: n > 3, [100.0, 4, 5],
-                         id='> 3'),
-            pytest.param(lambda n: n > 3 and isinstance(n, int), [4, 5],
-                         id='int > 3'),
-            pytest.param(lambda seq: len(seq) == 2, ['Py', [{}, 4]],
-                         id='len 2'),
-        )
-    )
-    def test_example_1(self, predicate, expected):
-        root = NESTED_LIST
-        assert list(pick(root, predicate)) == expected
+        assert list(two_or_more) == [2, 3.0, 4]
+        assert list(non_empty_strings) == ['Py']
 
     def test_example_2(self):
-        root = [1, [1., [2, 1]], [{'id': 1, 'data': [0, 1.0]}, 1, [{}, [1]], 0]]
-        ones = pick(root, 1)
+        """Example from 'Non-callable predicates'."""
 
-        assert len(list(ones)) == 7
+        data = [1, [1.0, [2, 1.]], [{'1': 1}, [3]]]
+        ones = pick(data, 1)
 
-    @pytest.mark.parametrize(
-        'dict_keys, expected',
-        (
-            pytest.param(False, ['_Py'], id='no keys'),
-            pytest.param(True, ['_key', '_str', '_Py', '_n'],
-                         id='including keys'),
-        )
-    )
-    def test_example_3(self, dict_keys, expected):
-        root = self.DICT
-        data = pick(root, lambda s: s.startswith('_'), dict_keys)
+        assert list(ones) == [1, 1.0, 1.0, 1]
 
-        assert list(data) == expected
+    def test_example_3(self):
+        """Example from 'Handling dictionary keys'."""
+
+        data = {'key': {'name': 'foo'}, '_key': {'_name': '_bar'}}
+        default = pick(data, lambda s: s.startswith('_'))
+        keys_included = pick(data, lambda s: s.startswith('_'), dict_keys=True)
+
+        assert list(default) == ['_bar']
+        assert list(keys_included) == ['_key', '_name', '_bar']
 
     def test_example_4(self):
+        """Example from 'Combining predicates'."""
+
         @predicate
         def is_int(n):
             return isinstance(n, int)
@@ -849,46 +829,63 @@ class TestReadmeExamples:
         def is_even(n):
             return n % 2 == 0
 
-        root = self.LIST
-
+        data = [[4, [5.0, 1], 3.0], [[15, []], {17: [7, [8], 0]}]]
         non_even_int = is_int & ~is_even
-        odd_integers = pick(root, non_even_int)
+        odd_integers = pick(data, non_even_int)
 
-        assert list(odd_integers) == [1, 15, 7, 9, 13, 97]
+        assert list(odd_integers) == [1, 15, 7]
 
     def test_example_5(self):
+        """Example from 'Combining predicates with functions'."""
+
         @predicate
         def is_list(obj):
             return isinstance(obj, list)
 
-        root = [('1', [2]), {('x',): [(3, [4]), '5']}, ['x', [['6']]],
-                {7: ('x',)}]
-
+        data = [('1', [2]), {('x',): [(3, [4]), '5']}, ['x', ['6']], {7: ('x',)}]
         short_list = (lambda obj: len(obj) < 2) & is_list
-        short_lists = pick(root, short_list)
+        short_lists = pick(data, short_list)
 
-        assert list(short_lists) == [[2], [4], [['6']], ['6']]
+        assert list(short_lists) == [[2], [4], ['6']]
 
     def test_example_6(self):
-        data = self.LIST_OF_INT
-        flat_data = pick(data, NO_CONTAINERS)
+        """Example from 'Built-in predicates'."""
 
-        assert list(flat_data) == [0, 1, 2, 3, 4, 5]
+        data = [[], [0], [[1], 2]]
+        everything = pick(data, ALL)
+        only_values = pick(data, NO_CONTAINERS)
+
+        assert list(everything) == [[], [0], 0, [[1], 2], [1], 1, 2]
+        assert list(only_values) == [0, 1, 2]
 
     def test_example_7(self):
-        data = self.LIST_OF_INT
+        """Example from 'Predicate factories'."""
+
+        data = [[1.0, [2, True]], [False, [3]], ['4', {5, True}]]
+        integers_only = pick(data, is_type(int) & not_type(bool))
+
+        assert list(integers_only) == [2, 3, 5]
+
+    def test_example_8(self):
+        """Examples from 'The flat function'."""
+
+        data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
         flat_data = flat(data)
         assert list(flat_data) == [0, 1, 2, 3, 4, 5]
 
-    def test_example_8(self):
-        root = [[1.0, [2, True], False], [False, [3]], [[4.5], '6', {7, True}]]
-        integers_only = pick(root, is_type(int) & not_type(bool))
-
-        assert list(integers_only) == [2, 3, 7]
+        assert list(flat({1: 2, 3: {4: 5}})) == [2, 5]
 
     def test_example_9(self):
+        """Examples from 'The max_depth function'."""
+
         nested_list = [0, [1, [2]]]
         nested_dict = {0: {1: {2: {3: [4]}}}}
 
         assert max_depth(nested_list) == 2
         assert max_depth(nested_dict) == 4
+
+        data = [0, [1, []]]
+
+        assert max_depth(data) == 1
+        assert max_depth(data[1]) == 0
+        assert max_depth(data[1][1]) == 0
