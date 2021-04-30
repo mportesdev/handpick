@@ -11,16 +11,19 @@ objects that meet certain criteria.
 The ``pick`` function
 =====================
 
-The ``pick`` generator function is the core of the package. It performs
-the recursive traversal of a (presumably nested) data structure and
-applies the picking criteria provided in the form of a predicate
-function (see below for various examples).
+The ``pick`` generator function is the main component of the package.
+It performs the recursive traversal of a (presumably nested) data
+structure and applies the picking criteria provided in the form of a
+predicate function (see below for various examples). Picked objects are
+yielded lazily by a generator-iterator.
 
 
 Simple predicate functions
 --------------------------
 
-In simple cases, lambda functions can be used as predicates.
+The predicate function is passed to ``pick`` as the second positional
+argument. In simple cases, lambda functions can be used as predicates.
+For example:
 
 .. code-block:: python
 
@@ -43,7 +46,7 @@ Non-callable predicates
 -----------------------
 
 If ``predicate`` is not callable, equality will be used as the picking
-criteria.
+criteria. For example:
 
 .. code-block:: python
 
@@ -62,8 +65,10 @@ criteria.
 Handling dictionary keys
 ------------------------
 
-You can configure whether or not ``pick`` will inspect dictionary keys
-by specifying the ``dict_keys`` keyword argument. Default is False.
+When inspecting mappings (dictionaries), you can configure whether or
+not ``pick`` will inspect dictionary keys by specifying the
+``dict_keys`` keyword argument. Default is False, which means only
+values will be inspected. For example:
 
 .. code-block:: python
 
@@ -89,13 +94,15 @@ Predicates
 The ``predicate`` decorator
 ---------------------------
 
-The ``predicate`` decorator returns objects that can be combined with other
-predicates using the operators ``&`` (and) and ``|`` (or), as well as negated
-using the operator ``~`` (not).
+The ``predicate`` decorator wraps a function in a object that can be
+combined with other predicates using the operators ``&`` (and) and
+``|`` (or), as well as negated using the operator ``~`` (not).
 
 
 Combining predicates
 --------------------
+
+For example:
 
 .. code-block:: python
 
@@ -125,8 +132,8 @@ Combining predicates
 Combining predicates with functions
 -----------------------------------
 
-Additionally, the ``&`` and ``|`` operations are supported between predicates
-and regular functions.
+In addition, the ``&`` and ``|`` operations are supported between
+predicates and regular undecorated functions. For example:
 
 .. code-block:: python
 
@@ -159,7 +166,7 @@ scenarios. For example:
 
     from handpick import pick, ALL, NO_CONTAINERS
 
-    data = [[], [0], [[1], 2]]
+    data = [[], [0], [['1'], b'2']]
 
     # pick all objects encountered during recursive traversal of data
     everything = pick(data, ALL)
@@ -170,16 +177,18 @@ scenarios. For example:
 .. code::
 
     >>> list(everything)
-    [[], [0], 0, [[1], 2], [1], 1, 2]
+    [[], [0], 0, [['1'], b'2'], ['1'], '1', b'2']
     >>> list(only_values)
-    [0, 1, 2]
+    [0, '1', b'2']
 
+**Note:** Strings and bytes-like objects are not regarded as containers
+of other objects by the ``NO_CONTAINERS`` built-in predicate.
 
 Predicate factories
 -------------------
 
-The ``is_type`` and ``not_type`` functions can be used to create predicates
-based on an object's type.
+The ``is_type`` and ``not_type`` functions can be used to create
+predicates based on an object's type. For example:
 
 .. code-block:: python
 
@@ -216,7 +225,8 @@ This function can be used to flatten a nested data structure. For example:
     >>> list(flat_data)
     [0, 1, 2, 3, 4, 5]
 
-When traversing a mapping, only its values are inspected. For example:
+When flattening a mapping (dictionary), only its values are inspected.
+For example:
 
 .. code::
 
@@ -229,14 +239,15 @@ When traversing a mapping, only its values are inspected. For example:
 The ``max_depth`` function
 --------------------------
 
-This function returns the maximum nested depth of a data structure.
+This function returns the maximum nested depth of a data structure. For
+example:
 
 .. code-block:: python
 
     from handpick import max_depth
 
     nested_list = [0, [1, [2]]]
-    nested_dict = {0: {1: {2: {3: [4]}}}}
+    nested_dict = {0: {1: {2: {3: {4: 4}}}}}
 
 .. code::
 
@@ -245,16 +256,13 @@ This function returns the maximum nested depth of a data structure.
     >>> max_depth(nested_dict)
     4
 
-Please note that this function is implemented such that empty containers
-do not constitute another level of nested depth. For example:
+**Note:** Empty containers constitute a level of nested depth as well
+as non-empty ones. For example:
 
-    >>> data = [0, [1, []]]
-    >>> max_depth(data)
-    1
-    >>> max_depth(data[1])
-    0
-    >>> max_depth(data[1][1])
-    0
+.. code::
+
+    >>> max_depth([0, [1, []]])
+    2
 
 
 API reference

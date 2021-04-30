@@ -846,12 +846,12 @@ class TestReadmeExamples:
     def test_example_6(self):
         """Example from 'Built-in predicates'."""
 
-        data = [[], [0], [[1], 2]]
+        data = [[], [0], [['1'], b'2']]
         everything = pick(data, ALL)
         only_values = pick(data, NO_CONTAINERS)
 
-        assert list(everything) == [[], [0], 0, [[1], 2], [1], 1, 2]
-        assert list(only_values) == [0, 1, 2]
+        assert list(everything) == [[], [0], 0, [['1'], b'2'], ['1'], '1', b'2']
+        assert list(only_values) == [0, '1', b'2']
 
     def test_example_7(self):
         """Example from 'Predicate factories'."""
@@ -874,7 +874,7 @@ class TestReadmeExamples:
         """Examples from 'The max_depth function'."""
 
         nested_list = [0, [1, [2]]]
-        nested_dict = {0: {1: {2: {3: [4]}}}}
+        nested_dict = {0: {1: {2: {3: {4: 4}}}}}
 
         assert max_depth(nested_list) == 2
         assert max_depth(nested_dict) == 4
