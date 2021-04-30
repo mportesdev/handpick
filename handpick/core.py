@@ -3,13 +3,13 @@ from collections.abc import Mapping, Iterable
 _ERRORS = (TypeError, ValueError, IndexError, KeyError, AttributeError)
 
 
-def pick(root, predicate, dict_keys=False, strings=False, bytes_like=False):
-    """Pick objects from `root` based on `predicate`.
+def pick(data, predicate, dict_keys=False, strings=False, bytes_like=False):
+    """Pick objects from `data` based on `predicate`.
 
-    Traverse `root` recursively and yield all objects for which
+    Traverse `data` recursively and yield all objects for which
     `predicate(obj)` is true.
 
-    `root` should be an iterable container.
+    `data` should be an iterable container.
 
     `predicate` should be a callable taking one argument and returning
     a Boolean value. If `predicate` is not callable, equality will be
@@ -30,23 +30,23 @@ def pick(root, predicate, dict_keys=False, strings=False, bytes_like=False):
     by the recursive algorithm. This can be changed by setting
     `bytes_like` to True.
     """
-    if not isinstance(root, Iterable):
+    if not isinstance(data, Iterable):
         return
-    if isinstance(root, str) and (not strings or len(root) <= 1):
+    if isinstance(data, str) and (not strings or len(data) <= 1):
         return
-    if isinstance(root, (bytes, bytearray)) and not bytes_like:
+    if isinstance(data, (bytes, bytearray)) and not bytes_like:
         return
 
-    root_is_mapping = isinstance(root, Mapping)
+    is_mapping = isinstance(data, Mapping)
     predicate_callable = callable(predicate)
-    for obj in root:
-        if root_is_mapping:
+    for obj in data:
+        if is_mapping:
             if dict_keys:
                 # process key
                 yield from pick([obj], predicate,
                                 dict_keys, strings, bytes_like)
             # switch from key to value and proceed
-            obj = root[obj]
+            obj = data[obj]
         if predicate_callable:
             try:
                 if predicate(obj):
@@ -185,25 +185,25 @@ def flat(data):
     yield from pick(data, NO_CONTAINERS)
 
 
-def max_depth(root):
-    """Return maximum nested depth of `root`.
+def max_depth(data):
+    """Return maximum nested depth of `data`.
 
-    `root` should be an iterable container. It is assumed that direct
-    elements of `root` are in depth 0. Empty containers do not
+    `data` should be an iterable container. It is assumed that direct
+    elements of `data` are in depth 0. Empty containers do not
     constitute another level of nested depth.
     """
-    return max(_iter_depth(root), default=0)
+    return max(_iter_depth(data), default=0)
 
 
-def _iter_depth(root, depth=0):
-    if not isinstance(root, Iterable) \
-            or isinstance(root, (str, bytes, bytearray)):
+def _iter_depth(data, depth=0):
+    if not isinstance(data, Iterable) \
+            or isinstance(data, (str, bytes, bytearray)):
         return
 
-    root_is_mapping = isinstance(root, Mapping)
-    for obj in root:
+    is_mapping = isinstance(data, Mapping)
+    for obj in data:
         yield depth
-        if root_is_mapping:
+        if is_mapping:
             # switch from key to value and proceed
-            obj = root[obj]
+            obj = data[obj]
         yield from _iter_depth(obj, depth=depth + 1)

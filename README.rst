@@ -260,13 +260,13 @@ do not constitute another level of nested depth. For example:
 API reference
 =============
 
-handpick.pick(root, predicate, dict_keys=False, strings=False, bytes_like=False)
-    Pick objects from ``root`` based on ``predicate``.
+handpick.pick(data, predicate, dict_keys=False, strings=False, bytes_like=False)
+    Pick objects from ``data`` based on ``predicate``.
 
-    Traverse ``root`` recursively and yield all objects for which
+    Traverse ``data`` recursively and yield all objects for which
     ``predicate(obj)`` is true.
 
-    ``root`` should be an iterable container.
+    ``data`` should be an iterable container.
 
     ``predicate`` should be a callable taking one argument and returning
     a Boolean value. If ``predicate`` is not callable, equality will be
@@ -329,11 +329,11 @@ handpick.flat(data)
 
     When traversing a mapping, only its values are inspected.
 
-handpick.max_depth(root)
-    Return maximum nested depth of ``root``.
+handpick.max_depth(data)
+    Return maximum nested depth of ``data``.
 
-    ``root`` should be an iterable container. It is assumed that direct
-    elements of ``root`` are in depth 0. Empty containers do not
+    ``data`` should be an iterable container. It is assumed that direct
+    elements of ``data`` are in depth 0. Empty containers do not
     constitute another level of nested depth.
 
 
