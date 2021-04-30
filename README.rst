@@ -15,7 +15,7 @@ The ``pick`` generator function is the main component of the package.
 It performs the recursive traversal of a (presumably nested) data
 structure and applies the picking criteria provided in the form of a
 predicate function (see below for various examples). Picked objects are
-yielded lazily by a generator-iterator.
+retrieved lazily by a generator.
 
 
 Simple predicate functions
@@ -211,7 +211,8 @@ Useful functions
 The ``flat`` function
 ---------------------
 
-This function can be used to flatten a nested data structure. For example:
+This function can be used to flatten a nested data structure. Values
+are retrieved lazily by a generator. For example:
 
 .. code-block:: python
 
@@ -340,8 +341,8 @@ handpick.flat(data)
 handpick.max_depth(data)
     Return maximum nested depth of ``data``.
 
-    ``data`` should be an iterable container. The depth of direct
-    elements of ``data`` is 0.
+    ``data`` should be an iterable container. Depth is counted from zero,
+    i.e. the direct elements of ``data`` are in depth 0.
 
 
 .. |pytest| image:: https://github.com/mportesdev/handpick/workflows/pytest/badge.svg

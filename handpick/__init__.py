@@ -15,7 +15,7 @@ from .core import (
     max_depth,
 )
 
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 __all__ = [
     '__version__', 'pick', 'predicate', 'ALL', 'NO_CONTAINERS', 'NO_LIST_DICT',
