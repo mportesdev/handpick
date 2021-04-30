@@ -188,9 +188,8 @@ def flat(data):
 def max_depth(data):
     """Return maximum nested depth of `data`.
 
-    `data` should be an iterable container. It is assumed that direct
-    elements of `data` are in depth 0. Empty containers do not
-    constitute another level of nested depth.
+    `data` should be an iterable container. The depth of direct
+    elements of `data` is 0.
     """
     return max(_iter_depth(data), default=0)
 
@@ -200,9 +199,10 @@ def _iter_depth(data, depth=0):
             or isinstance(data, (str, bytes, bytearray)):
         return
 
+    yield depth
+
     is_mapping = isinstance(data, Mapping)
     for obj in data:
-        yield depth
         if is_mapping:
             # switch from key to value and proceed
             obj = data[obj]

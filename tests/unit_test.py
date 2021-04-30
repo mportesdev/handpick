@@ -734,16 +734,16 @@ class TestMaxDepthIterDepth:
     @pytest.mark.parametrize(
         'root, expected',
         (
-            pytest.param(FLAT, 0, id='flat'),
-            pytest.param(NESTED_LIST, 2, id='nested_list'),
-            pytest.param(DICT_LIST, 2, id='dict_list'),
+            pytest.param(FLAT, 1, id='flat'),
+            pytest.param(NESTED_LIST, 3, id='nested_list'),
+            pytest.param(DICT_LIST, 3, id='dict_list'),
             pytest.param(LIST_TUPLE, 3, id='list_tuple'),
-            pytest.param(NESTED_DICT, 4, id='nested_dict'),
+            pytest.param(NESTED_DICT, 5, id='nested_dict'),
             pytest.param(LIST_5_LEVELS, 4, id='list_5_levels'),
             pytest.param(DICT_5_LEVELS, 4, id='dict_5_levels'),
             pytest.param([], 0, id='[]'),
-            pytest.param([[]], 0, id='[[]]'),
-            pytest.param([[[]]], 1, id='[[[]]]'),
+            pytest.param([[]], 1, id='[[]]'),
+            pytest.param([[[]]], 2, id='[[[]]]'),
         )
     )
     def test_max_depth(self, root, expected):
@@ -752,7 +752,7 @@ class TestMaxDepthIterDepth:
     @pytest.mark.parametrize(
         'json_file, expected',
         (
-            pytest.param('list_of_int.json', 11),
+            pytest.param('list_of_int.json', 12),
             pytest.param('dict_of_int.json', 5),
         )
     )
@@ -763,24 +763,19 @@ class TestMaxDepthIterDepth:
     @pytest.mark.parametrize(
         'root, expected',
         (
-            pytest.param(FLAT, [0]*9, id='flat'),
-            pytest.param(NESTED_LIST, [0, 1, 1, 1, 0, 1, 1, 1, 2, 2, 1],
-                         id='nested_list'),
-            pytest.param(DICT_LIST, [0, 1, 1, 2, 2, 0, 1, 1, 2, 2],
-                         id='dict_list'),
-            pytest.param(LIST_TUPLE, [0, 1, 1, 2, 3, 3, 3, 2, 1, 0, 1, 1],
-                         id='list_tuple'),
+            pytest.param(FLAT, [0, 1, 1], id='flat'),
+            pytest.param(NESTED_LIST, [0, 1, 1, 2, 3], id='nested_list'),
+            pytest.param(DICT_LIST, [0, 1, 2, 2, 1, 2, 2, 3], id='dict_list'),
+            pytest.param(LIST_TUPLE, [0, 1, 2, 3, 1], id='list_tuple'),
             pytest.param(NESTED_DICT,
-                         [0, 1, 2, 2, 1, 2, 2, 3, 3, 4, 4, 0, 1, 2, 2, 1, 2, 2, 2],
+                         [0, 1, 2, 3, 3, 2, 3, 4, 5, 1, 2, 3, 3, 2, 3, 3, 3],
                          id='nested_dict'),
-            pytest.param(LIST_5_LEVELS,
-                         [0, 1, 2, 2, 3, 4, 3, 1, 0, 0, 1, 2, 2, 3, 1, 1, 2],
+            pytest.param(LIST_5_LEVELS, [0, 1, 2, 3, 4, 1, 2, 3, 2],
                          id='list_5_levels'),
-            pytest.param(DICT_5_LEVELS, [0, 0, 1, 2, 2, 3, 4, 3, 4, 1],
-                         id='dict_5_levels'),
-            pytest.param([], [], id='[]'),
-            pytest.param([[]], [0], id='[[]]'),
-            pytest.param([[[]]], [0, 1], id='[[]]'),
+            pytest.param(DICT_5_LEVELS, [0, 1, 2, 3, 4, 4], id='dict_5_levels'),
+            pytest.param([], [0], id='[]'),
+            pytest.param([[]], [0, 1], id='[[]]'),
+            pytest.param([[[]]], [0, 1, 2], id='[[[]]]'),
         )
     )
     def test_iter_depth(self, root, expected):
@@ -884,8 +879,4 @@ class TestReadmeExamples:
         assert max_depth(nested_list) == 2
         assert max_depth(nested_dict) == 4
 
-        data = [0, [1, []]]
-
-        assert max_depth(data) == 1
-        assert max_depth(data[1]) == 0
-        assert max_depth(data[1][1]) == 0
+        assert max_depth([0, [1, []]]) == 2

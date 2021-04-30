@@ -332,9 +332,8 @@ handpick.flat(data)
 handpick.max_depth(data)
     Return maximum nested depth of ``data``.
 
-    ``data`` should be an iterable container. It is assumed that direct
-    elements of ``data`` are in depth 0. Empty containers do not
-    constitute another level of nested depth.
+    ``data`` should be an iterable container. The depth of direct
+    elements of ``data`` is 0.
 
 
 .. |pytest| image:: https://github.com/mportesdev/handpick/workflows/pytest/badge.svg
