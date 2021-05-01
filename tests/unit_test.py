@@ -857,9 +857,9 @@ class TestReadmeExamples:
         """Example from 'Predicate factories'."""
 
         data = [[1.0, [2, True]], [False, [3]], ['4', {5, True}]]
-        integers_only = pick(data, is_type(int) & not_type(bool))
+        strictly_integers = pick(data, is_type(int) & not_type(bool))
 
-        assert list(integers_only) == [2, 3, 5]
+        assert list(strictly_integers) == [2, 3, 5]
 
     def test_example_8(self):
         """Examples from 'The flat function'."""

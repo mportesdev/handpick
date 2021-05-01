@@ -11,7 +11,7 @@ objects that meet certain criteria.
 The ``pick`` function
 =====================
 
-The ``pick`` generator function is the main component of the package.
+The ``pick`` generator function is the library's main component.
 It performs the recursive traversal of a (presumably nested) data
 structure and applies the picking criteria provided in the form of a
 predicate function (see below for various examples). Picked objects are
@@ -65,10 +65,10 @@ criteria. For example:
 Handling dictionary keys
 ------------------------
 
-When inspecting mappings (dictionaries), you can configure whether or
-not ``pick`` will inspect dictionary keys by specifying the
+When inspecting dictionaries or other mappings, you can configure
+whether or not ``pick`` will inspect dictionary keys using the
 ``dict_keys`` keyword argument. Default is False, which means only
-values will be inspected. For example:
+dictionary values are inspected. For example:
 
 .. code-block:: python
 
@@ -94,7 +94,7 @@ Predicates
 The ``predicate`` decorator
 ---------------------------
 
-The ``predicate`` decorator wraps a function in a object that can be
+The ``predicate`` decorator wraps a function in an object that can be
 combined with other predicates using the operators ``&`` (and) and
 ``|`` (or), as well as negated using the operator ``~`` (not).
 
@@ -181,8 +181,10 @@ scenarios. For example:
     >>> list(only_values)
     [0, '1', b'2']
 
-**Note:** Strings and bytes-like objects are not regarded as containers
-of other objects by the ``NO_CONTAINERS`` built-in predicate.
+**Note:** Despite being iterable, strings and bytes-like objects are
+not regarded as containers of other objects by the ``NO_CONTAINERS``
+built-in predicate.
+
 
 Predicate factories
 -------------------
@@ -196,11 +198,11 @@ predicates based on an object's type. For example:
 
     data = [[1.0, [2, True]], [False, [3]], ['4', {5, True}]]
 
-    integers_only = pick(data, is_type(int) & not_type(bool))
+    strictly_integers = pick(data, is_type(int) & not_type(bool))
 
 .. code::
 
-    >>> list(integers_only)
+    >>> list(strictly_integers)
     [2, 3, 5]
 
 
@@ -226,8 +228,8 @@ are retrieved lazily by a generator. For example:
     >>> list(flat_data)
     [0, 1, 2, 3, 4, 5]
 
-When flattening a mapping (dictionary), only its values are inspected.
-For example:
+When flattening dictionaries or other mappings, only its values are
+inspected. For example:
 
 .. code::
 
@@ -257,8 +259,8 @@ example:
     >>> max_depth(nested_dict)
     4
 
-**Note:** Empty containers constitute a level of nested depth as well
-as non-empty ones. For example:
+**Note:** As well as non-empty ones, empty containers do constitute
+another level of nested depth. For example:
 
 .. code::
 
@@ -273,14 +275,14 @@ handpick.pick(data, predicate, dict_keys=False, strings=False, bytes_like=False)
     Pick objects from ``data`` based on ``predicate``.
 
     Traverse ``data`` recursively and yield all objects for which
-    ``predicate(obj)`` is true.
+    ``predicate(obj)`` is True or truthy.
 
     ``data`` should be an iterable container.
 
     ``predicate`` should be a callable taking one argument and returning
     a Boolean value. If ``predicate`` is not callable, equality will be
     used as the picking criteria, i.e. objects for which
-    ``obj == predicate`` is true will be yielded.
+    ``obj == predicate`` will be yielded.
 
     When traversing a mapping, only its values are inspected by
     default. If ``dict_keys`` is set to True, both keys and values of the
@@ -297,7 +299,7 @@ handpick.pick(data, predicate, dict_keys=False, strings=False, bytes_like=False)
     ``bytes_like`` to True.
 
 @handpick.predicate(func)
-    Decorator wrapping a function with a predicate object.
+    Decorator wrapping a function in a predicate object.
 
     The decorated function can be combined with other predicates using
     the operators ``&`` (and) and ``|`` (or), as well as negated using the

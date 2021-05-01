@@ -7,14 +7,14 @@ def pick(data, predicate, dict_keys=False, strings=False, bytes_like=False):
     """Pick objects from `data` based on `predicate`.
 
     Traverse `data` recursively and yield all objects for which
-    `predicate(obj)` is true.
+    `predicate(obj)` is True or truthy.
 
     `data` should be an iterable container.
 
     `predicate` should be a callable taking one argument and returning
     a Boolean value. If `predicate` is not callable, equality will be
     used as the picking criteria, i.e. objects for which
-    `obj == predicate` is true will be yielded.
+    `obj == predicate` will be yielded.
 
     When traversing a mapping, only its values are inspected by
     default. If `dict_keys` is set to True, both keys and values of the
@@ -60,7 +60,7 @@ def pick(data, predicate, dict_keys=False, strings=False, bytes_like=False):
 
 
 def predicate(func):
-    """Decorator wrapping a function with a predicate object.
+    """Decorator wrapping a function in a predicate object.
 
     The decorated function can be combined with other predicates using
     the operators `&` (and) and `|` (or), as well as negated using the
