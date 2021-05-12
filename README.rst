@@ -347,7 +347,7 @@ handpick.max_depth(data)
     i.e. the direct elements of ``data`` are in depth 0.
 
 
-.. |tests| image:: https://github.com/mportesdev/handpick/workflows/tests/badge.svg
+.. |tests| image:: https://github.com/mportesdev/handpick/actions/workflows/tests.yml/badge.svg
     :target: https://github.com/mportesdev/handpick/actions
 .. |coverage| image:: https://img.shields.io/codecov/c/gh/mportesdev/handpick
     :target: https://codecov.io/gh/mportesdev/handpick
