@@ -1,9 +1,16 @@
-name: pytest
+name: Tests
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  testing:
+  tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -17,14 +24,16 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Install poetry
+      run: curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+
     - name: Install dependencies
       run: |
-        pip install --upgrade pip setuptools
-        pip install -r requirements-ci.txt
-        pip install .
+        poetry run pip install --upgrade pip
+        poetry install
 
     - name: Run pytest
-      run: pytest --cov
+      run: poetry run pytest --cov
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
