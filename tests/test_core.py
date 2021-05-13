@@ -368,62 +368,69 @@ class TestPickStringsAndBytesLike:
     @pytest.mark.parametrize(
         'root, expected',
         (
-            pytest.param(['str'], ['str'], id='flat'),
+            pytest.param([''], [''], id='flat list, empty string'),
+            pytest.param(['a'], ['a'], id='flat list, single char string'),
+            pytest.param(['str'], ['str'], id='flat list'),
             pytest.param((['ab'], 'cd'), ['ab', 'cd'], id='nested'),
-            pytest.param({'ef': 'gh'}, ['ef', 'gh'], id='dict'),
-            pytest.param('str', [], id='str'),
+            pytest.param({'ef': 'gh'}, ['gh'], id='dict'),
+            pytest.param('', [], id='top-level string empty'),
+            pytest.param('a', [], id='top-level string single char'),
+            pytest.param('str', [], id='top-level string'),
         )
     )
     def test_strings_not_iterated_by_default(self, root, expected):
-        assert list(pick(root, is_str,
-                         dict_keys=True)) == expected
+        assert list(pick(root, is_str)) == expected
 
     @pytest.mark.parametrize(
         'root, expected',
         (
-            pytest.param(['str'], ['str', 's', 't', 'r'], id='flat'),
+            pytest.param([''], [''], id='flat list, empty string'),
+            pytest.param(['a'], ['a'], id='flat list, single char string'),
+            pytest.param(['str'], ['str', 's', 't', 'r'], id='flat list'),
             pytest.param((['ab'], 'cd'), ['ab', 'a', 'b', 'cd', 'c', 'd'],
                          id='nested'),
-            pytest.param({'ef': 'gh'}, ['ef', 'e', 'f', 'gh', 'g', 'h'],
-                         id='dict'),
-            pytest.param('str', ['s', 't', 'r'], id='str'),
+            pytest.param({'ef': 'gh'}, ['gh', 'g', 'h'], id='dict'),
+            pytest.param('', [], id='top-level string empty'),
+            pytest.param('a', [], id='top-level string single char'),
+            pytest.param('str', ['s', 't', 'r'], id='top-level string'),
         )
     )
     def test_strings_iterated_optionally(self, root, expected):
-        assert list(pick(root, is_str,
-                         dict_keys=True, strings=True)) == expected
+        assert list(pick(root, is_str, strings=True)) == expected
 
     @pytest.mark.parametrize(
         'root, expected',
         (
-            pytest.param(b'01', [], id='bytes'),
-            pytest.param([b'AB'], [], id='flat'),
+            pytest.param([b''], [], id='flat list, empty bytes'),
+            pytest.param([b'A'], [], id='flat list, bytes'),
             pytest.param((0, [[bytearray([1, 2])], b'12'], 1), [0, 1],
                          id='nested'),
             pytest.param({bytes([1, 2]): bytearray(b'\003\004')}, [],
                          id='dict'),
-            pytest.param(bytearray(b'ab'), [], id='bytearray'),
+            pytest.param(b'', [], id='top-level bytes empty'),
+            pytest.param(b'1', [], id='top-level bytes'),
+            pytest.param(bytearray(b'ab'), [], id='top-level bytearray'),
         )
     )
     def test_bytes_like_not_iterated_by_default(self, root, expected):
-        result = list(pick(root, is_int, dict_keys=True))
-        assert result == expected
+        assert list(pick(root, is_int)) == expected
 
     @pytest.mark.parametrize(
         'root, expected',
         (
-            pytest.param(b'01', [48, 49], id='bytes'),
-            pytest.param([b'AB'], [65, 66], id='flat'),
+            pytest.param([b''], [], id='flat list, bytes empty'),
+            pytest.param([b'A'], [65], id='flat list, bytes'),
             pytest.param((0, [[bytearray([1, 2])], b'12'], 1),
                          [0, 1, 2, 49, 50, 1], id='nested'),
-            pytest.param({bytes([1, 2]): bytearray(b'\003\004')}, [1, 2, 3, 4],
+            pytest.param({bytes([1, 2]): bytearray(b'\003\004')}, [3, 4],
                          id='dict'),
-            pytest.param(bytearray(b'ab'), [97, 98], id='bytearray'),
+            pytest.param(b'', [], id='top-level bytes empty'),
+            pytest.param(b'1', [49], id='top-level bytes'),
+            pytest.param(bytearray(b'ab'), [97, 98], id='top-level bytearray'),
         )
     )
     def test_bytes_like_iterated_optionally(self, root, expected):
-        result = list(pick(root, is_int, dict_keys=True, bytes_like=True))
-        assert result == expected
+        assert list(pick(root, is_int, bytes_like=True)) == expected
 
 
 class TestPredicates:

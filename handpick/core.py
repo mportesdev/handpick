@@ -22,8 +22,8 @@ def pick(data, predicate, dict_keys=False, strings=False, bytes_like=False):
 
     By default, strings are not regarded as containers of other objects
     and therefore not iterated by the recursive algorithm. This can be
-    changed by setting `strings` to True. Strings of length 0 or 1 are
-    never iterated.
+    changed by setting `strings` to True. Strings of length 1 are never
+    iterated.
 
     By default, bytes-like sequences (bytes and bytearrays) are not
     regarded as containers of other objects and therefore not iterated
@@ -32,7 +32,7 @@ def pick(data, predicate, dict_keys=False, strings=False, bytes_like=False):
     """
     if not isinstance(data, Iterable):
         return
-    if isinstance(data, str) and (not strings or len(data) <= 1):
+    if isinstance(data, str) and (not strings or len(data) == 1):
         return
     if isinstance(data, (bytes, bytearray)) and not bytes_like:
         return
