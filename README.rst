@@ -29,15 +29,12 @@ For example:
 
     from handpick import pick
 
-    data = [[1, 'Py'], [2, ['', 3.0]], 4]
+    data = [[1, 'Py'], [-2, ['', 3.0]], -4]
 
-    two_or_more = pick(data, lambda n: n >= 2)
     non_empty_strings = pick(data, lambda s: isinstance(s, str) and s)
 
 .. code::
 
-    >>> list(two_or_more)
-    [2, 3.0, 4]
     >>> list(non_empty_strings)
     ['Py']
 
@@ -60,6 +57,35 @@ criteria. For example:
 
     >>> list(ones)
     [1, 1.0, 1.0, 1]
+
+
+Suppressing errors
+------------------
+
+One important thing to note: when a call to the predicate function
+raises an exception, it is simply assumed that the object in question
+does not meet the picking criteria, and the exception is suppressed.
+For example:
+
+.. code-block:: python
+
+    from handpick import pick
+
+    def above_zero(n):
+        return n > 0
+
+    data = [[1, 'Py'], [-2, ['', 3.0]], -4]
+
+    positive = pick(data, above_zero)
+
+.. code::
+
+    >>> list(positive)
+    [1, 3.0]
+
+In the example above, some lists and strings are internally passed to
+the ``above_zero`` function, however the resulting TypeErrors are not
+propagated up to the code that called ``pick``.
 
 
 Handling dictionary keys
@@ -289,12 +315,12 @@ handpick.pick(data, predicate, dict_keys=False, strings=False, bytes_like=False)
     mapping are inspected.
 
     By default, strings are not regarded as containers of other objects
-    and therefore not visited by the recursive algorithm. This can be
+    and therefore not iterated by the recursive algorithm. This can be
     changed by setting ``strings`` to True. Strings of length 0 or 1 are
-    never visited.
+    never iterated.
 
     By default, bytes-like sequences (bytes and bytearrays) are not
-    regarded as containers of other objects and therefore not visited
+    regarded as containers of other objects and therefore not iterated
     by the recursive algorithm. This can be changed by setting
     ``bytes_like`` to True.
 
@@ -312,12 +338,12 @@ handpick.ALL
     Predicate that returns True for all objects.
 
 handpick.NO_CONTAINERS
-    Predicate that returns False for all iterable objects except
-    strings and bytes-like objects.
+    Predicate that returns True for non-iterable objects, strings
+    and bytes-like objects.
 
 handpick.NO_LIST_DICT
-    Predicate that returns False for instances of ``list`` and
-    ``dict``.
+    Predicate that returns True for all objects except instances of
+    ``list`` and ``dict``.
 
 handpick.is_type(type_or_types)
     Predicate factory. Return a predicate that returns True if

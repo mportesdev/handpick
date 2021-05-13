@@ -21,12 +21,12 @@ def pick(data, predicate, dict_keys=False, strings=False, bytes_like=False):
     mapping are inspected.
 
     By default, strings are not regarded as containers of other objects
-    and therefore not visited by the recursive algorithm. This can be
+    and therefore not iterated by the recursive algorithm. This can be
     changed by setting `strings` to True. Strings of length 0 or 1 are
-    never visited.
+    never iterated.
 
     By default, bytes-like sequences (bytes and bytearrays) are not
-    regarded as containers of other objects and therefore not visited
+    regarded as containers of other objects and therefore not iterated
     by the recursive algorithm. This can be changed by setting
     `bytes_like` to True.
     """
@@ -123,8 +123,8 @@ def _all(obj):
 
 @predicate
 def _no_containers(obj):
-    """Predicate that returns False for all iterable objects except
-    strings and bytes-like objects.
+    """Predicate that returns True for non-iterable objects, strings
+    and bytes-like objects.
     """
     return not isinstance(obj, Iterable) \
         or isinstance(obj, (str, bytes, bytearray))
@@ -132,8 +132,8 @@ def _no_containers(obj):
 
 @predicate
 def _no_list_dict(obj):
-    """Predicate that returns False for instances of `list` and
-    `dict`.
+    """Predicate that returns True for all objects except instances of
+    `list` and `dict`.
     """
     return not isinstance(obj, (list, dict))
 

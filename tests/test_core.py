@@ -785,14 +785,14 @@ class TestMaxDepthIterDepth:
 class TestReadmeExamples:
     """Test examples from README."""
 
+    LIST = [[1, 'Py'], [-2, ['', 3.0]], -4]
+
     def test_example_1(self):
         """Example from 'Simple predicate functions'."""
 
-        data = [[1, 'Py'], [2, ['', 3.0]], 4]
-        two_or_more = pick(data, lambda n: n >= 2)
+        data = self.LIST
         non_empty_strings = pick(data, lambda s: isinstance(s, str) and s)
 
-        assert list(two_or_more) == [2, 3.0, 4]
         assert list(non_empty_strings) == ['Py']
 
     def test_example_2(self):
@@ -804,6 +804,17 @@ class TestReadmeExamples:
         assert list(ones) == [1, 1.0, 1.0, 1]
 
     def test_example_3(self):
+        """Example from 'Suppressing errors'."""
+
+        def above_zero(n):
+            return n > 0
+
+        data = self.LIST
+        positive = pick(data, above_zero)
+
+        assert list(positive) == [1, 3.0]
+
+    def test_example_4(self):
         """Example from 'Handling dictionary keys'."""
 
         data = {'key': {'name': 'foo'}, '_key': {'_name': '_bar'}}
@@ -813,7 +824,7 @@ class TestReadmeExamples:
         assert list(default) == ['_bar']
         assert list(keys_included) == ['_key', '_name', '_bar']
 
-    def test_example_4(self):
+    def test_example_5(self):
         """Example from 'Combining predicates'."""
 
         @predicate
@@ -830,7 +841,7 @@ class TestReadmeExamples:
 
         assert list(odd_integers) == [1, 15, 7]
 
-    def test_example_5(self):
+    def test_example_6(self):
         """Example from 'Combining predicates with functions'."""
 
         @predicate
@@ -843,7 +854,7 @@ class TestReadmeExamples:
 
         assert list(short_lists) == [[2], [4], ['6']]
 
-    def test_example_6(self):
+    def test_example_7(self):
         """Example from 'Built-in predicates'."""
 
         data = [[], [0], [['1'], b'2']]
@@ -853,7 +864,7 @@ class TestReadmeExamples:
         assert list(everything) == [[], [0], 0, [['1'], b'2'], ['1'], '1', b'2']
         assert list(only_values) == [0, '1', b'2']
 
-    def test_example_7(self):
+    def test_example_8(self):
         """Example from 'Predicate factories'."""
 
         data = [[1.0, [2, True]], [False, [3]], ['4', {5, True}]]
@@ -861,7 +872,7 @@ class TestReadmeExamples:
 
         assert list(strictly_integers) == [2, 3, 5]
 
-    def test_example_8(self):
+    def test_example_9(self):
         """Examples from 'The flat function'."""
 
         data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
@@ -870,7 +881,7 @@ class TestReadmeExamples:
 
         assert list(flat({1: 2, 3: {4: 5}})) == [2, 5]
 
-    def test_example_9(self):
+    def test_example_10(self):
         """Examples from 'The max_depth function'."""
 
         nested_list = [0, [1, [2]]]
