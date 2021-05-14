@@ -174,6 +174,11 @@ def not_type(type_or_types):
 # useful functions
 
 def values_for_key(data, key):
+    """Pick values associated with a specific key.
+
+    Traverse `data` recursively and yield a sequence of dictionary
+    values that are mapped to a dictionary key `key`.
+    """
     for mapping in pick([data], is_type(Mapping)):
         yield from (v for k, v in mapping.items() if k == key)
 

@@ -235,6 +235,31 @@ Useful functions
 ================
 
 
+The ``values_for_key`` function
+-------------------------------
+
+When inspecting data structures that contain dictionaries or other
+mappings, you can use this function to retrieve values associated with
+a specific key, regardless of the nested depth in which these values
+are stored. Values are retrieved lazily by an iterator. For example:
+
+.. code-block:: python
+
+    from handpick import values_for_key
+
+    data = {'node_id': 4,
+            'child_nodes': [{'node_id': 8,
+                             'child_nodes': [{'node_id': 16}]},
+                            {'node_id': 9}]}
+
+    node_ids = values_for_key(data, key='node_id')
+
+.. code::
+
+    >>> list(node_ids)
+    [4, 8, 16, 9]
+
+
 The ``flat`` function
 ---------------------
 
@@ -355,6 +380,12 @@ handpick.not_type(type_or_types)
     object is not an instance of specified type(s).
 
     ``type_or_types`` must be a type or tuple of types.
+
+handpick.values_for_key(data, key)
+    Pick values associated with a specific key.
+
+    Traverse ``data`` recursively and yield a sequence of dictionary
+    values that are mapped to a dictionary key ``key``.
 
 handpick.flat(data)
     Flatten ``data``.

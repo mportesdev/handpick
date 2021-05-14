@@ -916,6 +916,17 @@ class TestReadmeExamples:
         assert list(strictly_integers) == [2, 3, 5]
 
     def test_example_9(self):
+        """Examples from 'The values_for_key function'."""
+
+        data = {'node_id': 4,
+                'child_nodes': [{'node_id': 8,
+                                 'child_nodes': [{'node_id': 16}]},
+                                {'node_id': 9}]}
+        node_ids = values_for_key(data, key='node_id')
+
+        assert list(node_ids) == [4, 8, 16, 9]
+
+    def test_example_10(self):
         """Examples from 'The flat function'."""
 
         data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
@@ -924,7 +935,7 @@ class TestReadmeExamples:
 
         assert list(flat({1: 2, 3: {4: 5}})) == [2, 5]
 
-    def test_example_10(self):
+    def test_example_11(self):
         """Examples from 'The max_depth function'."""
 
         nested_list = [0, [1, [2]]]
