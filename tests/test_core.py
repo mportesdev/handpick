@@ -817,9 +817,9 @@ class TestReadmeExamples:
             return n > 0
 
         data = self.LIST
-        positive = pick(data, above_zero)
+        positive_numbers = pick(data, above_zero)
 
-        assert list(positive) == [1, 3.0]
+        assert list(positive_numbers) == [1, 3.0]
 
     def test_example_4(self):
         """Example from 'Handling dictionary keys'."""

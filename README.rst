@@ -15,15 +15,15 @@ The ``pick`` generator function is the library's main component.
 It performs the recursive traversal of a (presumably nested) data
 structure and applies the picking criteria provided in the form of a
 predicate function (see below for various examples). Picked objects are
-retrieved lazily by a generator.
+retrieved lazily by an iterator.
 
 
 Simple predicate functions
 --------------------------
 
 The predicate function is passed to ``pick`` as the second positional
-argument. In simple cases, lambda functions can be used as predicates.
-For example:
+argument. In simple cases, you can use a lambda function as a
+predicate. For example:
 
 .. code-block:: python
 
@@ -76,16 +76,16 @@ For example:
 
     data = [[1, 'Py'], [-2, ['', 3.0]], -4]
 
-    positive = pick(data, above_zero)
+    positive_numbers = pick(data, above_zero)
 
 .. code::
 
-    >>> list(positive)
+    >>> list(positive_numbers)
     [1, 3.0]
 
-In the example above, some lists and strings are internally passed to
-the ``above_zero`` function, however the resulting TypeErrors are not
-propagated up to the code that called ``pick``.
+In the example above, several lists and strings were internally passed
+to the ``above_zero`` function, however the resulting ``TypeError``s
+did not propagate up to the code that called ``pick``.
 
 
 Handling dictionary keys
@@ -208,8 +208,7 @@ scenarios. For example:
     [0, '1', b'2']
 
 **Note:** Despite being iterable, strings and bytes-like objects are
-not regarded as containers of other objects by the ``NO_CONTAINERS``
-built-in predicate.
+not regarded as containers of other objects by ``NO_CONTAINERS``.
 
 
 Predicate factories
@@ -240,7 +239,7 @@ The ``flat`` function
 ---------------------
 
 This function can be used to flatten a nested data structure. Values
-are retrieved lazily by a generator. For example:
+are retrieved lazily by an iterator. For example:
 
 .. code-block:: python
 
@@ -285,7 +284,7 @@ example:
     >>> max_depth(nested_dict)
     4
 
-**Note:** As well as non-empty ones, empty containers do constitute
+**Note:** Just like non-empty containers, empty containers constitute
 another level of nested depth. For example:
 
 .. code::
