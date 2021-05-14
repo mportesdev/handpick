@@ -14,6 +14,7 @@ from handpick import (
     NO_LIST_DICT,
     is_type,
     not_type,
+    values_for_key,
     flat,
     max_depth,
 )
@@ -707,6 +708,41 @@ class TestBuiltinPredicates:
         root = LIST_5_LEVELS
         result = list(pick(root, no_dict_or_array & no_str_or_binary))
         assert result == [3.5, 2]
+
+
+class TestValuesForKey:
+
+    @pytest.mark.parametrize(
+        'data, key, expected',
+        (
+            pytest.param({}, 0, [], id='empty'),
+            pytest.param({0: 1, 2: 3}, 0, [1], id='top-level key 0'),
+            pytest.param({0: 1, 2: 3}, 1, [], id='top-level key missing'),
+            pytest.param({0: 1, 2: 3}, 2, [3], id='top-level key 2'),
+            pytest.param({0: {0: 1}}, 0, [{0: 1}, 1], id='same key, nested'),
+            pytest.param({'a': {'b': 0}, 'b': 1}, 'b', [1, 0],
+                         id='same key different level'),
+            pytest.param([{'foo': [{'x': 1, 'y': 2}, {'x': 3, 'y': 4}],
+                           'bar': ({'x': 5}, {'x': 6})}], 'x', [1, 3, 5, 6],
+                         id='list, dict, tuple x'),
+            pytest.param([{'foo': [{'x': 1, 'y': 2}, {'x': 3, 'y': 4}],
+                           'bar': ({'x': 5}, {'x': 6})}], 'y', [2, 4],
+                         id='list, dict, tuple y'),
+        )
+    )
+    def test_values_for_key(self, data, key, expected):
+        assert list(values_for_key(data, key)) == expected
+
+    @pytest.mark.parametrize(
+        'key, expected',
+        (
+            pytest.param('-98', [2532, 29553]),
+            pytest.param('16399', [20528]),
+        )
+    )
+    def test_values_for_key_with_generated_data(self, key, expected):
+        data = from_json('dict_of_int.json')
+        assert list(values_for_key(data, key)) == expected
 
 
 class TestFlat:

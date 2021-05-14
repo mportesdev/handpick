@@ -173,6 +173,11 @@ def not_type(type_or_types):
 
 # useful functions
 
+def values_for_key(data, key):
+    for mapping in pick([data], is_type(Mapping)):
+        yield from (v for k, v in mapping.items() if k == key)
+
+
 def flat(data):
     """Flatten `data`.
 
