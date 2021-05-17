@@ -112,37 +112,6 @@ class _Predicate:
         return self.__class__(_not)
 
 
-# built-in predicates
-
-@predicate
-def _all(obj):
-    """Predicate that returns True for all objects."""
-
-    return True
-
-
-@predicate
-def _no_containers(obj):
-    """Predicate that returns True for non-iterable objects, strings
-    and bytes-like objects.
-    """
-    return not isinstance(obj, Iterable) \
-        or isinstance(obj, (str, bytes, bytearray))
-
-
-@predicate
-def _no_list_dict(obj):
-    """Predicate that returns True for all objects except instances of
-    `list` and `dict`.
-    """
-    return not isinstance(obj, (list, dict))
-
-
-ALL = _all
-NO_CONTAINERS = _no_containers
-NO_LIST_DICT = _no_list_dict
-
-
 # predicate factories
 
 def is_type(type_or_types):
@@ -169,6 +138,16 @@ def not_type(type_or_types):
         return not isinstance(obj, type_or_types)
 
     return _pred
+
+
+# built-in predicates
+
+ALL = lambda obj: True
+"""Predicate that returns True for all objects."""
+
+NO_CONTAINERS = not_type(Iterable) | is_type((str, bytes, bytearray))
+"""Predicate that returns True for non-iterable objects, strings
+and bytes-like objects."""
 
 
 # useful functions

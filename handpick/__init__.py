@@ -6,11 +6,10 @@ find all objects that meet certain criteria.
 from .core import (
     pick,
     predicate,
-    ALL,
-    NO_CONTAINERS,
-    NO_LIST_DICT,
     is_type,
     not_type,
+    ALL,
+    NO_CONTAINERS,
     values_for_key,
     flat,
     max_depth,
@@ -19,6 +18,6 @@ from .core import (
 __version__ = '0.8.0'
 
 __all__ = [
-    '__version__', 'pick', 'predicate', 'ALL', 'NO_CONTAINERS', 'NO_LIST_DICT',
-    'is_type', 'not_type', 'values_for_key', 'flat', 'max_depth'
+    '__version__', 'pick', 'predicate', 'is_type', 'not_type',
+    'ALL', 'NO_CONTAINERS', 'values_for_key', 'flat', 'max_depth'
 ]

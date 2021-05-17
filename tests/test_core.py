@@ -9,11 +9,10 @@ import pytest
 from handpick import (
     pick,
     predicate,
-    ALL,
-    NO_CONTAINERS,
-    NO_LIST_DICT,
     is_type,
     not_type,
+    ALL,
+    NO_CONTAINERS,
     values_for_key,
     flat,
     max_depth,
@@ -581,11 +580,15 @@ class TestPredicates:
         """Test a compound predicate combining predicates and functions."""
 
         @predicate
+        def is_list_or_dict(obj):
+            return isinstance(obj, (list, dict))
+
+        @predicate
         def is_set(obj):
             return isinstance(obj, set)
 
         pred = (
-            NO_LIST_DICT
+            ~is_list_or_dict
             & ((bool & is_type(str)) | (~is_set & (lambda obj: len(obj) > 1)))
         )
 
@@ -636,33 +639,6 @@ class TestBuiltinPredicates:
             assert is_int(n)
 
     @pytest.mark.parametrize(
-        'root, expected',
-        (
-            pytest.param(DICT_LIST, [(2, '3'), 2, '3', 5, ()],
-                         id='dict list - no list/dict'),
-            pytest.param(LIST_5_LEVELS,
-                         [bytearray(b'2'), '4', 3.5, b'1', '0', '2', b'3', '1',
-                          (2,), 2],
-                         id='list 5 levels - no list/dict'),
-            pytest.param(DICT_5_LEVELS,
-                         ['0_value1', '2_value1', '4_value', {'4_value2'},
-                          '4_value2', '1_value2'],
-                         id='dict 5 levels - no list/dict'),
-        )
-    )
-    def test_no_list_dict_predicate(self, root, expected):
-        assert list(pick(root, NO_LIST_DICT)) == expected
-
-    @pytest.mark.parametrize(
-        'json_file',
-        ('list_of_int.json', 'dict_of_int.json')
-    )
-    def test_no_list_dict_predicate_with_generated_data(self, json_file):
-        root = from_json(json_file)
-        for n in pick(root, NO_LIST_DICT):
-            assert is_int(n)
-
-    @pytest.mark.parametrize(
         'root, type_or_types, expected',
         (
             pytest.param(FLAT, str, ['food', '', 'foo'], id='flat - str'),
@@ -702,12 +678,12 @@ class TestBuiltinPredicates:
         assert list(pick(root, not_type(type_or_types))) == expected
 
     def test_combined_builtin_predicates(self):
-        no_dict_or_array = NO_LIST_DICT & not_type(tuple)
-        no_str_or_binary = ~is_type((str, bytes, bytearray))
+        no_container_or_float = NO_CONTAINERS & not_type(float)
+        no_binary = ~is_type((bytes, bytearray))
 
         root = LIST_5_LEVELS
-        result = list(pick(root, no_dict_or_array & no_str_or_binary))
-        assert result == [3.5, 2]
+        result = list(pick(root, no_container_or_float & no_binary))
+        assert result == ['4', '0', '2', '1', 2]
 
 
 class TestValuesForKey:
@@ -898,6 +874,14 @@ class TestReadmeExamples:
         assert list(short_lists) == [[2], [4], ['6']]
 
     def test_example_7(self):
+        """Example from 'Predicate factories'."""
+
+        data = [[1.0, [2, True]], [False, [3]], ['4', {5, True}]]
+        strictly_integers = pick(data, is_type(int) & not_type(bool))
+
+        assert list(strictly_integers) == [2, 3, 5]
+
+    def test_example_8(self):
         """Example from 'Built-in predicates'."""
 
         data = [[], [0], [['1'], b'2']]
@@ -906,14 +890,6 @@ class TestReadmeExamples:
 
         assert list(everything) == [[], [0], 0, [['1'], b'2'], ['1'], '1', b'2']
         assert list(only_values) == [0, '1', b'2']
-
-    def test_example_8(self):
-        """Example from 'Predicate factories'."""
-
-        data = [[1.0, [2, True]], [False, [3]], ['4', {5, True}]]
-        strictly_integers = pick(data, is_type(int) & not_type(bool))
-
-        assert list(strictly_integers) == [2, 3, 5]
 
     def test_example_9(self):
         """Examples from 'The values_for_key function'."""

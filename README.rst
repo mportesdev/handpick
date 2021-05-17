@@ -84,8 +84,8 @@ For example:
     [1, 3.0]
 
 In the example above, several lists and strings were internally passed
-to the ``above_zero`` function, however the resulting ``TypeError``s
-did not propagate up to the code that called ``pick``.
+to the ``above_zero`` function but no ``TypeError`` propagated up to
+the code that called ``pick``.
 
 
 Handling dictionary keys
@@ -182,6 +182,26 @@ predicates and regular undecorated functions. For example:
     [[2], [4], ['6']]
 
 
+Predicate factories
+-------------------
+
+The ``is_type`` and ``not_type`` functions can be used to create
+predicates based on an object's type. For example:
+
+.. code-block:: python
+
+    from handpick import pick, is_type, not_type
+
+    data = [[1.0, [2, True]], [False, [3]], ['4', {5, True}]]
+
+    strictly_integers = pick(data, is_type(int) & not_type(bool))
+
+.. code::
+
+    >>> list(strictly_integers)
+    [2, 3, 5]
+
+
 Built-in predicates
 -------------------
 
@@ -209,26 +229,6 @@ scenarios. For example:
 
 **Note:** Despite being iterable, strings and bytes-like objects are
 not regarded as containers of other objects by ``NO_CONTAINERS``.
-
-
-Predicate factories
--------------------
-
-The ``is_type`` and ``not_type`` functions can be used to create
-predicates based on an object's type. For example:
-
-.. code-block:: python
-
-    from handpick import pick, is_type, not_type
-
-    data = [[1.0, [2, True]], [False, [3]], ['4', {5, True}]]
-
-    strictly_integers = pick(data, is_type(int) & not_type(bool))
-
-.. code::
-
-    >>> list(strictly_integers)
-    [2, 3, 5]
 
 
 Useful functions
@@ -358,17 +358,6 @@ handpick.pick(data, predicate, dict_keys=False, strings=False, bytes_like=False)
     Predicate objects are intended to be used as the ``predicate``
     argument to the ``pick`` function.
 
-handpick.ALL
-    Predicate that returns True for all objects.
-
-handpick.NO_CONTAINERS
-    Predicate that returns True for non-iterable objects, strings
-    and bytes-like objects.
-
-handpick.NO_LIST_DICT
-    Predicate that returns True for all objects except instances of
-    ``list`` and ``dict``.
-
 handpick.is_type(type_or_types)
     Predicate factory. Return a predicate that returns True if
     object is an instance of specified type(s).
@@ -380,6 +369,13 @@ handpick.not_type(type_or_types)
     object is not an instance of specified type(s).
 
     ``type_or_types`` must be a type or tuple of types.
+
+handpick.ALL
+    Predicate that returns True for all objects.
+
+handpick.NO_CONTAINERS
+    Predicate that returns True for non-iterable objects, strings
+    and bytes-like objects.
 
 handpick.values_for_key(data, key)
     Pick values associated with a specific key.
