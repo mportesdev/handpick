@@ -11,7 +11,6 @@ from handpick import (
     predicate,
     is_type,
     not_type,
-    ALL,
     NO_CONTAINERS,
     values_for_key,
     flat,
@@ -603,19 +602,6 @@ class TestBuiltinPredicates:
     @pytest.mark.parametrize(
         'root, expected',
         (
-            pytest.param(FLAT, list(FLAT), id='flat - all'),
-            pytest.param(DICT_LIST,
-                         [[{}, (2, '3')], {}, (2, '3'), 2, '3',
-                          [{}, [5, ()]], {}, [5, ()], 5, ()],
-                         id='dict list - all'),
-        )
-    )
-    def test_all_predicate(self, root, expected):
-        assert list(pick(root, ALL)) == expected
-
-    @pytest.mark.parametrize(
-        'root, expected',
-        (
             pytest.param(LIST_5_LEVELS,
                          [bytearray(b'2'), '4', 3.5, b'1', '0', '2', b'3', '1',
                           2],
@@ -885,10 +871,8 @@ class TestReadmeExamples:
         """Example from 'Built-in predicates'."""
 
         data = [[], [0], [['1'], b'2']]
-        everything = pick(data, ALL)
         only_values = pick(data, NO_CONTAINERS)
 
-        assert list(everything) == [[], [0], 0, [['1'], b'2'], ['1'], '1', b'2']
         assert list(only_values) == [0, '1', b'2']
 
     def test_example_9(self):

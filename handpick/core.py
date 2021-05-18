@@ -142,9 +142,6 @@ def not_type(type_or_types):
 
 # built-in predicates
 
-ALL = lambda obj: True
-"""Predicate that returns True for all objects."""
-
 NO_CONTAINERS = not_type(Iterable) | is_type((str, bytes, bytearray))
 """Predicate that returns True for non-iterable objects, strings
 and bytes-like objects."""

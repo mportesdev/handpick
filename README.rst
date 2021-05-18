@@ -222,20 +222,15 @@ scenarios. For example:
 
 .. code-block:: python
 
-    from handpick import pick, ALL, NO_CONTAINERS
+    from handpick import pick, NO_CONTAINERS
 
     data = [[], [0], [['1'], b'2']]
-
-    # pick all objects encountered during recursive traversal of data
-    everything = pick(data, ALL)
 
     # pick only objects that are not containers of other objects
     only_values = pick(data, NO_CONTAINERS)
 
 .. code::
 
-    >>> list(everything)
-    [[], [0], 0, [['1'], b'2'], ['1'], '1', b'2']
     >>> list(only_values)
     [0, '1', b'2']
 
@@ -381,9 +376,6 @@ handpick.not_type(type_or_types)
     object is not an instance of specified type(s).
 
     ``type_or_types`` must be a type or tuple of types.
-
-handpick.ALL
-    Predicate that returns True for all objects.
 
 handpick.NO_CONTAINERS
     Predicate that returns True for non-iterable objects, strings
