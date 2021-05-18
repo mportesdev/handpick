@@ -8,8 +8,20 @@ Handpick is a tool to traverse nested data structures and pick all
 objects that meet certain criteria.
 
 
+Installation
+============
+
+.. code::
+
+    pip install handpick
+
+
+Quick introduction
+==================
+
+
 The ``pick`` function
-=====================
+---------------------
 
 The ``pick`` generator function is the library's main component.
 It performs the recursive traversal of a (presumably nested) data
@@ -19,7 +31,7 @@ retrieved lazily by an iterator.
 
 
 Simple predicate functions
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The predicate function is passed to ``pick`` as the second positional
 argument. In simple cases, you can use a lambda function as a
@@ -40,7 +52,7 @@ predicate. For example:
 
 
 Non-callable predicates
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 If ``predicate`` is not callable, equality will be used as the picking
 criteria. For example:
@@ -60,7 +72,7 @@ criteria. For example:
 
 
 Suppressing errors
-------------------
+~~~~~~~~~~~~~~~~~~
 
 One important thing to note: when a call to the predicate function
 raises an exception, it is simply assumed that the object in question
@@ -89,7 +101,7 @@ the code that called ``pick``.
 
 
 Handling dictionary keys
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 When inspecting dictionaries or other mappings, you can configure
 whether or not ``pick`` will inspect dictionary keys using the
@@ -114,11 +126,11 @@ dictionary values are inspected. For example:
 
 
 Predicates
-==========
+----------
 
 
 The ``predicate`` decorator
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``predicate`` decorator wraps a function in an object that can be
 combined with other predicates using the operators ``&`` (and) and
@@ -126,7 +138,7 @@ combined with other predicates using the operators ``&`` (and) and
 
 
 Combining predicates
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 For example:
 
@@ -156,7 +168,7 @@ For example:
 
 
 Combining predicates with functions
------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In addition, the ``&`` and ``|`` operations are supported between
 predicates and regular undecorated functions. For example:
@@ -183,7 +195,7 @@ predicates and regular undecorated functions. For example:
 
 
 Predicate factories
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 The ``is_type`` and ``not_type`` functions can be used to create
 predicates based on an object's type. For example:
@@ -203,7 +215,7 @@ predicates based on an object's type. For example:
 
 
 Built-in predicates
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 Handpick provides some predefined predicates to be used in common
 scenarios. For example:
@@ -232,11 +244,11 @@ not regarded as containers of other objects by ``NO_CONTAINERS``.
 
 
 Useful functions
-================
+----------------
 
 
 The ``values_for_key`` function
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When inspecting data structures that contain dictionaries or other
 mappings, you can use this function to retrieve values associated with
@@ -261,7 +273,7 @@ are stored. Values are retrieved lazily by an iterator. For example:
 
 
 The ``flat`` function
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 This function can be used to flatten a nested data structure. Values
 are retrieved lazily by an iterator. For example:
@@ -278,7 +290,7 @@ are retrieved lazily by an iterator. For example:
     >>> list(flat_data)
     [0, 1, 2, 3, 4, 5]
 
-When flattening dictionaries or other mappings, only its values are
+When flattening dictionaries or other mappings, only their values are
 inspected. For example:
 
 .. code::
@@ -290,7 +302,7 @@ inspected. For example:
 
 
 The ``max_depth`` function
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This function returns the maximum nested depth of a data structure. For
 example:
