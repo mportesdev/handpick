@@ -27,12 +27,19 @@ jobs:
         source $HOME/.poetry/env
         poetry build --format wheel
         poetry publish --username=${{ secrets.PYPI_USERNAME }} --password=${{ secrets.PYPI_PASSWORD }}
+
+        # set outputs of this step to be used by the following steps
         BUILD_VERSION=$(poetry version --short)
         echo BUILD_VERSION=$BUILD_VERSION
         echo "::set-output name=BUILD_VERSION::$BUILD_VERSION"
-        WHEEL_PATH=$(ls dist/*$BUILD_VERSION*.whl)
+
+        WHEEL_PATH=$(find dist/ -name *$BUILD_VERSION*.whl)
         echo WHEEL_PATH=$WHEEL_PATH
         echo "::set-output name=WHEEL_PATH::$WHEEL_PATH"
+
+        WHEEL_NAME=$(basename $WHEEL_PATH)
+        echo WHEEL_NAME=$WHEEL_NAME
+        echo "::set-output name=WHEEL_NAME::$WHEEL_NAME"
 
     - name: Create GitHub release
       id: create_release
@@ -51,3 +58,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ${{ steps.build_wheel.outputs.WHEEL_PATH }}
+        asset_name: ${{ steps.build_wheel.outputs.WHEEL_NAME }}
+        asset_content_type: application/zip
