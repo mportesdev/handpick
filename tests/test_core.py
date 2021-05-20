@@ -13,7 +13,6 @@ from handpick import (
     not_type,
     NO_CONTAINERS,
     values_for_key,
-    flat,
     max_depth,
 )
 from handpick.core import _iter_depth
@@ -707,33 +706,6 @@ class TestValuesForKey:
         assert list(values_for_key(data, key)) == expected
 
 
-class TestFlat:
-
-    @pytest.mark.parametrize(
-        'data, expected',
-        (
-            pytest.param(FLAT, [62, 0.0, True, 'food', '', None, 'foo'],
-                         id='flat'),
-            pytest.param(NESTED_LIST, [1, 2, 100.0, 3, 'Py', 4, 5],
-                         id='nested list'),
-            pytest.param(DICT_LIST, [2, '3', 5],
-                         id='dict list'),
-            pytest.param(LIST_TUPLE, [None, 1, 2, 3, 3, 0, 'foo', 'bar'],
-                         id='list tuple'),
-            pytest.param(NESTED_DICT, [1, 2, 3],
-                         id='nested dict'),
-            pytest.param(LIST_5_LEVELS, [bytearray(b'2'), '4', 3.5, b'1', '0',
-                                         '2', b'3', '1', 2],
-                         id='list 5 levels'),
-            pytest.param(DICT_5_LEVELS, ['0_value1', '2_value1', '4_value',
-                                         '4_value2', '1_value2'],
-                         id='dict 5 levels'),
-        )
-    )
-    def test_flat(self, data, expected):
-        assert list(flat(data)) == expected
-
-
 class TestMaxDepthIterDepth:
 
     @pytest.mark.parametrize(
@@ -785,6 +757,33 @@ class TestMaxDepthIterDepth:
     )
     def test_iter_depth(self, root, expected):
         assert list(_iter_depth(root)) == expected
+
+
+class TestFlattening:
+
+    @pytest.mark.parametrize(
+        'data, expected',
+        (
+            pytest.param(FLAT, [62, 0.0, True, 'food', '', None, 'foo'],
+                         id='flat'),
+            pytest.param(NESTED_LIST, [1, 2, 100.0, 3, 'Py', 4, 5],
+                         id='nested list'),
+            pytest.param(DICT_LIST, [2, '3', 5],
+                         id='dict list'),
+            pytest.param(LIST_TUPLE, [None, 1, 2, 3, 3, 0, 'foo', 'bar'],
+                         id='list tuple'),
+            pytest.param(NESTED_DICT, [1, 2, 3],
+                         id='nested dict'),
+            pytest.param(LIST_5_LEVELS, [bytearray(b'2'), '4', 3.5, b'1', '0',
+                                         '2', b'3', '1', 2],
+                         id='list 5 levels'),
+            pytest.param(DICT_5_LEVELS, ['0_value1', '2_value1', '4_value',
+                                         '4_value2', '1_value2'],
+                         id='dict 5 levels'),
+        )
+    )
+    def test_flattening(self, data, expected):
+        assert list(pick(data, NO_CONTAINERS)) == expected
 
 
 class TestReadmeExamples:
@@ -887,15 +886,6 @@ class TestReadmeExamples:
         assert list(node_ids) == [4, 8, 16, 9]
 
     def test_example_10(self):
-        """Examples from 'The flat function'."""
-
-        data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
-        flat_data = flat(data)
-        assert list(flat_data) == [0, 1, 2, 3, 4, 5]
-
-        assert list(flat({1: 2, 3: {4: 5}})) == [2, 5]
-
-    def test_example_11(self):
         """Examples from 'The max_depth function'."""
 
         nested_list = [0, [1, [2]]]
@@ -905,3 +895,11 @@ class TestReadmeExamples:
         assert max_depth(nested_dict) == 4
 
         assert max_depth([0, [1, []]]) == 2
+
+    def test_example_11(self):
+        """Examples from 'Flattening nested data'."""
+
+        data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
+        flat_data = pick(data, NO_CONTAINERS)
+
+        assert list(flat_data) == [0, 1, 2, 3, 4, 5]

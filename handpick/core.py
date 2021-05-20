@@ -159,18 +159,6 @@ def values_for_key(data, key):
         yield from (v for k, v in mapping.items() if k == key)
 
 
-def flat(data):
-    """Flatten `data`.
-
-    Yield a sequence of objects from a (presumably nested) data
-    structure `data`. Only non-iterable objects, strings and bytes-like
-    objects are yielded.
-
-    When traversing a mapping, only its values are inspected.
-    """
-    yield from pick(data, NO_CONTAINERS)
-
-
 def max_depth(data):
     """Return maximum nested depth of `data`.
 

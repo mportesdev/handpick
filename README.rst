@@ -267,35 +267,6 @@ are stored. Values are retrieved lazily by an iterator. For example:
     [4, 8, 16, 9]
 
 
-The ``flat`` function
-~~~~~~~~~~~~~~~~~~~~~
-
-This function can be used to flatten a nested data structure. Values
-are retrieved lazily by an iterator. For example:
-
-.. code-block:: python
-
-    from handpick import flat
-
-    data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
-    flat_data = flat(data)
-
-.. code::
-
-    >>> list(flat_data)
-    [0, 1, 2, 3, 4, 5]
-
-When flattening dictionaries or other mappings, only their values are
-inspected. For example:
-
-.. code::
-
-    >>> list(flat({1: 2, 3: {4: 5}}))
-    [2, 5]
-
-**Note:** ``flat(data)`` is a shortcut for ``pick(data, NO_CONTAINERS)``.
-
-
 The ``max_depth`` function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -323,6 +294,28 @@ another level of nested depth. For example:
 
     >>> max_depth([0, [1, []]])
     2
+
+
+Recipes
+=======
+
+
+Flattening nested data
+----------------------
+
+For example:
+
+.. code-block:: python
+
+    from handpick import pick, NO_CONTAINERS
+
+    data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
+    flat_data = pick(data, NO_CONTAINERS)
+
+.. code::
+
+    >>> list(flat_data)
+    [0, 1, 2, 3, 4, 5]
 
 
 API reference
@@ -386,15 +379,6 @@ handpick.values_for_key(data, key)
 
     Traverse ``data`` recursively and yield a sequence of dictionary
     values that are mapped to a dictionary key ``key``.
-
-handpick.flat(data)
-    Flatten ``data``.
-
-    Yield a sequence of objects from a (presumably nested) data
-    structure ``data``. Only non-iterable objects, strings and bytes-like
-    objects are yielded.
-
-    When traversing a mapping, only its values are inspected.
 
 handpick.max_depth(data)
     Return maximum nested depth of ``data``.
