@@ -84,10 +84,10 @@ class _Predicate:
             return NotImplemented
         other_func = other.func if isinstance(other, self.__class__) else other
 
-        def _and(obj):
+        def new_func(obj):
             return self.func(obj) and other_func(obj)
 
-        return self.__class__(_and)
+        return self.__class__(new_func)
 
     def __rand__(self, other):
         return self & other
@@ -97,19 +97,19 @@ class _Predicate:
             return NotImplemented
         other_func = other.func if isinstance(other, self.__class__) else other
 
-        def _or(obj):
+        def new_func(obj):
             return self.func(obj) or other_func(obj)
 
-        return self.__class__(_or)
+        return self.__class__(new_func)
 
     def __ror__(self, other):
         return self | other
 
     def __invert__(self):
-        def _not(obj):
+        def new_func(obj):
             return not self.func(obj)
 
-        return self.__class__(_not)
+        return self.__class__(new_func)
 
 
 # predicate factories
@@ -121,10 +121,10 @@ def is_type(type_or_types):
     `type_or_types` must be a type or tuple of types.
     """
     @predicate
-    def _pred(obj):
+    def new_predicate(obj):
         return isinstance(obj, type_or_types)
 
-    return _pred
+    return new_predicate
 
 
 def not_type(type_or_types):
@@ -134,10 +134,10 @@ def not_type(type_or_types):
     `type_or_types` must be a type or tuple of types.
     """
     @predicate
-    def _pred(obj):
+    def new_predicate(obj):
         return not isinstance(obj, type_or_types)
 
-    return _pred
+    return new_predicate
 
 
 # built-in predicates
