@@ -596,32 +596,7 @@ class TestPredicates:
         assert result == ['a', (0, 'b'), 'b', '\\']
 
 
-class TestBuiltinPredicates:
-
-    @pytest.mark.parametrize(
-        'root, expected',
-        (
-            pytest.param(LIST_5_LEVELS,
-                         [bytearray(b'2'), '4', 3.5, b'1', '0', '2', b'3', '1',
-                          2],
-                         id='list 5 levels - no containers'),
-            pytest.param(DICT_5_LEVELS,
-                         ['0_value1', '2_value1', '4_value', '4_value2',
-                          '1_value2'],
-                         id='dict 5 levels - no containers'),
-        )
-    )
-    def test_no_containers_predicate(self, root, expected):
-        assert list(pick(root, NO_CONTAINERS)) == expected
-
-    @pytest.mark.parametrize(
-        'json_file',
-        ('list_of_int.json', 'dict_of_int.json')
-    )
-    def test_no_containers_predicate_with_generated_data(self, json_file):
-        root = from_json(json_file)
-        for n in pick(root, NO_CONTAINERS):
-            assert is_int(n)
+class TestPredicateFactories:
 
     @pytest.mark.parametrize(
         'root, type_or_types, expected',
@@ -661,6 +636,34 @@ class TestBuiltinPredicates:
     )
     def test_not_type_predicate(self, root, type_or_types, expected):
         assert list(pick(root, not_type(type_or_types))) == expected
+
+
+class TestBuiltinPredicates:
+
+    @pytest.mark.parametrize(
+        'root, expected',
+        (
+            pytest.param(LIST_5_LEVELS,
+                         [bytearray(b'2'), '4', 3.5, b'1', '0', '2', b'3', '1',
+                          2],
+                         id='list 5 levels - no containers'),
+            pytest.param(DICT_5_LEVELS,
+                         ['0_value1', '2_value1', '4_value', '4_value2',
+                          '1_value2'],
+                         id='dict 5 levels - no containers'),
+        )
+    )
+    def test_no_containers_predicate(self, root, expected):
+        assert list(pick(root, NO_CONTAINERS)) == expected
+
+    @pytest.mark.parametrize(
+        'json_file',
+        ('list_of_int.json', 'dict_of_int.json')
+    )
+    def test_no_containers_predicate_with_generated_data(self, json_file):
+        root = from_json(json_file)
+        for n in pick(root, NO_CONTAINERS):
+            assert is_int(n)
 
     def test_combined_builtin_predicates(self):
         no_container_or_float = NO_CONTAINERS & not_type(float)
