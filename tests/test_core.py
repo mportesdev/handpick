@@ -11,7 +11,7 @@ from handpick import (
     predicate,
     is_type,
     not_type,
-    NO_CONTAINERS,
+    IS_CONTAINER,
     IS_MAPPING,
     values_for_key,
     max_depth,
@@ -654,23 +654,23 @@ class TestBuiltinPredicates:
                          id='dict 5 levels - no containers'),
         )
     )
-    def test_no_containers_predicate(self, root, expected):
-        assert list(pick(root, NO_CONTAINERS)) == expected
+    def test_is_container_predicate(self, root, expected):
+        assert list(pick(root, ~IS_CONTAINER)) == expected
 
     @pytest.mark.parametrize(
         'json_file',
         ('list_of_int.json', 'dict_of_int.json')
     )
-    def test_no_containers_predicate_with_generated_data(self, json_file):
+    def test_is_container_predicate_with_generated_data(self, json_file):
         root = from_json(json_file)
-        for n in pick(root, NO_CONTAINERS):
+        for n in pick(root, ~IS_CONTAINER):
             assert is_int(n)
 
     @pytest.mark.parametrize(
         'pred, expected',
         (
-            pytest.param(NO_CONTAINERS | IS_MAPPING, [{}, 2, '3', {}, 5]),
-            pytest.param(NO_CONTAINERS & IS_MAPPING, []),
+            pytest.param(~IS_CONTAINER | IS_MAPPING, [{}, 2, '3', {}, 5]),
+            pytest.param(~IS_CONTAINER & IS_MAPPING, []),
         )
     )
     def test_combined_builtin_predicates(self, pred, expected):
@@ -791,7 +791,7 @@ class TestFlattening:
         )
     )
     def test_flattening(self, data, expected):
-        assert list(pick(data, NO_CONTAINERS)) == expected
+        assert list(pick(data, ~IS_CONTAINER)) == expected
 
 
 class TestReadmeExamples:
@@ -878,7 +878,7 @@ class TestReadmeExamples:
         """Example from 'Built-in predicates'."""
 
         data = [[], [0], [['1'], b'2']]
-        only_values = pick(data, NO_CONTAINERS)
+        only_values = pick(data, ~IS_CONTAINER)
 
         assert list(only_values) == [0, '1', b'2']
 
@@ -908,6 +908,6 @@ class TestReadmeExamples:
         """Examples from 'Flattening nested data'."""
 
         data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
-        flat_data = pick(data, NO_CONTAINERS)
+        flat_data = pick(data, not_type(list))
 
         assert list(flat_data) == [0, 1, 2, 3, 4, 5]

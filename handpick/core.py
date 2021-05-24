@@ -142,8 +142,8 @@ def not_type(type_or_types):
 
 # built-in predicates
 
-NO_CONTAINERS = not_type(Iterable) | is_type((str, bytes, bytearray))
-"""Predicate that returns True for non-iterable objects, strings
+IS_CONTAINER = is_type(Iterable) & not_type((str, bytes, bytearray))
+"""Predicate that returns True for iterable containers except strings
 and bytes-like objects."""
 
 IS_MAPPING = is_type(Mapping)
@@ -173,8 +173,7 @@ def max_depth(data):
 
 
 def _iter_depth(data, depth=0):
-    if not isinstance(data, Iterable) \
-            or isinstance(data, (str, bytes, bytearray)):
+    if not IS_CONTAINER(data):
         return
 
     yield depth

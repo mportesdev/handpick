@@ -8,7 +8,7 @@ from .core import (
     predicate,
     is_type,
     not_type,
-    NO_CONTAINERS,
+    IS_CONTAINER,
     IS_MAPPING,
     values_for_key,
     max_depth,
@@ -18,5 +18,5 @@ __version__ = '0.8.3'
 
 __all__ = [
     '__version__', 'pick', 'predicate', 'is_type', 'not_type',
-    'NO_CONTAINERS', 'IS_MAPPING', 'values_for_key', 'max_depth'
+    'IS_CONTAINER', 'IS_MAPPING', 'values_for_key', 'max_depth'
 ]

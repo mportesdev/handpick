@@ -222,12 +222,12 @@ scenarios. For example:
 
 .. code-block:: python
 
-    from handpick import pick, NO_CONTAINERS
+    from handpick import pick, IS_CONTAINER
 
     data = [[], [0], [['1'], b'2']]
 
     # pick only objects that are not containers of other objects
-    only_values = pick(data, NO_CONTAINERS)
+    only_values = pick(data, ~IS_CONTAINER)
 
 .. code::
 
@@ -235,7 +235,7 @@ scenarios. For example:
     [0, '1', b'2']
 
 **Note:** Despite being iterable, strings and bytes-like objects are
-not regarded as containers of other objects by ``NO_CONTAINERS``.
+not regarded as containers of other objects by ``IS_CONTAINER``.
 
 
 Useful functions
@@ -307,10 +307,10 @@ For example:
 
 .. code-block:: python
 
-    from handpick import pick, NO_CONTAINERS
+    from handpick import pick, not_type
 
     data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
-    flat_data = pick(data, NO_CONTAINERS)
+    flat_data = pick(data, not_type(list))
 
 .. code::
 
@@ -370,8 +370,8 @@ handpick.not_type(type_or_types)
 
     ``type_or_types`` must be a type or tuple of types.
 
-handpick.NO_CONTAINERS
-    Predicate that returns True for non-iterable objects, strings
+handpick.IS_CONTAINER
+    Predicate that returns True for iterable containers except strings
     and bytes-like objects.
 
 handpick.IS_MAPPING
