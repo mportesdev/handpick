@@ -12,6 +12,7 @@ from handpick import (
     is_type,
     not_type,
     NO_CONTAINERS,
+    IS_MAPPING,
     values_for_key,
     max_depth,
 )
@@ -665,13 +666,16 @@ class TestBuiltinPredicates:
         for n in pick(root, NO_CONTAINERS):
             assert is_int(n)
 
-    def test_combined_builtin_predicates(self):
-        no_container_or_float = NO_CONTAINERS & not_type(float)
-        no_binary = ~is_type((bytes, bytearray))
-
-        root = LIST_5_LEVELS
-        result = list(pick(root, no_container_or_float & no_binary))
-        assert result == ['4', '0', '2', '1', 2]
+    @pytest.mark.parametrize(
+        'pred, expected',
+        (
+            pytest.param(NO_CONTAINERS | IS_MAPPING, [{}, 2, '3', {}, 5]),
+            pytest.param(NO_CONTAINERS & IS_MAPPING, []),
+        )
+    )
+    def test_combined_builtin_predicates(self, pred, expected):
+        result = list(pick(DICT_LIST, pred))
+        assert result == expected
 
 
 class TestValuesForKey:

@@ -374,6 +374,9 @@ handpick.NO_CONTAINERS
     Predicate that returns True for non-iterable objects, strings
     and bytes-like objects.
 
+handpick.IS_MAPPING
+    Predicate that returns True for dictionaries and other mappings.
+
 handpick.values_for_key(data, key)
     Pick values associated with a specific key.
 

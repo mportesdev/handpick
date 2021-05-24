@@ -37,7 +37,7 @@ def pick(data, predicate, dict_keys=False, strings=False, bytes_like=False):
     if isinstance(data, (bytes, bytearray)) and not bytes_like:
         return
 
-    is_mapping = isinstance(data, Mapping)
+    is_mapping = IS_MAPPING(data)
     predicate_callable = callable(predicate)
     for obj in data:
         if is_mapping:
@@ -146,6 +146,9 @@ NO_CONTAINERS = not_type(Iterable) | is_type((str, bytes, bytearray))
 """Predicate that returns True for non-iterable objects, strings
 and bytes-like objects."""
 
+IS_MAPPING = is_type(Mapping)
+"""Predicate that returns True for dictionaries and other mappings."""
+
 
 # useful functions
 
@@ -155,7 +158,7 @@ def values_for_key(data, key):
     Traverse `data` recursively and yield a sequence of dictionary
     values that are mapped to a dictionary key `key`.
     """
-    for mapping in pick([data], is_type(Mapping)):
+    for mapping in pick([data], IS_MAPPING):
         if key in mapping:
             yield mapping[key]
 
@@ -176,7 +179,7 @@ def _iter_depth(data, depth=0):
 
     yield depth
 
-    is_mapping = isinstance(data, Mapping)
+    is_mapping = IS_MAPPING(data)
     for obj in data:
         if is_mapping:
             # switch from key to value and proceed
