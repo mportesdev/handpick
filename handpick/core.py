@@ -156,7 +156,8 @@ def values_for_key(data, key):
     values that are mapped to a dictionary key `key`.
     """
     for mapping in pick([data], is_type(Mapping)):
-        yield from (v for k, v in mapping.items() if k == key)
+        if key in mapping:
+            yield mapping[key]
 
 
 def max_depth(data):

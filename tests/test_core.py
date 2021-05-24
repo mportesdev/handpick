@@ -682,16 +682,17 @@ class TestValuesForKey:
             pytest.param({}, 0, [], id='empty'),
             pytest.param({0: 1, 2: 3}, 0, [1], id='top-level key 0'),
             pytest.param({0: 1, 2: 3}, 1, [], id='top-level key missing'),
-            pytest.param({0: 1, 2: 3}, 2, [3], id='top-level key 2'),
             pytest.param({0: {0: 1}}, 0, [{0: 1}, 1], id='same key, nested'),
+            pytest.param({0: {1: 2}, 3: {1: 4}}, 1, [2, 4],
+                         id='same key, same level'),
             pytest.param({'a': {'b': 0}, 'b': 1}, 'b', [1, 0],
                          id='same key different level'),
             pytest.param([{'foo': [{'x': 1, 'y': 2}, {'x': 3, 'y': 4}],
                            'bar': ({'x': 5}, {'x': 6})}], 'x', [1, 3, 5, 6],
-                         id='list, dict, tuple x'),
+                         id='list-dict-tuple x'),
             pytest.param([{'foo': [{'x': 1, 'y': 2}, {'x': 3, 'y': 4}],
                            'bar': ({'x': 5}, {'x': 6})}], 'y', [2, 4],
-                         id='list, dict, tuple y'),
+                         id='list-dict-tuple y'),
         )
     )
     def test_values_for_key(self, data, key, expected):
