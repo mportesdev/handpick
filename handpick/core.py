@@ -20,13 +20,13 @@ def pick(data, predicate, dict_keys=False, strings=False, bytes_like=False):
     default. If `dict_keys` is set to True, both keys and values of the
     mapping are inspected.
 
-    By default, strings are not regarded as containers of other objects
+    By default, strings are not treated as containers of other objects
     and therefore not iterated by the recursive algorithm. This can be
     changed by setting `strings` to True. Strings of length 1 are never
     iterated.
 
     By default, bytes-like sequences (bytes and bytearrays) are not
-    regarded as containers of other objects and therefore not iterated
+    treated as containers of other objects and therefore not iterated
     by the recursive algorithm. This can be changed by setting
     `bytes_like` to True.
     """
@@ -143,8 +143,9 @@ def not_type(type_or_types):
 # built-in predicates
 
 IS_CONTAINER = is_type(Iterable) & not_type((str, bytes, bytearray))
-"""Predicate that returns True for iterable containers except strings
-and bytes-like objects."""
+"""Predicate that returns True for iterable containers of other
+objects. Strings and bytes-like objects are not treated as containers.
+"""
 
 IS_MAPPING = is_type(Mapping)
 """Predicate that returns True for dictionaries and other mappings."""
