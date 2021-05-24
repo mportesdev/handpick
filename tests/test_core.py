@@ -136,6 +136,59 @@ def retrieve_items(obj, routes):
 class TestPick:
 
     @pytest.mark.parametrize(
+        'root, expected',
+        (
+            pytest.param(LIST_5_LEVELS,
+                         [bytearray(b'2'), '4', 3.5, b'1', '0', '2', b'3', '1',
+                          2],
+                         id='list 5 levels - no containers'),
+            pytest.param(DICT_5_LEVELS,
+                         ['0_value1', '2_value1', '4_value', '4_value2',
+                          '1_value2'],
+                         id='dict 5 levels - no containers'),
+        )
+    )
+    def test_containers_excluded_optionally(self, root, expected):
+        assert list(pick(root, lambda x: True, containers=False)) == expected
+
+    def test_containers_in_dict_keys_excluded_optionally(self):
+        data = {'1': (), (0, 1): 2}
+        result = pick(data, lambda x: True, containers=False, dict_keys=True)
+
+        assert list(result) == ['1', 0, 1, 2]
+
+    @pytest.mark.parametrize(
+        'root, predicate, routes',
+        (
+            pytest.param(FLAT, lambda obj: float(obj) < 50, [[1], [2]],
+                         id='flat - float < 50'),
+            pytest.param(NESTED_LIST, lambda obj: obj[1],
+                         [[0], [1], [1, 1], [1, 2]],
+                         id='nested list - item 3'),
+            pytest.param(LIST_TUPLE, lambda obj: 3 in obj, [[0, 1], [0, 1, 0]],
+                         id='list tuple - contains 3'),
+            pytest.param(NESTED_DICT,
+                         lambda obj: isinstance(obj, dict) and not obj,
+                         [['1', 'list', 1, 1, 1], ['2', 'tuple', 0]],
+                         id='nested dict - empty dict'),
+        )
+    )
+    def test_picked_objects_by_identity(self, root, predicate, routes):
+        result = pick(root, predicate)
+        expected_items = retrieve_items(root, routes)
+
+        # Unique object to make the assertion fail if `actual` and
+        # `expected` are of unequal length
+        sentinel = object()
+
+        for actual, expected in itertools.zip_longest(result, expected_items,
+                                                      fillvalue=sentinel):
+            assert actual is expected
+
+
+class TestPickWithSimpleFunctions:
+
+    @pytest.mark.parametrize(
         'root, predicate, expected',
         (
             pytest.param(FLAT, bool, [62, True, 'food', 'foo'],
@@ -247,34 +300,6 @@ class TestPick:
     )
     def test_composite(self, root, predicate, expected):
         assert list(pick(root, predicate)) == expected
-
-    @pytest.mark.parametrize(
-        'root, predicate, routes',
-        (
-            pytest.param(FLAT, lambda obj: float(obj) < 50, [[1], [2]],
-                         id='flat - float < 50'),
-            pytest.param(NESTED_LIST, lambda obj: obj[1],
-                         [[0], [1], [1, 1], [1, 2]],
-                         id='nested list - item 3'),
-            pytest.param(LIST_TUPLE, lambda obj: 3 in obj, [[0, 1], [0, 1, 0]],
-                         id='list tuple - contains 3'),
-            pytest.param(NESTED_DICT,
-                         lambda obj: isinstance(obj, dict) and not obj,
-                         [['1', 'list', 1, 1, 1], ['2', 'tuple', 0]],
-                         id='nested dict - empty dict'),
-        )
-    )
-    def test_picked_objects_by_identity(self, root, predicate, routes):
-        result = pick(root, predicate)
-        expected_items = retrieve_items(root, routes)
-
-        # Unique object to make the assertion fail if `actual` and
-        # `expected` are of unequal length
-        sentinel = object()
-
-        for actual, expected in itertools.zip_longest(result, expected_items,
-                                                      fillvalue=sentinel):
-            assert actual is expected
 
 
 class TestPickDictKeysHandling:

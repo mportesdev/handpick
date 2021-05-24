@@ -321,7 +321,7 @@ For example:
 API reference
 =============
 
-handpick.pick(data, predicate, dict_keys=False, strings=False, bytes_like=False)
+handpick.pick(data, predicate, containers=True, dict_keys=False, strings=False, bytes_like=False)
     Pick objects from ``data`` based on ``predicate``.
 
     Traverse ``data`` recursively and yield all objects for which
@@ -333,6 +333,9 @@ handpick.pick(data, predicate, dict_keys=False, strings=False, bytes_like=False)
     a Boolean value. If ``predicate`` is not callable, equality will be
     used as the picking criteria, i.e. objects for which
     ``obj == predicate`` will be yielded.
+
+    By default, containers of other objects are yielded just like any
+    other objects. To exclude containers, set ``containers`` to False.
 
     When traversing a mapping, only its values are inspected by
     default. If ``dict_keys`` is set to True, both keys and values of the

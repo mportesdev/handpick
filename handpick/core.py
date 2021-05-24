@@ -3,7 +3,8 @@ from collections.abc import Mapping, Iterable
 _ERRORS = (TypeError, ValueError, IndexError, KeyError, AttributeError)
 
 
-def pick(data, predicate, dict_keys=False, strings=False, bytes_like=False):
+def pick(data, predicate, containers=True, dict_keys=False, strings=False,
+         bytes_like=False):
     """Pick objects from `data` based on `predicate`.
 
     Traverse `data` recursively and yield all objects for which
@@ -15,6 +16,9 @@ def pick(data, predicate, dict_keys=False, strings=False, bytes_like=False):
     a Boolean value. If `predicate` is not callable, equality will be
     used as the picking criteria, i.e. objects for which
     `obj == predicate` will be yielded.
+
+    By default, containers of other objects are yielded just like any
+    other objects. To exclude containers, set `containers` to False.
 
     When traversing a mapping, only its values are inspected by
     default. If `dict_keys` is set to True, both keys and values of the
@@ -43,20 +47,24 @@ def pick(data, predicate, dict_keys=False, strings=False, bytes_like=False):
         if is_mapping:
             if dict_keys:
                 # process key
-                yield from pick([obj], predicate,
-                                dict_keys, strings, bytes_like)
+                yield from pick(
+                    [obj], predicate, containers, dict_keys, strings, bytes_like
+                )
             # switch from key to value and proceed
             obj = data[obj]
-        if predicate_callable:
-            try:
-                if predicate(obj):
-                    yield obj
-            except _ERRORS:
-                # exception indicates that object does not meet predicate
-                pass
-        elif obj == predicate:
-            yield obj
-        yield from pick(obj, predicate, dict_keys, strings, bytes_like)
+        if containers or not IS_CONTAINER(obj):
+            if predicate_callable:
+                try:
+                    if predicate(obj):
+                        yield obj
+                except _ERRORS:
+                    # exception indicates that object does not meet predicate
+                    pass
+            elif obj == predicate:
+                yield obj
+        yield from pick(
+            obj, predicate, containers, dict_keys, strings, bytes_like
+        )
 
 
 def predicate(func):
