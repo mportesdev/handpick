@@ -88,6 +88,8 @@ class _Predicate:
         return self.func(obj)
 
     def __and__(self, other):
+        """Override the `&` operator."""
+
         if not callable(other):
             return NotImplemented
         other_func = other.func if isinstance(other, self.__class__) else other
@@ -101,6 +103,8 @@ class _Predicate:
         return self & other
 
     def __or__(self, other):
+        """Override the `|` operator."""
+
         if not callable(other):
             return NotImplemented
         other_func = other.func if isinstance(other, self.__class__) else other
@@ -114,6 +118,8 @@ class _Predicate:
         return self | other
 
     def __invert__(self):
+        """Override the `~` operator."""
+
         def new_func(obj):
             return not self.func(obj)
 
