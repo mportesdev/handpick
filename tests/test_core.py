@@ -158,7 +158,7 @@ class TestPick:
         assert list(result) == ['1', 0, 1, 2]
 
     @pytest.mark.parametrize(
-        'root, predicate, routes',
+        'root, pred, routes',
         (
             pytest.param(FLAT, lambda obj: float(obj) < 50, [[1], [2]],
                          id='flat - float < 50'),
@@ -173,8 +173,8 @@ class TestPick:
                          id='nested dict - empty dict'),
         )
     )
-    def test_picked_objects_by_identity(self, root, predicate, routes):
-        result = pick(root, predicate)
+    def test_picked_objects_by_identity(self, root, pred, routes):
+        result = pick(root, pred)
         expected_items = retrieve_items(root, routes)
 
         # Unique object to make the assertion fail if `actual` and
@@ -189,7 +189,7 @@ class TestPick:
 class TestPickWithSimpleFunctions:
 
     @pytest.mark.parametrize(
-        'root, predicate, expected',
+        'root, pred, expected',
         (
             pytest.param(FLAT, bool, [62, True, 'food', 'foo'],
                          id='flat - bool'),
@@ -199,11 +199,11 @@ class TestPickWithSimpleFunctions:
                          id='nested dict - is list'),
         )
     )
-    def test_bool(self, root, predicate, expected):
-        assert list(pick(root, predicate)) == expected
+    def test_bool(self, root, pred, expected):
+        assert list(pick(root, pred)) == expected
 
     @pytest.mark.parametrize(
-        'root, predicate, expected',
+        'root, pred, expected',
         (
             pytest.param(FLAT, is_str, ['food', '', 'foo'],
                          id='flat - is str'),
@@ -214,11 +214,11 @@ class TestPickWithSimpleFunctions:
                          id='nested list - is int'),
         )
     )
-    def test_isinstance(self, root, predicate, expected):
-        assert list(pick(root, predicate)) == expected
+    def test_isinstance(self, root, pred, expected):
+        assert list(pick(root, pred)) == expected
 
     @pytest.mark.parametrize(
-        'root, predicate, expected',
+        'root, pred, expected',
         (
             pytest.param(FLAT, lambda obj: float(obj) < 50, [0.0, True],
                          id='flat - float < 50'),
@@ -228,11 +228,11 @@ class TestPickWithSimpleFunctions:
                          id='list 5 levels - int >= 0'),
         )
     )
-    def test_int_float(self, root, predicate, expected):
-        assert list(pick(root, predicate)) == expected
+    def test_int_float(self, root, pred, expected):
+        assert list(pick(root, pred)) == expected
 
     @pytest.mark.parametrize(
-        'root, predicate, expected',
+        'root, pred, expected',
         (
             pytest.param(FLAT, lambda obj: obj[2], ['food', 'foo'],
                          id='flat - item 2'),
@@ -242,11 +242,11 @@ class TestPickWithSimpleFunctions:
                          id='nested list - item 3'),
         )
     )
-    def test_subscript(self, root, predicate, expected):
-        assert list(pick(root, predicate)) == expected
+    def test_subscript(self, root, pred, expected):
+        assert list(pick(root, pred)) == expected
 
     @pytest.mark.parametrize(
-        'root, predicate, expected',
+        'root, pred, expected',
         (
             pytest.param(FLAT, lambda obj: len(obj) == 0, ['', [], {}],
                          id='flat - len 0'),
@@ -256,11 +256,11 @@ class TestPickWithSimpleFunctions:
                          id='list tuple - len 3'),
         )
     )
-    def test_len(self, root, predicate, expected):
-        assert list(pick(root, predicate)) == expected
+    def test_len(self, root, pred, expected):
+        assert list(pick(root, pred)) == expected
 
     @pytest.mark.parametrize(
-        'root, predicate, expected',
+        'root, pred, expected',
         (
             pytest.param(FLAT, lambda obj: 'foo' in obj, ['food', 'foo'],
                          id='flat - contains "foo"'),
@@ -269,11 +269,11 @@ class TestPickWithSimpleFunctions:
                          id='list tuple - contains 3'),
         )
     )
-    def test_contains(self, root, predicate, expected):
-        assert list(pick(root, predicate)) == expected
+    def test_contains(self, root, pred, expected):
+        assert list(pick(root, pred)) == expected
 
     @pytest.mark.parametrize(
-        'root, predicate, expected',
+        'root, pred, expected',
         (
             pytest.param(FLAT, lambda obj: hasattr(obj, 'count'),
                          ['food', '', [], 'foo'],
@@ -283,11 +283,11 @@ class TestPickWithSimpleFunctions:
                          id='nested dict - has .append'),
         )
     )
-    def test_hasattr(self, root, predicate, expected):
-        assert list(pick(root, predicate)) == expected
+    def test_hasattr(self, root, pred, expected):
+        assert list(pick(root, pred)) == expected
 
     @pytest.mark.parametrize(
-        'root, predicate, expected',
+        'root, pred, expected',
         (
             pytest.param(FLAT, lambda obj: isinstance(obj, float) and obj % 2,
                          [],
@@ -298,8 +298,8 @@ class TestPickWithSimpleFunctions:
                          id='nested dict - empty dict'),
         )
     )
-    def test_composite(self, root, predicate, expected):
-        assert list(pick(root, predicate)) == expected
+    def test_composite(self, root, pred, expected):
+        assert list(pick(root, pred)) == expected
 
 
 class TestPickDictKeysHandling:
@@ -308,7 +308,7 @@ class TestPickDictKeysHandling:
                'good food']
 
     @pytest.mark.parametrize(
-        'root, predicate, expected',
+        'root, pred, expected',
         (
             pytest.param(STRINGS, is_str,
                          ['foot', '', 'foobar', 'bar', 'fool', 'good food'],
@@ -322,11 +322,11 @@ class TestPickDictKeysHandling:
             pytest.param(NESTED_DICT, is_str, [], id='nested dict - is str'),
         )
     )
-    def test_pick_no_keys(self, root, predicate, expected):
-        assert list(pick(root, predicate)) == expected
+    def test_pick_no_keys(self, root, pred, expected):
+        assert list(pick(root, pred)) == expected
 
     @pytest.mark.parametrize(
-        'root, predicate, expected',
+        'root, pred, expected',
         (
             pytest.param(STRINGS, is_str,
                          ['foot', '', 'foobar', 'foo', 'bar', 'bar', 'fool',
@@ -344,13 +344,13 @@ class TestPickDictKeysHandling:
                          id='nested dict - is str'),
         )
     )
-    def test_pick_including_keys(self, root, predicate, expected):
-        assert list(pick(root, predicate, dict_keys=True)) == expected
+    def test_pick_including_keys(self, root, pred, expected):
+        assert list(pick(root, pred, dict_keys=True)) == expected
 
 
 class TestPickSpecialCases:
 
-    @pytest.mark.parametrize('predicate', (lambda x: True, bool, abs))
+    @pytest.mark.parametrize('pred', (lambda x: True, bool, abs))
     @pytest.mark.parametrize(
         'root',
         (
@@ -359,10 +359,10 @@ class TestPickSpecialCases:
             pytest.param({}, id='dict'),
         )
     )
-    def test_empty_root_yields_nothing(self, root, predicate):
-        assert list(pick(root, predicate)) == []
+    def test_empty_root_yields_nothing(self, root, pred):
+        assert list(pick(root, pred)) == []
 
-    @pytest.mark.parametrize('predicate', (lambda x: True, bool, abs))
+    @pytest.mark.parametrize('pred', (lambda x: True, bool, abs))
     @pytest.mark.parametrize(
         'root',
         (
@@ -371,11 +371,11 @@ class TestPickSpecialCases:
             pytest.param(hash, id='builtin'),
         )
     )
-    def test_non_iterable_root_yields_nothing(self, root, predicate):
-        assert list(pick(root, predicate)) == []
+    def test_non_iterable_root_yields_nothing(self, root, pred):
+        assert list(pick(root, pred)) == []
 
     @pytest.mark.parametrize(
-        'root, predicate, expected_len',
+        'root, pred, expected_len',
         (
             pytest.param([1, 2, 3], 1, 1, id='1'),
             pytest.param([1, 2, 3], None, 0, id='None'),
@@ -383,8 +383,8 @@ class TestPickSpecialCases:
             pytest.param(DICT_LIST, {}, 2, id='dict list - {}'),
         )
     )
-    def test_non_callable_predicate(self, root, predicate, expected_len):
-        assert list(pick(root, predicate)) == [predicate] * expected_len
+    def test_non_callable_predicate(self, root, pred, expected_len):
+        assert list(pick(root, pred)) == [pred] * expected_len
 
 
 class TestPickStringsAndBytesLike:
@@ -493,7 +493,7 @@ class TestPredicates:
         assert result == [(2,)]
 
     @pytest.mark.parametrize(
-        'function, predicate, values, expected',
+        'function, pred, values, expected',
         (
             pytest.param(lambda obj: len(obj) < 2,
                          predicate(is_list),
@@ -501,10 +501,10 @@ class TestPredicates:
                          [False, True, False, True, False, True]),
         )
     )
-    def test_function_and_predicate(self, function, predicate, values,
+    def test_function_and_predicate(self, function, pred, values,
                                     expected):
         """Test function & predicate."""
-        compound_predicate = function & predicate
+        compound_predicate = function & pred
 
         for value, result in zip(values, expected):
             assert compound_predicate(value) is result
