@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "handpick"
-version = "0.8.4"
+version = "0.9.0"
 description = "Inspect nested data structures."
 license = "MIT"
 authors = ["Michal Porteš <michalportes1@gmail.com>"]
@@ -17,8 +17,8 @@ classifiers = [
 python = "^3.6"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.2"
-pytest-cov = "^2.12"
+pytest = "^6.2.5"
+pytest-cov = "^2.12.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
