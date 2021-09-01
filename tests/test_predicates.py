@@ -21,8 +21,22 @@ from tests import (
 )
 
 
+class TestDecoratorUsage:
+
+    def test_decorator(self):
+        ...
+
+    def test_decorator_call(self):
+        ...
+
+
 class TestErrorHandling:
-    ...
+
+    def test_predicate_suppresses_errors_by_default(self):
+        ...
+
+    def test_predicate_propagates_errors_optionally(self):
+        ...
 
 
 class TestOverloadedOperators:

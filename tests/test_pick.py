@@ -4,7 +4,8 @@ import operator
 
 import pytest
 
-from handpick import pick, IS_CONTAINER
+from handpick import pick, predicate, IS_CONTAINER
+
 from tests import (
     is_int,
     FLAT,
@@ -34,40 +35,20 @@ def retrieve_items(obj, routes):
 
 class TestPick:
 
-    def test_containers_included_by_default(self):
-        ...
-
     @pytest.mark.parametrize(
-        'root, expected',
+        'data, pred, routes',
         (
-            pytest.param(LIST_5_LEVELS,
-                         [bytearray(b'2'), '4', 3.5, b'1', '0', '2', b'3', '1',
-                          2],
-                         id='list 5 levels - no containers'),
-            pytest.param(DICT_5_LEVELS,
-                         ['0_value1', '2_value1', '4_value', '4_value2',
-                          '1_value2'],
-                         id='dict 5 levels - no containers'),
-        )
-    )
-    def test_containers_excluded_optionally(self, root, expected):
-        assert list(pick(root, lambda x: True, containers=False)) == expected
-
-    def test_containers_in_dict_keys_excluded_optionally(self):
-        data = {'1': (), (0, 1): 2}
-        result = pick(data, lambda x: True, containers=False, dict_keys=True)
-
-        assert list(result) == ['1', 0, 1, 2]
-
-    @pytest.mark.parametrize(
-        'root, pred, routes',
-        (
-            pytest.param(FLAT, lambda obj: float(obj) < 50, [[1], [2]],
+            pytest.param(FLAT,
+                         predicate(lambda obj: float(obj) < 50),
+                         [[1], [2]],
                          id='flat - float < 50'),
-            pytest.param(NESTED_LIST, lambda obj: obj[1],
+            pytest.param(NESTED_LIST,
+                         predicate(lambda obj: obj[1]),
                          [[0], [1], [1, 1], [1, 2]],
                          id='nested list - item 3'),
-            pytest.param(LIST_TUPLE, lambda obj: 3 in obj, [[0, 1], [0, 1, 0]],
+            pytest.param(LIST_TUPLE,
+                         predicate(lambda obj: 3 in obj),
+                         [[0, 1], [0, 1, 0]],
                          id='list tuple - contains 3'),
             pytest.param(NESTED_DICT,
                          lambda obj: isinstance(obj, dict) and not obj,
@@ -75,9 +56,9 @@ class TestPick:
                          id='nested dict - empty dict'),
         )
     )
-    def test_picked_objects_by_identity(self, root, pred, routes):
-        result = pick(root, pred)
-        expected_items = retrieve_items(root, routes)
+    def test_picked_objects_by_identity(self, data, pred, routes):
+        result = pick(data, pred)
+        expected_items = retrieve_items(data, routes)
 
         # Unique object to make the assertion fail if `actual` and
         # `expected` are of unequal length
@@ -88,10 +69,44 @@ class TestPick:
             assert actual is expected
 
 
-class TestSimpleFunctionPredicates:
+class TestContainerHandling:
+
+    def test_containers_included_by_default(self):
+        ...
 
     @pytest.mark.parametrize(
-        'root, pred, expected',
+        'data, expected',
+        (
+                pytest.param(LIST_5_LEVELS,
+                             [bytearray(b'2'), '4', 3.5, b'1', '0', '2',
+                              b'3', '1',
+                              2],
+                             id='list 5 levels - no containers'),
+                pytest.param(DICT_5_LEVELS,
+                             ['0_value1', '2_value1', '4_value', '4_value2',
+                              '1_value2'],
+                             id='dict 5 levels - no containers'),
+        )
+    )
+    def test_containers_excluded_optionally(self, data, expected):
+        assert list(
+            pick(data, lambda x: True, containers=False)) == expected
+
+    def test_containers_in_dict_keys_included_by_default(self):
+        ...
+
+    def test_containers_in_dict_keys_excluded_optionally(self):
+        data = {'1': (), (0, 1): 2}
+        result = pick(data, lambda x: True, containers=False,
+                      dict_keys=True)
+
+        assert list(result) == ['1', 0, 1, 2]
+
+
+class TestFunctionsAndPredicates:
+
+    @pytest.mark.parametrize(
+        'data, pred, expected',
         (
             pytest.param(FLAT, bool, [62, True, 'food', 'foo'],
                          id='flat - bool'),
@@ -99,14 +114,6 @@ class TestSimpleFunctionPredicates:
                          [[1, 2, 100.0], 1, 2, 100.0, [3, 'Py', [{}, 4], 5],
                           3, 'Py', [{}, 4], 4, 5],
                          id='nested dict - is list'),
-        )
-    )
-    def test_bool(self, root, pred, expected):
-        assert list(pick(root, pred)) == expected
-
-    @pytest.mark.parametrize(
-        'root, pred, expected',
-        (
             pytest.param(FLAT, is_str, ['food', '', 'foo'],
                          id='flat - is str'),
             pytest.param(LIST_TUPLE, is_tuple,
@@ -114,94 +121,110 @@ class TestSimpleFunctionPredicates:
                          id='list tuple - is tuple'),
             pytest.param(NESTED_LIST, is_int, [1, 2, 3, 4, 5],
                          id='nested list - is int'),
-        )
-    )
-    def test_isinstance(self, root, pred, expected):
-        assert list(pick(root, pred)) == expected
-
-    @pytest.mark.parametrize(
-        'root, pred, expected',
-        (
-            pytest.param(FLAT, lambda obj: float(obj) < 50, [0.0, True],
-                         id='flat - float < 50'),
-            pytest.param(LIST_5_LEVELS, lambda obj: int(obj) >= 0,
-                         [bytearray(b'2'), '4', 3.5, b'1', '0', '2', b'3',
-                          '1', 2],
-                         id='list 5 levels - int >= 0'),
-        )
-    )
-    def test_int_float(self, root, pred, expected):
-        assert list(pick(root, pred)) == expected
-
-    @pytest.mark.parametrize(
-        'root, pred, expected',
-        (
-            pytest.param(FLAT, lambda obj: obj[2], ['food', 'foo'],
-                         id='flat - item 2'),
-            pytest.param(NESTED_LIST, lambda obj: obj[1],
-                         [[1, 2, 100.0], [3, 'Py', [{}, 4], 5], 'Py',
-                          [{}, 4]],
-                         id='nested list - item 3'),
-        )
-    )
-    def test_subscript(self, root, pred, expected):
-        assert list(pick(root, pred)) == expected
-
-    @pytest.mark.parametrize(
-        'root, pred, expected',
-        (
-            pytest.param(FLAT, lambda obj: len(obj) == 0, ['', [], {}],
-                         id='flat - len 0'),
-            pytest.param(LIST_TUPLE, lambda obj: len(obj) == 3,
-                         [[None, ((1, 2, 3), 3), 0], (1, 2, 3), 'foo',
-                          'bar'],
-                         id='list tuple - len 3'),
-        )
-    )
-    def test_len(self, root, pred, expected):
-        assert list(pick(root, pred)) == expected
-
-    @pytest.mark.parametrize(
-        'root, pred, expected',
-        (
-            pytest.param(FLAT, lambda obj: 'foo' in obj, ['food', 'foo'],
-                         id='flat - contains "foo"'),
-            pytest.param(LIST_TUPLE, lambda obj: 3 in obj,
-                         [((1, 2, 3), 3), (1, 2, 3)],
-                         id='list tuple - contains 3'),
-        )
-    )
-    def test_contains(self, root, pred, expected):
-        assert list(pick(root, pred)) == expected
-
-    @pytest.mark.parametrize(
-        'root, pred, expected',
-        (
             pytest.param(FLAT, lambda obj: hasattr(obj, 'count'),
                          ['food', '', [], 'foo'],
                          id='flat - has .count'),
             pytest.param(NESTED_DICT, lambda obj: hasattr(obj, 'append'),
                          [[], [1, [2, [3, {}]]], [2, [3, {}]], [3, {}], [], []],
                          id='nested dict - has .append'),
-        )
-    )
-    def test_hasattr(self, root, pred, expected):
-        assert list(pick(root, pred)) == expected
-
-    @pytest.mark.parametrize(
-        'root, pred, expected',
-        (
-            pytest.param(FLAT, lambda obj: isinstance(obj, float) and obj % 2,
-                         [],
-                         id='flat - odd float'),
             pytest.param(NESTED_DICT,
                          lambda obj: isinstance(obj, dict) and not obj,
                          [{}, {}],
                          id='nested dict - empty dict'),
         )
     )
-    def test_composite(self, root, pred, expected):
-        assert list(pick(root, pred)) == expected
+    def test_safe_function(self, data, pred, expected):
+        assert list(pick(data, pred)) == expected
+
+    @pytest.mark.parametrize(
+        'data, pred, expected_error',
+        (
+            pytest.param(FLAT,
+                         lambda obj: float(obj) < 50,
+                         (TypeError, ValueError),
+                         id='flat - float < 50'),
+            pytest.param(LIST_5_LEVELS,
+                         lambda obj: int(obj) >= 0,
+                         (TypeError, ValueError),
+                         id='list 5 levels - int >= 0'),
+            pytest.param(FLAT,
+                         lambda obj: obj[2],
+                         (TypeError, IndexError, KeyError),
+                         id='flat - item 2'),
+            pytest.param(NESTED_LIST,
+                         lambda obj: obj[1],
+                         (TypeError, IndexError, KeyError),
+                         id='nested list - item 3'),
+            pytest.param(FLAT,
+                         lambda obj: len(obj) == 0,
+                         TypeError,
+                         id='flat - len 0'),
+            pytest.param(LIST_TUPLE,
+                         lambda obj: len(obj) == 3,
+                         TypeError,
+                         id='list tuple - len 3'),
+            pytest.param(FLAT,
+                         lambda obj: 'foo' in obj,
+                         TypeError,
+                         id='flat - contains "foo"'),
+            pytest.param(LIST_TUPLE,
+                         lambda obj: 3 in obj,
+                         TypeError,
+                         id='list tuple - contains 3'),
+            pytest.param(FLAT,
+                         lambda obj: obj % 2 == 0,
+                         TypeError,
+                         id='flat - even number'),
+        )
+    )
+    def test_function_raises_error(self, data, pred, expected_error):
+        with pytest.raises(expected_error):
+            list(pick(data, pred))
+
+    @pytest.mark.parametrize(
+        'data, pred, expected',
+        (
+            pytest.param(FLAT,
+                         predicate(lambda obj: float(obj) < 50),
+                         [0.0, True],
+                         id='flat - float < 50'),
+            pytest.param(LIST_5_LEVELS,
+                         predicate(lambda obj: int(obj) >= 0),
+                         [bytearray(b'2'), '4', 3.5, b'1', '0', '2', b'3',
+                          '1', 2],
+                         id='list 5 levels - int >= 0'),
+            pytest.param(FLAT,
+                         predicate(lambda obj: obj[2]),
+                         ['food', 'foo'],
+                         id='flat - item 2'),
+            pytest.param(NESTED_LIST,
+                         predicate(lambda obj: obj[1]),
+                         [[1, 2, 100.0], [3, 'Py', [{}, 4], 5], 'Py', [{}, 4]],
+                         id='nested list - item 3'),
+            pytest.param(FLAT,
+                         predicate(lambda obj: len(obj) == 0),
+                         ['', [], {}],
+                         id='flat - len 0'),
+            pytest.param(LIST_TUPLE,
+                         predicate(lambda obj: len(obj) == 3),
+                         [[None, ((1, 2, 3), 3), 0], (1, 2, 3), 'foo', 'bar'],
+                         id='list tuple - len 3'),
+            pytest.param(FLAT,
+                         predicate(lambda obj: 'foo' in obj),
+                         ['food', 'foo'],
+                         id='flat - contains "foo"'),
+            pytest.param(LIST_TUPLE,
+                         predicate(lambda obj: 3 in obj),
+                         [((1, 2, 3), 3), (1, 2, 3)],
+                         id='list tuple - contains 3'),
+            pytest.param(FLAT,
+                         predicate(lambda obj: obj % 2 == 0),
+                         [62, 0.0],
+                         id='flat - even number'),
+        )
+    )
+    def test_predicate_supresses_error(self, data, pred, expected):
+        assert list(pick(data, pred)) == expected
 
 
 class TestDictKeyHandling:
@@ -210,7 +233,7 @@ class TestDictKeyHandling:
                'good food']
 
     @pytest.mark.parametrize(
-        'root, pred, expected',
+        'data, pred, expected',
         (
             pytest.param(STRINGS, is_str,
                          ['foot', '', 'foobar', 'bar', 'fool', 'good food'],
@@ -219,16 +242,16 @@ class TestDictKeyHandling:
                          ['foot', 'foobar', {'foo': 'bar', 'bar': 'fool'},
                           'fool', 'good food'],
                          id='strings - contains "foo"'),
-            pytest.param(DICT_LIST, lambda n: 2 <= n <= 4, [2],
+            pytest.param(DICT_LIST, predicate(lambda n: 2 <= n <= 4), [2],
                          id='dict list - 2-4'),
             pytest.param(NESTED_DICT, is_str, [], id='nested dict - is str'),
         )
     )
-    def test_pick_no_keys(self, root, pred, expected):
-        assert list(pick(root, pred)) == expected
+    def test_dict_keys_excluded_by_default(self, data, pred, expected):
+        assert list(pick(data, pred)) == expected
 
     @pytest.mark.parametrize(
-        'root, pred, expected',
+        'data, pred, expected',
         (
             pytest.param(STRINGS, is_str,
                          ['foot', '', 'foobar', 'foo', 'bar', 'bar', 'fool',
@@ -238,7 +261,7 @@ class TestDictKeyHandling:
                          ['foot', 'foobar', {'foo': 'bar', 'bar': 'fool'},
                           'foo', 'fool', 'good food'],
                          id='strings - contains "foo"'),
-            pytest.param(DICT_LIST, lambda n: 2 <= n <= 4, [2, 4],
+            pytest.param(DICT_LIST, predicate(lambda n: 2 <= n <= 4), [2, 4],
                          id='dict list - 2-4'),
             pytest.param(NESTED_DICT, is_str,
                          ['1', 'dict', 'list', 'tuple', 'list', '2', 'dict',
@@ -246,38 +269,24 @@ class TestDictKeyHandling:
                          id='nested dict - is str'),
         )
     )
-    def test_pick_including_keys(self, root, pred, expected):
-        assert list(pick(root, pred, dict_keys=True)) == expected
+    def test_dict_keys_included_optionally(self, data, pred, expected):
+        assert list(pick(data, pred, dict_keys=True)) == expected
 
 
 class TestSpecialCases:
 
     @pytest.mark.parametrize('pred', (lambda x: True, bool, abs))
-    @pytest.mark.parametrize(
-        'root',
-        (
-            pytest.param([], id='list'),
-            pytest.param((), id='tuple'),
-            pytest.param({}, id='dict'),
-        )
-    )
-    def test_empty_root_yields_nothing(self, root, pred):
-        assert list(pick(root, pred)) == []
+    @pytest.mark.parametrize('data', ([], (), {}))
+    def test_empty_root_yields_nothing(self, data, pred):
+        assert list(pick(data, pred)) == []
 
     @pytest.mark.parametrize('pred', (lambda x: True, bool, abs))
-    @pytest.mark.parametrize(
-        'root',
-        (
-            pytest.param(0, id='int'),
-            pytest.param(None, id='None'),
-            pytest.param(hash, id='builtin'),
-        )
-    )
-    def test_non_iterable_root_yields_nothing(self, root, pred):
-        assert list(pick(root, pred)) == []
+    @pytest.mark.parametrize('data', (0, None, hash))
+    def test_non_iterable_root_yields_nothing(self, data, pred):
+        assert list(pick(data, pred)) == []
 
     @pytest.mark.parametrize(
-        'root, pred, expected_len',
+        'data, pred, expected_len',
         (
             pytest.param([1, 2, 3], 1, 1, id='1'),
             pytest.param([1, 2, 3], None, 0, id='None'),
@@ -285,14 +294,14 @@ class TestSpecialCases:
             pytest.param(DICT_LIST, {}, 2, id='dict list - {}'),
         )
     )
-    def test_non_callable_predicate(self, root, pred, expected_len):
-        assert list(pick(root, pred)) == [pred] * expected_len
+    def test_non_callable_predicate(self, data, pred, expected_len):
+        assert list(pick(data, pred)) == [pred] * expected_len
 
 
 class TestStringsAndBytesLike:
 
     @pytest.mark.parametrize(
-        'root, expected',
+        'data, expected',
         (
             pytest.param([''], [''], id='flat list, empty string'),
             pytest.param(['a'], ['a'], id='flat list, single char string'),
@@ -304,11 +313,11 @@ class TestStringsAndBytesLike:
             pytest.param('str', [], id='top-level string'),
         )
     )
-    def test_strings_not_iterated_by_default(self, root, expected):
-        assert list(pick(root, is_str)) == expected
+    def test_strings_not_iterated_by_default(self, data, expected):
+        assert list(pick(data, is_str)) == expected
 
     @pytest.mark.parametrize(
-        'root, expected',
+        'data, expected',
         (
             pytest.param([''], [''], id='flat list, empty string'),
             pytest.param(['a'], ['a'], id='flat list, single char string'),
@@ -321,11 +330,11 @@ class TestStringsAndBytesLike:
             pytest.param('str', ['s', 't', 'r'], id='top-level string'),
         )
     )
-    def test_strings_iterated_optionally(self, root, expected):
-        assert list(pick(root, is_str, strings=True)) == expected
+    def test_strings_iterated_optionally(self, data, expected):
+        assert list(pick(data, is_str, strings=True)) == expected
 
     @pytest.mark.parametrize(
-        'root, expected',
+        'data, expected',
         (
             pytest.param([b''], [], id='flat list, empty bytes'),
             pytest.param([b'A'], [], id='flat list, bytes'),
@@ -338,11 +347,11 @@ class TestStringsAndBytesLike:
             pytest.param(bytearray(b'ab'), [], id='top-level bytearray'),
         )
     )
-    def test_bytes_like_not_iterated_by_default(self, root, expected):
-        assert list(pick(root, is_int)) == expected
+    def test_bytes_like_not_iterated_by_default(self, data, expected):
+        assert list(pick(data, is_int)) == expected
 
     @pytest.mark.parametrize(
-        'root, expected',
+        'data, expected',
         (
             pytest.param([b''], [], id='flat list, bytes empty'),
             pytest.param([b'A'], [65], id='flat list, bytes'),
@@ -355,8 +364,8 @@ class TestStringsAndBytesLike:
             pytest.param(bytearray(b'ab'), [97, 98], id='top-level bytearray'),
         )
     )
-    def test_bytes_like_iterated_optionally(self, root, expected):
-        assert list(pick(root, is_int, bytes_like=True)) == expected
+    def test_bytes_like_iterated_optionally(self, data, expected):
+        assert list(pick(data, is_int, bytes_like=True)) == expected
 
 
 class TestFlattening:
