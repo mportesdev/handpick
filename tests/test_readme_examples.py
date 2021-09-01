@@ -29,27 +29,16 @@ class TestReadmeExamples:
         assert list(ones) == [1, 1.0, 1.0, 1]
 
     def test_example_3(self):
-        """Example from 'Suppressing errors'."""
-
-        def above_zero(n):
-            return n > 0
-
-        data = [[1, 'Py'], [-2, ['', 3.0]], -4]
-        positive_numbers = pick(data, above_zero)
-
-        assert list(positive_numbers) == [1, 3.0]
-
-    def test_example_4(self):
         """Example from 'Handling dictionary keys'."""
 
-        data = {'key': {'name': 'foo'}, '_key': {'_name': '_bar'}}
-        default = pick(data, lambda s: s.startswith('_'))
-        keys_included = pick(data, lambda s: s.startswith('_'), dict_keys=True)
+        data = {'foo': {'name': 'foo'}, 'bar': {'name': 'bar'}}
+        default = pick(data, lambda s: 'a' in s)
+        keys_included = pick(data, lambda s: 'a' in s, dict_keys=True)
 
-        assert list(default) == ['_bar']
-        assert list(keys_included) == ['_key', '_name', '_bar']
+        assert list(default) == ['bar']
+        assert list(keys_included) == ['name', 'bar', 'name', 'bar']
 
-    def test_example_5(self):
+    def test_example_4(self):
         """Example from 'Combining predicates'."""
 
         @predicate
@@ -66,7 +55,7 @@ class TestReadmeExamples:
 
         assert list(odd_integers) == [1, 15, 7]
 
-    def test_example_6(self):
+    def test_example_5(self):
         """Example from 'Combining predicates with functions'."""
 
         @predicate
@@ -78,6 +67,19 @@ class TestReadmeExamples:
         short_lists = pick(data, short_list)
 
         assert list(short_lists) == [[2], [4], ['6']]
+
+    def test_example_6(self):
+        """Example from 'Suppressing errors'."""
+
+        @predicate
+        def above_zero(n):
+            return n > 0
+
+        assert above_zero(1) is True
+        assert above_zero('a') is False
+
+        positive_numbers = pick([[1, 'Py', -2], [None, 3.0]], above_zero)
+        assert list(positive_numbers) == [1, 3.0]
 
     def test_example_7(self):
         """Example from 'Predicate factories'."""

@@ -71,35 +71,6 @@ criteria. For example:
     [1, 1.0, 1.0, 1]
 
 
-Suppressing errors
-~~~~~~~~~~~~~~~~~~
-
-One important thing to note: when a call to the predicate function
-raises an exception, it is simply assumed that the object in question
-does not meet the picking criteria, and the exception is suppressed.
-For example:
-
-.. code-block:: python
-
-    from handpick import pick
-
-    def above_zero(n):
-        return n > 0
-
-    data = [[1, 'Py'], [-2, ['', 3.0]], -4]
-
-    positive_numbers = pick(data, above_zero)
-
-.. code::
-
-    >>> list(positive_numbers)
-    [1, 3.0]
-
-In the example above, several lists and strings were internally passed
-to the ``above_zero`` function but no ``TypeError`` propagated up to
-the code that called ``pick``.
-
-
 Handling dictionary keys
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -112,17 +83,17 @@ dictionary values are inspected. For example:
 
     from handpick import pick
 
-    data = {'key': {'name': 'foo'}, '_key': {'_name': '_bar'}}
+    data = {'foo': {'name': 'foo'}, 'bar': {'name': 'bar'}}
 
-    default = pick(data, lambda s: s.startswith('_'))
-    keys_included = pick(data, lambda s: s.startswith('_'), dict_keys=True)
+    default = pick(data, lambda s: 'a' in s)
+    keys_included = pick(data, lambda s: 'a' in s, dict_keys=True)
 
 .. code::
 
     >>> list(default)
-    ['_bar']
+    ['bar']
     >>> list(keys_included)
-    ['_key', '_name', '_bar']
+    ['name', 'bar', 'name', 'bar']
 
 
 Predicates
@@ -192,6 +163,36 @@ predicates and regular undecorated functions. For example:
 
     >>> list(short_lists)
     [[2], [4], ['6']]
+
+
+Suppressing errors
+~~~~~~~~~~~~~~~~~~
+
+One important thing to note: when the predicate's underlying function raises
+an exception, the exception is suppressed and instead the call to the predicate
+returns False. In other words, it is assumed that the object in question does
+not meet the picking criteria. For example:
+
+.. code-block:: python
+
+    from handpick import pick, predicate
+
+    @predicate
+    def above_zero(n):
+        return n > 0
+
+.. code::
+
+    >>> above_zero(1)
+    True
+    >>> above_zero('a')
+    False
+    >>> positive_numbers = pick([[1, 'Py', -2], [None, 3.0]], above_zero)
+    >>> list(positive_numbers)
+    [1, 3.0]
+
+In the example above, several lists and strings were internally compared to `0`
+but no ``TypeError`` propagated up to the code that called ``above_zero``.
 
 
 Predicate factories
