@@ -54,12 +54,8 @@ def pick(data, predicate, containers=True, dict_keys=False, strings=False,
             obj = data[obj]
         if containers or not IS_CONTAINER(obj):
             if predicate_callable:
-                try:
-                    if predicate(obj):
-                        yield obj
-                except _ERRORS:
-                    # exception indicates that object does not meet predicate
-                    pass
+                if predicate(obj):
+                    yield obj
             elif obj == predicate:
                 yield obj
         yield from pick(
@@ -85,7 +81,11 @@ class _Predicate:
         self.func = func
 
     def __call__(self, obj):
-        return self.func(obj)
+        try:
+            return self.func(obj)
+        except _ERRORS:
+            # exception indicates that object does not meet predicate
+            return False
 
     def __and__(self, other):
         """Override the `&` operator."""
