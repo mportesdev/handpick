@@ -63,7 +63,7 @@ def pick(data, predicate, containers=True, dict_keys=False, strings=False,
         )
 
 
-def predicate(func):
+class predicate:
     """Decorator wrapping a function in a predicate object.
 
     The decorated function can be combined with other predicates using
@@ -73,10 +73,6 @@ def predicate(func):
     Predicate objects are intended to be used as the `predicate`
     argument to the `pick` function.
     """
-    return _Predicate(func)
-
-
-class _Predicate:
     def __init__(self, func):
         self.func = func
 
