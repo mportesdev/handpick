@@ -39,6 +39,31 @@ class TestErrorHandling:
         ...
 
 
+class TestFromFunctionFactoryMethod:
+
+    @pytest.mark.parametrize(
+        'class_or_instance',
+        (
+            predicate,
+            predicate(lambda x: x),
+        )
+    )
+    @pytest.mark.parametrize(
+        'function_or_predicate',
+        (
+            lambda x: x > 0,
+            predicate(lambda x: x > 0)
+        )
+    )
+    def test(self, class_or_instance, function_or_predicate):
+        pred = class_or_instance.from_function(function_or_predicate)
+        assert isinstance(pred, predicate)
+        assert pred.func is function_or_predicate
+        assert not pred(0)
+        assert pred(42)
+        assert not pred('abc')
+
+
 class TestOverloadedOperators:
     """Test the `&`, `|`, `~` overloaded operations of predicates."""
 

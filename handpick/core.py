@@ -83,6 +83,10 @@ class predicate:
             # exception indicates that object does not meet predicate
             return False
 
+    @classmethod
+    def from_function(cls, func):
+        return cls(func)
+
     def __and__(self, other):
         """Override the `&` operator."""
 
