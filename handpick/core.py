@@ -171,11 +171,16 @@ def values_for_key(data, key):
     """Pick values associated with a specific key.
 
     Traverse `data` recursively and yield a sequence of dictionary
-    values that are mapped to a dictionary key `key`.
+    values that are mapped to `key`. A list of multiple keys can be
+    passed as the `key` argument.
     """
+    if not isinstance(key, list):
+        key = [key]
+
     for mapping in pick([data], IS_MAPPING):
-        if key in mapping:
-            yield mapping[key]
+        for k in key:
+            if k in mapping:
+                yield mapping[k]
 
 
 def max_depth(data):

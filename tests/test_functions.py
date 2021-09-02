@@ -36,8 +36,26 @@ class TestValuesForKey:
                          id='list-dict-tuple y'),
         )
     )
-    def test_values_for_key(self, data, key, expected):
+    def test_single_key(self, data, key, expected):
         assert list(values_for_key(data, key)) == expected
+
+    @pytest.mark.parametrize(
+        'data, keys, expected',
+        (
+            pytest.param({}, [], [], id='empty'),
+            pytest.param({}, [0], [], id='empty key 0'),
+            pytest.param({0: 1, 2: 3}, [0, 2], [1, 3], id='top-level keys 0, 2'),
+            pytest.param({0: 1, 2: 3}, [1, 2], [3], id='top-level key missing'),
+            pytest.param({0: {1: 2}, 3: {1: 4}}, [1, 3], [{1: 4}, 2, 4],
+                         id='two keys, two levels'),
+            pytest.param([{'foo': [{'x': 1, 'y': 2}, {'x': 3, 'y': 4}],
+                           'bar': ({'x': 5}, {'x': 6})}], ['x', 'y'],
+                         [1, 2, 3, 4, 5, 6],
+                         id='list-dict-tuple keys x, y'),
+        )
+    )
+    def test_list_of_keys(self, data, keys, expected):
+        assert list(values_for_key(data, keys)) == expected
 
     @pytest.mark.parametrize(
         'key, expected',
