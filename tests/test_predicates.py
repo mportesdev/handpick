@@ -2,7 +2,7 @@ import pytest
 
 from handpick import (
     pick,
-    predicate,
+    Predicate,
     is_type,
     not_type,
     IS_CONTAINER,
@@ -44,20 +44,20 @@ class TestFromFunctionFactoryMethod:
     @pytest.mark.parametrize(
         'class_or_instance',
         (
-            predicate,
-            predicate(lambda x: x),
+            Predicate,
+            Predicate(lambda x: x),
         )
     )
     @pytest.mark.parametrize(
         'function_or_predicate',
         (
             lambda x: x > 0,
-            predicate(lambda x: x > 0)
+            Predicate(lambda x: x > 0)
         )
     )
     def test(self, class_or_instance, function_or_predicate):
         pred = class_or_instance.from_function(function_or_predicate)
-        assert isinstance(pred, predicate)
+        assert isinstance(pred, Predicate)
         assert pred.func is function_or_predicate
         assert not pred(0)
         assert pred(42)
@@ -70,11 +70,11 @@ class TestOverloadedOperators:
     def test_predicate_and_predicate(self):
         """Test predicate & predicate."""
 
-        @predicate
+        @Predicate
         def is_str(obj):
             return isinstance(obj, str)
 
-        @predicate
+        @Predicate
         def is_short(obj):
             return len(obj) < 3
 
@@ -88,7 +88,7 @@ class TestOverloadedOperators:
     def test_predicate_and_function(self):
         """Test predicate & function."""
 
-        @predicate
+        @Predicate
         def is_tuple(obj):
             return isinstance(obj, tuple)
 
@@ -102,7 +102,7 @@ class TestOverloadedOperators:
     def test_function_and_predicate(self):
         """Test function & predicate."""
 
-        @predicate
+        @Predicate
         def is_list(obj):
             return isinstance(obj, list)
 
@@ -115,7 +115,7 @@ class TestOverloadedOperators:
     def test_predicate_and_non_callable_raises_error(self):
         """Test predicate & non-callable is not implemented."""
 
-        @predicate
+        @Predicate
         def is_dunder_name(string):
             return string.startswith('__') and string.endswith('__')
 
@@ -125,11 +125,11 @@ class TestOverloadedOperators:
     def test_predicate_or_predicate(self):
         """Test predicate | predicate."""
 
-        @predicate
+        @Predicate
         def is_roundable(obj):
             return hasattr(obj, '__round__')
 
-        can_be_int = predicate(is_int) | is_roundable
+        can_be_int = Predicate(is_int) | is_roundable
 
         data = [('1', [None, 9.51]), {'': {2., '2'}}, range(5, 7), '2',
                 {3: True}]
@@ -139,7 +139,7 @@ class TestOverloadedOperators:
     def test_predicate_or_function(self):
         """Test predicate | function."""
 
-        @predicate
+        @Predicate
         def is_tuple(obj):
             return isinstance(obj, tuple)
 
@@ -153,7 +153,7 @@ class TestOverloadedOperators:
     def test_function_or_predicate(self):
         """Test function | predicate."""
 
-        @predicate
+        @Predicate
         def is_tuple(obj):
             return isinstance(obj, tuple)
 
@@ -167,7 +167,7 @@ class TestOverloadedOperators:
     def test_predicate_or_non_callable_raises_error(self):
         """Test predicate | non-callable is not implemented."""
 
-        @predicate
+        @Predicate
         def is_dunder_name(string):
             return string.startswith('__') and string.endswith('__')
 
@@ -177,7 +177,7 @@ class TestOverloadedOperators:
     def test_not_predicate(self):
         """Test ~predicate."""
 
-        @predicate
+        @Predicate
         def is_long(obj):
             return len(obj) > 2
 
@@ -190,11 +190,11 @@ class TestOverloadedOperators:
 
     def test_compound_predicate(self):
         """Test predicate & (~predicate | ~predicate)."""
-        @predicate
+        @Predicate
         def is_even(obj):
             return obj % 2 == 0
 
-        falsey = ~predicate(bool)
+        falsey = ~Predicate(bool)
         odd_or_zero_int = is_type(int) & (~is_even | falsey)
 
         data = [[4, [5.0, 11], 3], [[12, [0]], {17: 6}], 9, [[8], 0, {13, '1'}]]
@@ -204,11 +204,11 @@ class TestOverloadedOperators:
     def test_compound_predicate_with_functions(self):
         """Test (~predicate & ((func & predicate) | (~predicate & func)))."""
 
-        @predicate
+        @Predicate
         def is_list_or_dict(obj):
             return isinstance(obj, (list, dict))
 
-        @predicate
+        @Predicate
         def is_set(obj):
             return isinstance(obj, set)
 

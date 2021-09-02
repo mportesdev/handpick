@@ -100,10 +100,10 @@ Predicates
 ----------
 
 
-The ``predicate`` decorator
+The ``Predicate`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``predicate`` decorator wraps a function in an object that can be
+The ``Predicate`` decorator wraps a function in an object that can be
 combined with other predicates using the operators ``&`` (and) and
 ``|`` (or), as well as negated using the operator ``~`` (not).
 
@@ -115,13 +115,13 @@ For example:
 
 .. code-block:: python
 
-    from handpick import pick, predicate
+    from handpick import pick, Predicate
 
-    @predicate
+    @Predicate
     def is_int(n):
         return isinstance(n, int)
 
-    @predicate
+    @Predicate
     def is_even(n):
         return n % 2 == 0
 
@@ -146,9 +146,9 @@ predicates and regular undecorated functions. For example:
 
 .. code-block:: python
 
-    from handpick import pick, predicate
+    from handpick import pick, Predicate
 
-    @predicate
+    @Predicate
     def is_list(obj):
         return isinstance(obj, list)
 
@@ -175,9 +175,9 @@ not meet the picking criteria. For example:
 
 .. code-block:: python
 
-    from handpick import pick, predicate
+    from handpick import pick, Predicate
 
-    @predicate
+    @Predicate
     def above_zero(n):
         return n > 0
 
@@ -352,7 +352,7 @@ handpick.pick(data, predicate, containers=True, dict_keys=False, strings=False, 
     by the recursive algorithm. This can be changed by setting
     ``bytes_like`` to True.
 
-@handpick.predicate(func)
+@handpick.Predicate(func)
     Decorator wrapping a function in a predicate object.
 
     The decorated function can be combined with other predicates using

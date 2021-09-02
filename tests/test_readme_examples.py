@@ -1,6 +1,6 @@
 from handpick import (
     pick,
-    predicate,
+    Predicate,
     is_type,
     not_type,
     IS_CONTAINER,
@@ -41,11 +41,11 @@ class TestReadmeExamples:
     def test_example_4(self):
         """Example from 'Combining predicates'."""
 
-        @predicate
+        @Predicate
         def is_int(n):
             return isinstance(n, int)
 
-        @predicate
+        @Predicate
         def is_even(n):
             return n % 2 == 0
 
@@ -58,7 +58,7 @@ class TestReadmeExamples:
     def test_example_5(self):
         """Example from 'Combining predicates with functions'."""
 
-        @predicate
+        @Predicate
         def is_list(obj):
             return isinstance(obj, list)
 
@@ -71,7 +71,7 @@ class TestReadmeExamples:
     def test_example_6(self):
         """Example from 'Suppressing errors'."""
 
-        @predicate
+        @Predicate
         def above_zero(n):
             return n > 0
 

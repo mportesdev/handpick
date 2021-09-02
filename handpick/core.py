@@ -63,7 +63,7 @@ def pick(data, predicate, containers=True, dict_keys=False, strings=False,
         )
 
 
-class predicate:
+class Predicate:
     """Decorator wrapping a function in a predicate object.
 
     The decorated function can be combined with other predicates using
@@ -134,7 +134,7 @@ def is_type(type_or_types):
 
     `type_or_types` must be a type or tuple of types.
     """
-    @predicate
+    @Predicate
     def new_predicate(obj):
         return isinstance(obj, type_or_types)
 
@@ -147,7 +147,7 @@ def not_type(type_or_types):
 
     `type_or_types` must be a type or tuple of types.
     """
-    @predicate
+    @Predicate
     def new_predicate(obj):
         return not isinstance(obj, type_or_types)
 
