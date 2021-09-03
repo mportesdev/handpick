@@ -23,11 +23,10 @@ Quick introduction
 The ``pick`` function
 ---------------------
 
-The ``pick`` generator function is the library's main component.
-It performs the recursive traversal of a (presumably nested) data
-structure and applies the picking criteria provided in the form of a
-predicate function (see below for various examples). Picked objects are
-retrieved lazily by an iterator.
+The ``pick`` generator function performs the recursive traversal of a
+(presumably nested) data structure and applies the picking criteria provided
+in the form of a predicate function (see below for various examples). Picked
+objects are retrieved lazily by an iterator.
 
 
 Simple predicate functions
@@ -191,7 +190,7 @@ not meet the picking criteria. For example:
     >>> list(positive_numbers)
     [1, 3.0]
 
-In the example above, several lists and strings were internally compared to `0`
+In the example above, several lists and strings were internally compared to ``0``
 but no ``TypeError`` propagated up to the code that called ``above_zero``.
 
 
@@ -223,12 +222,12 @@ scenarios. For example:
 
 .. code-block:: python
 
-    from handpick import pick, IS_CONTAINER
+    from handpick import pick, IS_COLLECTION
 
     data = [[], [0], [['1'], b'2']]
 
-    # pick only objects that are not containers of other objects
-    only_values = pick(data, ~IS_CONTAINER)
+    # pick only objects that are not collections of other objects
+    only_values = pick(data, ~IS_COLLECTION)
 
 .. code::
 
@@ -236,7 +235,7 @@ scenarios. For example:
     [0, '1', b'2']
 
 **Note:** Despite being iterable, strings and bytes-like objects are
-not treated as containers of other objects by ``IS_CONTAINER``.
+not treated as collections of other objects by ``IS_COLLECTION``.
 
 
 Useful functions
@@ -288,7 +287,7 @@ example:
     >>> max_depth(nested_dict)
     4
 
-**Note:** Just like non-empty containers, empty containers constitute
+**Note:** Just like non-empty collections, empty collections constitute
 another level of nested depth. For example:
 
 .. code::
@@ -322,33 +321,33 @@ For example:
 API reference
 =============
 
-handpick.pick(data, predicate, containers=True, dict_keys=False, strings=False, bytes_like=False)
+handpick.pick(data, predicate, collections=True, dict_keys=False, strings=False, bytes_like=False)
     Pick objects from ``data`` based on ``predicate``.
 
     Traverse ``data`` recursively and yield all objects for which
     ``predicate(obj)`` is True or truthy.
 
-    ``data`` should be an iterable container.
+    ``data`` should be an iterable collection.
 
     ``predicate`` should be a callable taking one argument and returning
     a Boolean value. If ``predicate`` is not callable, equality will be
     used as the picking criteria, i.e. objects for which
     ``obj == predicate`` will be yielded.
 
-    By default, containers of other objects are yielded just like any
-    other objects. To exclude containers, set ``containers`` to False.
+    By default, collections of other objects are yielded just like any
+    other objects. To exclude collections, set ``collections`` to False.
 
     When traversing a mapping, only its values are inspected by
     default. If ``dict_keys`` is set to True, both keys and values of the
     mapping are inspected.
 
-    By default, strings are not treated as containers of other objects
+    By default, strings are not treated as collections of other objects
     and therefore not iterated by the recursive algorithm. This can be
     changed by setting ``strings`` to True. Strings of length 1 are never
     iterated.
 
     By default, bytes-like sequences (bytes and bytearrays) are not
-    treated as containers of other objects and therefore not iterated
+    treated as collections of other objects and therefore not iterated
     by the recursive algorithm. This can be changed by setting
     ``bytes_like`` to True.
 
@@ -374,9 +373,9 @@ handpick.not_type(type_or_types)
 
     ``type_or_types`` must be a type or tuple of types.
 
-handpick.IS_CONTAINER
-    Predicate that returns True for iterable containers of other
-    objects. Strings and bytes-like objects are not treated as containers.
+handpick.IS_COLLECTION
+    Predicate that returns True for iterable collections of other
+    objects. Strings and bytes-like objects are not treated as collections.
 
 handpick.IS_MAPPING
     Predicate that returns True for dictionaries and other mappings.
@@ -390,7 +389,7 @@ handpick.values_for_key(data, key)
 handpick.max_depth(data)
     Return maximum nested depth of ``data``.
 
-    ``data`` should be an iterable container. Depth is counted from zero,
+    ``data`` should be an iterable collection. Depth is counted from zero,
     i.e. the direct elements of ``data`` are in depth 0.
 
 
