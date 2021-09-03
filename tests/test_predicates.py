@@ -5,7 +5,7 @@ from handpick import (
     Predicate,
     is_type,
     not_type,
-    IS_CONTAINER,
+    IS_COLLECTION,
     IS_MAPPING,
 )
 
@@ -300,23 +300,23 @@ class TestBuiltinPredicates:
             pytest.param(LIST_5_LEVELS,
                          [bytearray(b'2'), '4', 3.5, b'1', '0', '2', b'3', '1',
                           2],
-                         id='list 5 levels - no containers'),
+                         id='list 5 levels - no collections'),
             pytest.param(DICT_5_LEVELS,
                          ['0_value1', '2_value1', '4_value', '4_value2',
                           '1_value2'],
-                         id='dict 5 levels - no containers'),
+                         id='dict 5 levels - no collections'),
         )
     )
-    def test_is_container_predicate(self, data, expected):
-        assert list(pick(data, ~IS_CONTAINER)) == expected
+    def test_is_collection_predicate(self, data, expected):
+        assert list(pick(data, ~IS_COLLECTION)) == expected
 
     @pytest.mark.parametrize(
         'json_file',
         ('list_of_int.json', 'dict_of_int.json')
     )
-    def test_is_container_predicate_with_generated_data(self, json_file):
+    def test_is_collection_predicate_with_generated_data(self, json_file):
         data = from_json(json_file)
-        for n in pick(data, ~IS_CONTAINER):
+        for n in pick(data, ~IS_COLLECTION):
             assert is_int(n)
 
     def test_is_mapping_predicate(self):
@@ -325,8 +325,8 @@ class TestBuiltinPredicates:
     @pytest.mark.parametrize(
         'pred, expected',
         (
-            pytest.param(~IS_CONTAINER | IS_MAPPING, [{}, 2, '3', {}, 5]),
-            pytest.param(~IS_CONTAINER & IS_MAPPING, []),
+            pytest.param(~IS_COLLECTION | IS_MAPPING, [{}, 2, '3', {}, 5]),
+            pytest.param(~IS_COLLECTION & IS_MAPPING, []),
         )
     )
     def test_combined_builtin_predicates(self, pred, expected):

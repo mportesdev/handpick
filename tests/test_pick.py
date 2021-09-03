@@ -4,7 +4,7 @@ import operator
 
 import pytest
 
-from handpick import pick, Predicate, IS_CONTAINER
+from handpick import pick, Predicate, IS_COLLECTION
 
 from tests import (
     is_int,
@@ -69,9 +69,9 @@ class TestPick:
             assert actual is expected
 
 
-class TestContainerHandling:
+class TestCollectionHandling:
 
-    def test_containers_included_by_default(self):
+    def test_collections_included_by_default(self):
         ...
 
     @pytest.mark.parametrize(
@@ -81,23 +81,23 @@ class TestContainerHandling:
                              [bytearray(b'2'), '4', 3.5, b'1', '0', '2',
                               b'3', '1',
                               2],
-                             id='list 5 levels - no containers'),
+                             id='list 5 levels - no collections'),
                 pytest.param(DICT_5_LEVELS,
                              ['0_value1', '2_value1', '4_value', '4_value2',
                               '1_value2'],
-                             id='dict 5 levels - no containers'),
+                             id='dict 5 levels - no collections'),
         )
     )
-    def test_containers_excluded_optionally(self, data, expected):
+    def test_collections_excluded_optionally(self, data, expected):
         assert list(
-            pick(data, lambda x: True, containers=False)) == expected
+            pick(data, lambda x: True, collections=False)) == expected
 
-    def test_containers_in_dict_keys_included_by_default(self):
+    def test_collections_in_dict_keys_included_by_default(self):
         ...
 
-    def test_containers_in_dict_keys_excluded_optionally(self):
+    def test_collections_in_dict_keys_excluded_optionally(self):
         data = {'1': (), (0, 1): 2}
-        result = pick(data, lambda x: True, containers=False,
+        result = pick(data, lambda x: True, collections=False,
                       dict_keys=True)
 
         assert list(result) == ['1', 0, 1, 2]
@@ -392,4 +392,4 @@ class TestFlattening:
         )
     )
     def test_flattening(self, data, expected):
-        assert list(pick(data, ~IS_CONTAINER)) == expected
+        assert list(pick(data, ~IS_COLLECTION)) == expected

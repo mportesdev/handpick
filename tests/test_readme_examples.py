@@ -3,7 +3,7 @@ from handpick import (
     Predicate,
     is_type,
     not_type,
-    IS_CONTAINER,
+    IS_COLLECTION,
     values_for_key,
     max_depth,
 )
@@ -93,7 +93,7 @@ class TestReadmeExamples:
         """Example from 'Built-in predicates'."""
 
         data = [[], [0], [['1'], b'2']]
-        only_values = pick(data, ~IS_CONTAINER)
+        only_values = pick(data, ~IS_COLLECTION)
 
         assert list(only_values) == [0, '1', b'2']
 

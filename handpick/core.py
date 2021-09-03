@@ -3,34 +3,34 @@ from collections.abc import Mapping, Iterable
 _ERRORS = (TypeError, ValueError, IndexError, KeyError, AttributeError)
 
 
-def pick(data, predicate, containers=True, dict_keys=False, strings=False,
+def pick(data, predicate, collections=True, dict_keys=False, strings=False,
          bytes_like=False):
     """Pick objects from `data` based on `predicate`.
 
     Traverse `data` recursively and yield all objects for which
     `predicate(obj)` is True or truthy.
 
-    `data` should be an iterable container.
+    `data` should be an iterable collection.
 
     `predicate` should be a callable taking one argument and returning
     a Boolean value. If `predicate` is not callable, equality will be
     used as the picking criteria, i.e. objects for which
     `obj == predicate` will be yielded.
 
-    By default, containers of other objects are yielded just like any
-    other objects. To exclude containers, set `containers` to False.
+    By default, collections of other objects are yielded just like any
+    other objects. To exclude collections, set `collections` to False.
 
     When traversing a mapping, only its values are inspected by
     default. If `dict_keys` is set to True, both keys and values of the
     mapping are inspected.
 
-    By default, strings are not treated as containers of other objects
+    By default, strings are not treated as collections of other objects
     and therefore not iterated by the recursive algorithm. This can be
     changed by setting `strings` to True. Strings of length 1 are never
     iterated.
 
     By default, bytes-like sequences (bytes and bytearrays) are not
-    treated as containers of other objects and therefore not iterated
+    treated as collections of other objects and therefore not iterated
     by the recursive algorithm. This can be changed by setting
     `bytes_like` to True.
     """
@@ -47,14 +47,14 @@ def pick(data, predicate, containers=True, dict_keys=False, strings=False,
         if is_mapping:
             # key-value pair or just value
             obj = (obj, data[obj]) if dict_keys else (data[obj],)
-        elif containers or not IS_CONTAINER(obj):
+        elif collections or not IS_COLLECTION(obj):
             if predicate_callable:
                 if predicate(obj):
                     yield obj
             elif obj == predicate:
                 yield obj
         yield from pick(
-            obj, predicate, containers, dict_keys, strings, bytes_like
+            obj, predicate, collections, dict_keys, strings, bytes_like
         )
 
 
@@ -153,9 +153,9 @@ def not_type(type_or_types):
 
 # built-in predicates
 
-IS_CONTAINER = is_type(Iterable) & not_type((str, bytes, bytearray))
-"""Predicate that returns True for iterable containers of other
-objects. Strings and bytes-like objects are not treated as containers.
+IS_COLLECTION = is_type(Iterable) & not_type((str, bytes, bytearray))
+"""Predicate that returns True for iterable collections of other
+objects. Strings and bytes-like objects are not treated as collections.
 """
 
 IS_MAPPING = is_type(Mapping)
@@ -183,14 +183,14 @@ def values_for_key(data, key):
 def max_depth(data):
     """Return maximum nested depth of `data`.
 
-    `data` should be an iterable container. Depth is counted from zero,
+    `data` should be an iterable collection. Depth is counted from zero,
     i.e. the direct elements of `data` are in depth 0.
     """
     return max(_iter_depth(data), default=0)
 
 
 def _iter_depth(data, depth=0):
-    if not IS_CONTAINER(data):
+    if not IS_COLLECTION(data):
         return
 
     yield depth
