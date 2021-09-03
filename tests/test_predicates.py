@@ -29,6 +29,20 @@ class TestDecoratorUsage:
     def test_decorator_call(self):
         ...
 
+    def test_stacked_decorator(self):
+
+        @Predicate
+        @Predicate
+        @Predicate
+        @Predicate
+        @Predicate
+        def is_even(n):
+            return n % 2 == 0
+
+        assert is_even(42)
+        assert not is_even(15)
+        assert not is_even('x')
+
 
 class TestErrorHandling:
 
@@ -187,6 +201,19 @@ class TestOverloadedOperators:
                 {3, False, 1}]
         result = list(pick(data, is_short))
         assert result == ['1', [0, 1], {'long': '2'}, '2', range(2)]
+
+    def test_double_negation(self):
+        """Test ~(~predicate)."""
+
+        @Predicate
+        def is_even(n):
+            return n % 2 == 0
+
+        even = ~(~is_even)
+
+        assert even(42)
+        assert not even(15)
+        assert not even('x')
 
     def test_compound_predicate(self):
         """Test predicate & (~predicate | ~predicate)."""
