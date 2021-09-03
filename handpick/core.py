@@ -92,12 +92,13 @@ class Predicate:
 
         if not callable(other):
             return NotImplemented
-        other_func = other.func if isinstance(other, self.__class__) else other
+        if isinstance(other, self.__class__):
+            other = other.func
 
-        def new_func(obj):
-            return self.func(obj) and other_func(obj)
+        def fn(obj):
+            return self.func(obj) and other(obj)
 
-        return self.__class__(new_func)
+        return self.from_function(fn)
 
     def __rand__(self, other):
         return self & other
@@ -107,12 +108,13 @@ class Predicate:
 
         if not callable(other):
             return NotImplemented
-        other_func = other.func if isinstance(other, self.__class__) else other
+        if isinstance(other, self.__class__):
+            other = other.func
 
-        def new_func(obj):
-            return self.func(obj) or other_func(obj)
+        def fn(obj):
+            return self.func(obj) or other(obj)
 
-        return self.__class__(new_func)
+        return self.from_function(fn)
 
     def __ror__(self, other):
         return self | other
@@ -120,10 +122,10 @@ class Predicate:
     def __invert__(self):
         """Override the `~` operator."""
 
-        def new_func(obj):
+        def fn(obj):
             return not self.func(obj)
 
-        return self.__class__(new_func)
+        return self.from_function(fn)
 
 
 # predicate factories
