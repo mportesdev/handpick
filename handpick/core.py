@@ -45,14 +45,9 @@ def pick(data, predicate, containers=True, dict_keys=False, strings=False,
     predicate_callable = callable(predicate)
     for obj in data:
         if is_mapping:
-            if dict_keys:
-                # process key
-                yield from pick(
-                    [obj], predicate, containers, dict_keys, strings, bytes_like
-                )
-            # switch from key to value and proceed
-            obj = data[obj]
-        if containers or not IS_CONTAINER(obj):
+            # key-value pair or just value
+            obj = (obj, data[obj]) if dict_keys else (data[obj],)
+        elif containers or not IS_CONTAINER(obj):
             if predicate_callable:
                 if predicate(obj):
                     yield obj
