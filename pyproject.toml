@@ -7,7 +7,7 @@ authors = ["Michal Porteš <michalportes1@gmail.com>"]
 readme = "README.rst"
 homepage = "https://github.com/mportesdev/handpick"
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Operating System :: OS Independent",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
