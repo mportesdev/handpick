@@ -384,7 +384,8 @@ handpick.values_for_key(data, key)
     Pick values associated with a specific key.
 
     Traverse ``data`` recursively and yield a sequence of dictionary
-    values that are mapped to a dictionary key ``key``.
+    values that are mapped to ``key``. ``key`` may be a list of multiple
+    keys.
 
 handpick.max_depth(data)
     Return maximum nested depth of ``data``.

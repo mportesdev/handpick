@@ -45,14 +45,16 @@ def pick(data, predicate, collections=True, dict_keys=False, strings=False,
     predicate_callable = callable(predicate)
     for obj in data:
         if is_mapping:
-            # key-value pair or just value
+            # (key, value) or just (value,)
             obj = (obj, data[obj]) if dict_keys else (data[obj],)
         elif collections or not IS_COLLECTION(obj):
+            # test object against predicate
             if predicate_callable:
                 if predicate(obj):
                     yield obj
             elif obj == predicate:
                 yield obj
+        # inspect object recursively
         yield from pick(
             obj, predicate, collections, dict_keys, strings, bytes_like
         )
@@ -168,8 +170,8 @@ def values_for_key(data, key):
     """Pick values associated with a specific key.
 
     Traverse `data` recursively and yield a sequence of dictionary
-    values that are mapped to `key`. A list of multiple keys can be
-    passed as the `key` argument.
+    values that are mapped to `key`. `key` may be a list of multiple
+    keys.
     """
     if not isinstance(key, list):
         key = [key]
