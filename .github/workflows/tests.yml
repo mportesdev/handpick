@@ -29,13 +29,11 @@ jobs:
 
     - name: Install dependencies
       run: |
-        source $HOME/.poetry/env
         poetry run pip install --upgrade pip
         poetry install
 
     - name: Run tests
       run: |
-        source $HOME/.poetry/env
         poetry run pytest --cov
 
     - name: Upload coverage to Codecov
