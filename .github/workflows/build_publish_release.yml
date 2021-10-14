@@ -24,7 +24,6 @@ jobs:
     - name: Build wheel and publish to PyPI
       id: build_wheel
       run: |
-        source $HOME/.poetry/env
         poetry build --format wheel
         poetry publish --username=${{ secrets.PYPI_USERNAME }} --password=${{ secrets.PYPI_PASSWORD }}
 
