@@ -1,4 +1,4 @@
-|tests| |coverage| |release| |license| |pyversions| |format| |downloads|
+|build-test| |coverage| |release| |license| |pyversions| |format| |downloads|
 
 ========
 Handpick
@@ -394,7 +394,7 @@ handpick.max_depth(data)
     i.e. the direct elements of ``data`` are in depth 0.
 
 
-.. |tests| image:: https://github.com/mportesdev/handpick/actions/workflows/tests.yml/badge.svg
+.. |build-test| image:: https://github.com/mportesdev/handpick/actions/workflows/build-test.yml/badge.svg
     :target: https://github.com/mportesdev/handpick/actions
 .. |coverage| image:: https://img.shields.io/codecov/c/gh/mportesdev/handpick
     :target: https://codecov.io/gh/mportesdev/handpick
