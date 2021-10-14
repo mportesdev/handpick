@@ -1,4 +1,4 @@
-name: Tests
+name: Build & test
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  tests:
+  build-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -33,11 +33,26 @@ jobs:
         poetry run pip install --upgrade pip setuptools
         poetry install --no-root
 
+    - name: Build wheel, delete source, install wheel
+      id: build_wheel
+      run: |
+        poetry build --format=wheel
+        rm -rf handpick
+        WHEEL_PATH="$(ls -1r dist/* | head -n 1)"
+        echo "Wheel path: $WHEEL_PATH"
+        poetry run pip install $WHEEL_PATH
+        INSTALLED_PATH="$(poetry run pip show handpick | grep -Po '(?<=Location: ).*$')/handpick"
+        echo "Wheel installed at $INSTALLED_PATH"
+        echo "::set-output name=WHEEL_PATH::$WHEEL_PATH"
+        echo "::set-output name=INSTALLED_PATH::$INSTALLED_PATH"
+
     - name: Run tests
       id: run_tests
       run: |
+        CODE_PATH=${{ steps.build_wheel.outputs.INSTALLED_PATH }}
+        echo "Code path for coverage: $CODE_PATH"
         COV_REPORT="$HOME/coverage.xml"
-        poetry run pytest --cov=handpick --cov-report=xml":$COV_REPORT"
+        poetry run pytest --cov=$CODE_PATH --cov-report=xml":$COV_REPORT"
         echo "::set-output name=COV_REPORT::$COV_REPORT"
 
     - name: Upload coverage to Codecov
