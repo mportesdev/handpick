@@ -17,7 +17,8 @@ jobs:
          python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -29,12 +30,17 @@ jobs:
 
     - name: Install dependencies
       run: |
-        poetry run pip install --upgrade pip
-        poetry install
+        poetry run pip install --upgrade pip setuptools
+        poetry install --no-root
 
     - name: Run tests
+      id: run_tests
       run: |
-        poetry run pytest --cov
+        COV_REPORT="$HOME/coverage.xml"
+        poetry run pytest --cov=handpick --cov-report=xml":$COV_REPORT"
+        echo "::set-output name=COV_REPORT::$COV_REPORT"
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
+      with:
+        files: ${{ steps.run_tests.outputs.COV_REPORT }}
