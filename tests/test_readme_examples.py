@@ -97,6 +97,10 @@ class TestReadmeExamples:
 
         assert list(only_values) == [0, '1', b'2']
 
+        only_values = pick(data, lambda obj: True, collections=False)
+
+        assert list(only_values) == [0, '1', b'2']
+
     def test_example_9(self):
         """Examples from 'The values_for_key function'."""
 

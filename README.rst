@@ -237,6 +237,15 @@ scenarios. For example:
 **Note:** Despite being iterable, strings and bytes-like objects are
 not treated as collections of other objects by ``IS_COLLECTION``.
 
+The same as above can be achieved by specifying the ``collections`` keyword
+argument to ``pick``:
+
+.. code::
+
+    >>> only_values = pick(data, lambda obj: True, collections=False)
+    >>> list(only_values)
+    [0, '1', b'2']
+
 
 Useful functions
 ----------------
