@@ -3,8 +3,9 @@ from collections.abc import Mapping, Iterable
 _ERRORS = (TypeError, ValueError, IndexError, KeyError, AttributeError)
 
 
-def pick(data, predicate, collections=True, dict_keys=False, strings=False,
-         bytes_like=False):
+def pick(
+    data, predicate, collections=True, dict_keys=False, strings=False, bytes_like=False
+):
     """Pick objects from `data` based on `predicate`.
 
     Traverse `data` recursively and yield all objects for which
@@ -55,9 +56,7 @@ def pick(data, predicate, collections=True, dict_keys=False, strings=False,
             elif obj == predicate:
                 yield obj
         # inspect object recursively
-        yield from pick(
-            obj, predicate, collections, dict_keys, strings, bytes_like
-        )
+        yield from pick(obj, predicate, collections, dict_keys, strings, bytes_like)
 
 
 class Predicate:
@@ -70,6 +69,7 @@ class Predicate:
     Predicate objects are intended to be used as the `predicate`
     argument to the `pick` function.
     """
+
     def __init__(self, func):
         self.func = func
 
@@ -127,12 +127,14 @@ class Predicate:
 
 # predicate factories
 
+
 def is_type(type_or_types):
     """Predicate factory. Return a predicate that returns True if
     object is an instance of specified type(s).
 
     `type_or_types` must be a type or tuple of types.
     """
+
     @Predicate
     def new_predicate(obj):
         return isinstance(obj, type_or_types)
@@ -146,6 +148,7 @@ def not_type(type_or_types):
 
     `type_or_types` must be a type or tuple of types.
     """
+
     @Predicate
     def new_predicate(obj):
         return not isinstance(obj, type_or_types)
@@ -165,6 +168,7 @@ IS_MAPPING = is_type(Mapping)
 
 
 # useful functions
+
 
 def values_for_key(data, key):
     """Pick values associated with a specific key.
