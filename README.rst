@@ -330,77 +330,106 @@ For example:
 API reference
 =============
 
-handpick.pick(data, predicate, collections=True, dict_keys=False, strings=False, bytes_like=False)
-    Pick objects from ``data`` based on ``predicate``.
+pick
+----
 
-    Traverse ``data`` recursively and yield all objects for which
-    ``predicate(obj)`` is True or truthy.
+*handpick.pick(data, predicate, collections=True, dict_keys=False, strings=False, bytes_like=False)*
 
-    ``data`` should be an iterable collection.
+Pick objects from ``data`` based on ``predicate``.
 
-    ``predicate`` should be a callable taking one argument and returning
-    a Boolean value. If ``predicate`` is not callable, equality will be
-    used as the picking criteria, i.e. objects for which
-    ``obj == predicate`` will be yielded.
+Traverse ``data`` recursively and yield all objects for which
+``predicate(obj)`` is True or truthy. ``data`` should be an iterable
+collection. ``predicate`` should be a callable taking one argument
+and returning a Boolean value.
 
-    By default, collections of other objects are yielded just like any
-    other objects. To exclude collections, set ``collections`` to False.
+If ``predicate`` is not callable, equality will be used as the picking
+criteria, i.e. objects for which ``obj == predicate`` will be yielded.
 
-    When traversing a mapping, only its values are inspected by
-    default. If ``dict_keys`` is set to True, both keys and values of the
-    mapping are inspected.
+By default, collections of other objects are yielded just like any
+other objects. To exclude collections, pass ``collections=False``.
 
-    By default, strings are not treated as collections of other objects
-    and therefore not iterated by the recursive algorithm. This can be
-    changed by setting ``strings`` to True. Strings of length 1 are never
-    iterated.
+When traversing a mapping, only its values are inspected by default.
+To inspect both keys and values of mappings, pass ``dict_keys=True``.
 
-    By default, bytes-like sequences (bytes and bytearrays) are not
-    treated as collections of other objects and therefore not iterated
-    by the recursive algorithm. This can be changed by setting
-    ``bytes_like`` to True.
+By default, strings are not treated as collections of other objects
+and therefore not iterated by the recursive algorithm. This can be
+changed by passing ``strings=True``. Strings of length 1 are never
+iterated.
 
-@handpick.Predicate(func)
-    Decorator wrapping a function in a predicate object.
+By default, bytes-like sequences (bytes and bytearrays) are not
+treated as collections of other objects and therefore not iterated
+by the recursive algorithm. This can be changed by passing
+``bytes_like=True``.
 
-    The decorated function can be combined with other predicates using
-    the operators ``&`` (and) and ``|`` (or), as well as negated using the
-    operator ``~`` (not).
+Predicate
+---------
 
-    Predicate objects are intended to be used as the ``predicate``
-    argument to the ``pick`` function.
+*@handpick.Predicate(func)*
 
-handpick.is_type(type_or_types)
-    Predicate factory. Return a predicate that returns True if
-    object is an instance of specified type(s).
+Decorator wrapping a function in a predicate object.
 
-    ``type_or_types`` must be a type or tuple of types.
+The decorated function can be combined with other predicates using
+the operators ``&`` (and) and ``|`` (or), as well as negated using the
+operator ``~`` (not).
 
-handpick.not_type(type_or_types)
-    Predicate factory. Return a predicate that returns True if
-    object is not an instance of specified type(s).
+Predicate objects are intended to be used as the ``predicate``
+argument to the ``pick`` function.
 
-    ``type_or_types`` must be a type or tuple of types.
+is_type
+-------
 
-handpick.IS_COLLECTION
-    Predicate that returns True for iterable collections of other
-    objects. Strings and bytes-like objects are not treated as collections.
+*handpick.is_type(type_or_types)*
 
-handpick.IS_MAPPING
-    Predicate that returns True for dictionaries and other mappings.
+Predicate factory. Return a predicate that returns True if
+object is an instance of specified type(s).
 
-handpick.values_for_key(data, key)
-    Pick values associated with a specific key.
+``type_or_types`` must be a type or tuple of types.
 
-    Traverse ``data`` recursively and yield a sequence of dictionary
-    values that are mapped to ``key``. ``key`` may be a list of multiple
-    keys.
+not_type
+--------
 
-handpick.max_depth(data)
-    Return maximum nested depth of ``data``.
+*handpick.not_type(type_or_types)*
 
-    ``data`` should be an iterable collection. Depth is counted from zero,
-    i.e. the direct elements of ``data`` are in depth 0.
+Predicate factory. Return a predicate that returns True if
+object is not an instance of specified type(s).
+
+``type_or_types`` must be a type or tuple of types.
+
+IS_COLLECTION
+-------------
+
+*handpick.IS_COLLECTION*
+
+Predicate that returns True for iterable collections of other
+objects. Strings and bytes-like objects are not treated as collections.
+
+IS_MAPPING
+----------
+
+*handpick.IS_MAPPING*
+
+Predicate that returns True for dictionaries and other mappings.
+
+values_for_key
+--------------
+
+*handpick.values_for_key(data, key)*
+
+Pick values associated with a specific key.
+
+Traverse ``data`` recursively and yield a sequence of dictionary
+values that are mapped to ``key``. ``key`` may be a list of multiple
+keys.
+
+max_depth
+---------
+
+*handpick.max_depth(data)*
+
+Return maximum nested depth of ``data``.
+
+``data`` should be an iterable collection. Depth is counted from zero,
+i.e. the direct elements of ``data`` are in depth 0.
 
 
 .. |build-test| image:: https://github.com/mportesdev/handpick/actions/workflows/build-test.yml/badge.svg

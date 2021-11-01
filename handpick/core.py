@@ -9,31 +9,28 @@ def pick(
     """Pick objects from `data` based on `predicate`.
 
     Traverse `data` recursively and yield all objects for which
-    `predicate(obj)` is True or truthy.
+    `predicate(obj)` is True or truthy. `data` should be an iterable
+    collection. `predicate` should be a callable taking one argument
+    and returning a Boolean value.
 
-    `data` should be an iterable collection.
-
-    `predicate` should be a callable taking one argument and returning
-    a Boolean value. If `predicate` is not callable, equality will be
-    used as the picking criteria, i.e. objects for which
-    `obj == predicate` will be yielded.
+    If `predicate` is not callable, equality will be used as the picking
+    criteria, i.e. objects for which `obj == predicate` will be yielded.
 
     By default, collections of other objects are yielded just like any
-    other objects. To exclude collections, set `collections` to False.
+    other objects. To exclude collections, pass `collections=False`.
 
-    When traversing a mapping, only its values are inspected by
-    default. If `dict_keys` is set to True, both keys and values of the
-    mapping are inspected.
+    When traversing a mapping, only its values are inspected by default.
+    To inspect both keys and values of mappings, pass `dict_keys=True`.
 
     By default, strings are not treated as collections of other objects
     and therefore not iterated by the recursive algorithm. This can be
-    changed by setting `strings` to True. Strings of length 1 are never
+    changed by passing `strings=True`. Strings of length 1 are never
     iterated.
 
     By default, bytes-like sequences (bytes and bytearrays) are not
     treated as collections of other objects and therefore not iterated
-    by the recursive algorithm. This can be changed by setting
-    `bytes_like` to True.
+    by the recursive algorithm. This can be changed by passing
+    `bytes_like=True`.
     """
     if not isinstance(data, Iterable):
         return
