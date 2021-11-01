@@ -1,4 +1,4 @@
-|build-test| |coverage| |release| |license| |pyversions| |format| |downloads|
+|build| |coverage| |version| |pyversions| |license| |format| |downloads|
 
 ========
 Handpick
@@ -432,16 +432,16 @@ Return maximum nested depth of ``data``.
 i.e. the direct elements of ``data`` are in depth 0.
 
 
-.. |build-test| image:: https://github.com/mportesdev/handpick/actions/workflows/build-test.yml/badge.svg
+.. |build| image:: https://github.com/mportesdev/handpick/actions/workflows/build-test.yml/badge.svg
     :target: https://github.com/mportesdev/handpick/actions
 .. |coverage| image:: https://img.shields.io/codecov/c/gh/mportesdev/handpick
     :target: https://codecov.io/gh/mportesdev/handpick
-.. |release| image:: https://img.shields.io/github/v/release/mportesdev/handpick
-    :target: https://github.com/mportesdev/handpick/releases/latest
-.. |license| image:: https://img.shields.io/github/license/mportesdev/handpick
-    :target: https://github.com/mportesdev/handpick/blob/main/LICENSE
+.. |version| image:: https://img.shields.io/pypi/v/handpick
+    :target: https://pypi.org/project/handpick
 .. |pyversions| image:: https://img.shields.io/pypi/pyversions/handpick
     :target: https://pypi.org/project/handpick
+.. |license| image:: https://img.shields.io/github/license/mportesdev/handpick
+    :target: https://github.com/mportesdev/handpick/blob/main/LICENSE
 .. |format| image:: https://img.shields.io/pypi/format/handpick
     :target: https://pypi.org/project/handpick/#files
 .. |downloads| image:: https://pepy.tech/badge/handpick

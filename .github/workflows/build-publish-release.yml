@@ -26,36 +26,12 @@ jobs:
       run: |
         poetry build --format wheel
         poetry publish --username=${{ secrets.PYPI_USERNAME }} --password=${{ secrets.PYPI_PASSWORD }}
-
-        # set outputs of this step to be used by the following steps
-        BUILD_VERSION=$(poetry version --short)
-        echo BUILD_VERSION=$BUILD_VERSION
-        echo "::set-output name=BUILD_VERSION::$BUILD_VERSION"
-
-        WHEEL_PATH=$(find dist/ -name *$BUILD_VERSION*.whl)
-        echo WHEEL_PATH=$WHEEL_PATH
-        echo "::set-output name=WHEEL_PATH::$WHEEL_PATH"
-
-        WHEEL_NAME=$(basename $WHEEL_PATH)
-        echo WHEEL_NAME=$WHEEL_NAME
-        echo "::set-output name=WHEEL_NAME::$WHEEL_NAME"
+        echo "::set-output name=BUILD_VERSION::$(poetry version --short)"
+        echo "::set-output name=WHEEL_PATH::$(ls -1r dist/* | head -n 1)"
 
     - name: Create GitHub release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ steps.build_wheel.outputs.BUILD_VERSION }}
-        release_name: version ${{ steps.build_wheel.outputs.BUILD_VERSION }}
-
-    - name: Upload wheel to GitHub release
-      id: upload_release_asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ steps.build_wheel.outputs.WHEEL_PATH }}
-        asset_name: ${{ steps.build_wheel.outputs.WHEEL_NAME }}
-        asset_content_type: application/zip
+        token: ${{ secrets.GITHUB_TOKEN }}
+        name: version ${{ steps.build_wheel.outputs.BUILD_VERSION }}
+        files: ${{ steps.build_wheel.outputs.WHEEL_PATH }}
