@@ -1,102 +1,74 @@
-import json
-from pathlib import Path
-
-TEST_DATA_PATH = Path(__file__).parent / "data"
+def is_even(n):
+    return n % 2 == 0
 
 
-def from_json(filename):
-    with open(TEST_DATA_PATH / filename) as f:
-        data = json.load(f)
-    return data
+def is_positive(n):
+    return n > 0
 
 
-def is_int(obj):
-    return isinstance(obj, int)
+# basic sequences (tuple, list, str, bytes, bytearray)
 
-
-FLAT = (62, 0.0, True, "food", "", None, [], "foo", {})
-
-NESTED_LIST = [
-    [1, 2, 100.0],
-    [3, "Py", [{}, 4], 5],
-]
-
-DICT_LIST = {
-    1: [
-        {},
-        (2, "3"),
-    ],
-    4: [
-        {},
-        [5, ()],
-    ],
-}
-
-LIST_TUPLE = [
+SEQUENCES = (
     [
-        None,
+        [
+            "hand",
+        ],
+        b"pick",
         (
-            (1, 2, 3),
-            3,
+            42,
+            b"hand",
         ),
-        0,
     ],
-    ("foo", "bar"),
-]
+    (
+        "3.14",
+        (1.414,),
+        [
+            "15",
+            bytearray(b"pick"),
+        ],
+    ),
+)
 
-NESTED_DICT = {
-    "1": {
-        "dict": {
-            "list": [],
-            "tuple": (),
-        },
-        "list": [1, [2, [3, {}]]],
-    },
-    "2": {
-        "dict": {
-            "list": [],
-            "tuple": (),
-        },
-        "tuple": ({}, [], ()),
-    },
-}
 
-LIST_5_LEVELS = [
+# similar to above, modified to contain dictionaries
+
+SEQS_DICTS = (
     [
         [
-            bytearray(b"2"),
-            [
-                ["4"],
-                3.5,
-            ],
+            "hand",
         ],
-        b"1",
-    ],
-    "0",
-    [
-        [
-            "2",
-            [b"3"],
-        ],
-        "1",
-        (2,),
-    ],
-]
-
-DICT_5_LEVELS = {
-    "0_key1": "0_value1",
-    "0_key2": {
-        "1_key1": {
-            "2_key1": "2_value1",
-            "2_key2": {
-                "3_key1": {
-                    "4_key": "4_value",
-                },
-                "3_key2": {
-                    "4_value2",
-                },
-            },
+        b"pick",
+        {
+            42: b"hand",
         },
-        "1_key2": "1_value2",
-    },
-}
+    ],
+    (
+        "3.14",
+        (1.414,),
+        {
+            ("15",): bytearray(b"pick"),
+        },
+    ),
+)
+
+
+# similar to above, modified to contain set and frozenset
+
+COLLECTIONS = (
+    [
+        {
+            "hand",
+        },
+        b"pick",
+        {
+            42: b"hand",
+        },
+    ],
+    (
+        "3.14",
+        (frozenset({1.414}),),
+        {
+            ("15",): bytearray(b"pick"),
+        },
+    ),
+)
