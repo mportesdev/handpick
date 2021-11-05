@@ -1,8 +1,8 @@
 |build| |coverage| |version| |pyversions| |license| |format| |downloads|
 
-========
-Handpick
-========
+==========
+ Handpick
+==========
 
 Handpick is a tool to traverse nested data structures and pick all
 objects that meet certain criteria.
@@ -23,7 +23,7 @@ Quick introduction
 The ``pick`` function
 ---------------------
 
-The ``pick`` generator function performs the recursive traversal of a
+The `pick`_ generator function performs the recursive traversal of a
 (presumably nested) data structure and applies the picking criteria provided
 in the form of a predicate function (see below for various examples). Picked
 objects are retrieved lazily by an iterator.
@@ -102,7 +102,7 @@ Predicates
 The ``Predicate`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``Predicate`` decorator wraps a function in an object that can be
+The `Predicate`_ decorator wraps a function in an object that can be
 combined with other predicates using the operators ``&`` (and) and
 ``|`` (or), as well as negated using the operator ``~`` (not).
 
@@ -237,14 +237,9 @@ scenarios. For example:
 **Note:** Despite being iterable, strings and bytes-like objects are
 not treated as collections of other objects by ``IS_COLLECTION``.
 
-The same as above can be achieved by specifying the ``collections`` keyword
-argument to ``pick``:
-
-.. code::
-
-    >>> only_values = pick(data, lambda obj: True, collections=False)
-    >>> list(only_values)
-    [0, '1', b'2']
+(Also note that the same as above can be achieved by
+specifying the ``collections`` keyword argument:
+``pick(data, lambda obj: True, collections=False)``. See also `Flattening nested data`_.)
 
 
 Useful functions
