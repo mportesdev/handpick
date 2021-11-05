@@ -7,7 +7,7 @@ from tests import SEQUENCES, COLLECTIONS, SEQS_DICTS
 
 class TestCollectionHandling:
     def test_collections_included_by_default(self):
-        picked = list(pick(SEQUENCES, lambda x: True))
+        picked = list(pick(SEQUENCES))
         assert picked == [
             [["hand"], b"pick", (42, b"hand")],
             ["hand"],
@@ -26,7 +26,7 @@ class TestCollectionHandling:
         ]
 
     def test_collections_excluded_optionally(self):
-        picked = list(pick(SEQUENCES, lambda x: True, collections=False))
+        picked = list(pick(SEQUENCES, collections=False))
         assert picked == [
             "hand",
             b"pick",
@@ -39,7 +39,7 @@ class TestCollectionHandling:
         ]
 
     def test_collections_in_dict_keys_included_by_default(self):
-        picked = list(pick(SEQS_DICTS, lambda x: True, dict_keys=True))
+        picked = list(pick(SEQS_DICTS, dict_keys=True))
         assert picked == [
             [["hand"], b"pick", {42: b"hand"}],
             ["hand"],
@@ -60,7 +60,7 @@ class TestCollectionHandling:
 
     def test_collections_in_dict_keys_excluded_optionally(self):
         picked = list(
-            pick(SEQS_DICTS, lambda x: True, collections=False, dict_keys=True)
+            pick(SEQS_DICTS, collections=False, dict_keys=True)
         )
         assert picked == [
             "hand",
@@ -124,13 +124,18 @@ class TestDictKeyHandling:
 
 class TestSpecialCases:
     def test_empty_root_yields_nothing(self):
-        assert list(pick([], lambda x: True)) == []
+        assert list(pick([])) == []
 
     def test_non_iterable_root_yields_nothing(self):
-        assert list(pick(None, lambda x: True)) == []
+        assert list(pick(None)) == []
 
     def test_non_callable_predicate(self):
         assert list(pick(COLLECTIONS, b"pick")) == [b"pick", bytearray(b"pick")]
+
+    def test_predicate_not_specified(self):
+        assert list(pick([{1: 2}])) == [{1: 2}, 2]
+        assert list(pick([{1: 2}], collections=False)) == [2]
+        assert list(pick([{1: 2}], dict_keys=True)) == [{1: 2}, 1, 2]
 
 
 class TestStringsAndBytesLike:
@@ -169,7 +174,7 @@ class TestStringsAndBytesLike:
         ),
     )
     def test_bytes_like_not_iterated_by_default(self, data, expected):
-        assert list(pick(data, lambda x: True)) == expected
+        assert list(pick(data)) == expected
 
     @pytest.mark.parametrize(
         "data, expected",
@@ -180,4 +185,4 @@ class TestStringsAndBytesLike:
         ),
     )
     def test_bytes_like_iterated_optionally(self, data, expected):
-        assert list(pick(data, lambda x: True, bytes_like=True)) == expected
+        assert list(pick(data, bytes_like=True)) == expected

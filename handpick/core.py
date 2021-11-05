@@ -4,7 +4,12 @@ _ERRORS = (TypeError, ValueError, IndexError, KeyError, AttributeError)
 
 
 def pick(
-    data, predicate, collections=True, dict_keys=False, strings=False, bytes_like=False
+    data,
+    predicate=lambda obj: True,
+    collections=True,
+    dict_keys=False,
+    strings=False,
+    bytes_like=False,
 ):
     """Pick objects from `data` based on `predicate`.
 
@@ -13,8 +18,9 @@ def pick(
     collection. `predicate` should be a callable taking one argument
     and returning a Boolean value.
 
-    If `predicate` is not callable, equality will be used as the picking
-    criteria, i.e. objects for which `obj == predicate` will be yielded.
+    If `predicate` is omitted, all objects are picked. If `predicate`
+    is not callable, equality is used as criteria, i.e. objects for
+    which `obj == predicate` are picked.
 
     By default, collections of other objects are yielded just like any
     other objects. To exclude collections, pass `collections=False`.

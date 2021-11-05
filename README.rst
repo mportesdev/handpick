@@ -32,7 +32,7 @@ objects are retrieved lazily by an iterator.
 Simple predicate functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The predicate function is passed to ``pick`` as the second positional
+The predicate function is passed to ``pick`` as the ``predicate``
 argument. In simple cases, you can use a lambda function as a
 predicate. For example:
 
@@ -237,9 +237,10 @@ scenarios. For example:
 **Note:** Despite being iterable, strings and bytes-like objects are
 not treated as collections of other objects by ``IS_COLLECTION``.
 
-(Also note that the same as above can be achieved by
-specifying the ``collections`` keyword argument:
-``pick(data, lambda obj: True, collections=False)``. See also `Flattening nested data`_.)
+(Also note that the same as above can be achieved by omitting ``predicate``
+and passing ``collections=False``:
+``pick(data, collections=False)``.
+See also `Flattening nested data`_.)
 
 
 Useful functions
@@ -311,10 +312,10 @@ For example:
 
 .. code-block:: python
 
-    from handpick import pick, not_type
+    from handpick import pick
 
     data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
-    flat_data = pick(data, not_type(list))
+    flat_data = pick(data, collections=False)
 
 .. code::
 
@@ -328,7 +329,7 @@ API reference
 pick
 ----
 
-*handpick.pick(data, predicate, collections=True, dict_keys=False, strings=False, bytes_like=False)*
+*handpick.pick(data, predicate=lambda obj: True, collections=True, dict_keys=False, strings=False, bytes_like=False)*
 
 Pick objects from ``data`` based on ``predicate``.
 
@@ -337,8 +338,9 @@ Traverse ``data`` recursively and yield all objects for which
 collection. ``predicate`` should be a callable taking one argument
 and returning a Boolean value.
 
-If ``predicate`` is not callable, equality will be used as the picking
-criteria, i.e. objects for which ``obj == predicate`` will be yielded.
+If ``predicate`` is omitted, all objects are picked. If ``predicate``
+is not callable, equality is used as criteria, i.e. objects for
+which ``obj == predicate`` are picked.
 
 By default, collections of other objects are yielded just like any
 other objects. To exclude collections, pass ``collections=False``.

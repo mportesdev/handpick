@@ -97,7 +97,7 @@ class TestReadmeExamples:
 
         assert list(only_values) == [0, "1", b"2"]
 
-        only_values = pick(data, lambda obj: True, collections=False)
+        only_values = pick(data, collections=False)
 
         assert list(only_values) == [0, "1", b"2"]
 
@@ -130,6 +130,6 @@ class TestReadmeExamples:
         """Examples from 'Flattening nested data'."""
 
         data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
-        flat_data = pick(data, not_type(list))
+        flat_data = pick(data, collections=False)
 
         assert list(flat_data) == [0, 1, 2, 3, 4, 5]
