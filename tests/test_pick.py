@@ -89,7 +89,7 @@ class TestFunctionsAndPredicates:
         ]
 
     def test_function_raises_error(self):
-        with pytest.raises(TypeError, match="'set' object does not support indexing"):
+        with pytest.raises(TypeError):
             list(pick(COLLECTIONS, lambda s: s[1]))
 
     def test_predicate_suppresses_errors(self):
