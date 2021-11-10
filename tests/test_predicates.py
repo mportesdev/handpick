@@ -12,9 +12,12 @@ class TestDecoratorUsage:
         def is_even(n):
             return n % 2 == 0
 
-        assert is_even(42) is True
-        assert is_even(15) is False
-        assert is_even("A") is False  # suppressed TypeError
+        assert type(is_even.func) is Predicate
+        assert type(is_even.func.func) is not Predicate
+
+        assert is_even(42) is is_even.func(42) is is_even.func.func(42) is True
+        assert is_even(15) is is_even.func(15) is is_even.func.func(15) is False
+        assert is_even("A") is is_even.func("A") is False  # suppressed TypeError
 
 
 class TestFromFunctionFactoryMethod:
@@ -26,9 +29,10 @@ class TestFromFunctionFactoryMethod:
         pred = class_or_instance.from_function(function_or_predicate)
 
         assert pred.__class__ is Predicate
+        assert pred.func is function_or_predicate
 
-        assert pred(42) is True
-        assert pred(0) is False
+        assert pred(42) is pred.func(42) is True
+        assert pred(0) is pred.func(0) is False
         assert pred("A") is False  # suppressed TypeError
 
 
@@ -47,11 +51,12 @@ class TestOverloadedOperators:
             return n > 0
 
         pred = is_even & is_positive
+        assert type(pred.func) is not Predicate
 
-        assert pred(42) is True
-        assert pred(-42) is False
-        assert pred(15) is False
-        assert pred(-15) is False
+        assert pred(42) is pred.func(42) is True
+        assert pred(-42) is pred.func(-42) is False
+        assert pred(15) is pred.func(15) is False
+        assert pred(-15) is pred.func(-15) is False
         assert pred("A") is False  # suppressed TypeError
 
     def test_predicate_and_function(self):
@@ -65,11 +70,12 @@ class TestOverloadedOperators:
             return n > 0
 
         pred = is_even & is_positive
+        assert type(pred.func) is not Predicate
 
-        assert pred(42) is True
-        assert pred(-42) is False
-        assert pred(15) is False
-        assert pred(-15) is False
+        assert pred(42) is pred.func(42) is True
+        assert pred(-42) is pred.func(-42) is False
+        assert pred(15) is pred.func(15) is False
+        assert pred(-15) is pred.func(-15) is False
         assert pred("A") is False  # suppressed TypeError
 
     def test_function_and_predicate(self):
@@ -83,11 +89,12 @@ class TestOverloadedOperators:
             return n > 0
 
         pred = is_even & is_positive
+        assert type(pred.func) is not Predicate
 
-        assert pred(42) is True
-        assert pred(-42) is False
-        assert pred(15) is False
-        assert pred(-15) is False
+        assert pred(42) is pred.func(42) is True
+        assert pred(-42) is pred.func(-42) is False
+        assert pred(15) is pred.func(15) is False
+        assert pred(-15) is pred.func(-15) is False
         assert pred("A") is False  # suppressed TypeError
 
     def test_predicate_and_non_callable_raises_error(self):
@@ -112,11 +119,12 @@ class TestOverloadedOperators:
             return n > 0
 
         pred = is_even | is_positive
+        assert type(pred.func) is not Predicate
 
-        assert pred(42) is True
-        assert pred(-42) is True
-        assert pred(15) is True
-        assert pred(-15) is False
+        assert pred(42) is pred.func(42) is True
+        assert pred(-42) is pred.func(-42) is True
+        assert pred(15) is pred.func(15) is True
+        assert pred(-15) is pred.func(-15) is False
         assert pred("A") is False  # suppressed TypeError
 
     def test_predicate_or_function(self):
@@ -130,11 +138,12 @@ class TestOverloadedOperators:
             return n > 0
 
         pred = is_even | is_positive
+        assert type(pred.func) is not Predicate
 
-        assert pred(42) is True
-        assert pred(-42) is True
-        assert pred(15) is True
-        assert pred(-15) is False
+        assert pred(42) is pred.func(42) is True
+        assert pred(-42) is pred.func(-42) is True
+        assert pred(15) is pred.func(15) is True
+        assert pred(-15) is pred.func(-15) is False
         assert pred("A") is False  # suppressed TypeError
 
     def test_function_or_predicate(self):
@@ -148,11 +157,12 @@ class TestOverloadedOperators:
             return n > 0
 
         pred = is_even | is_positive
+        assert type(pred.func) is not Predicate
 
-        assert pred(42) is True
-        assert pred(-42) is True
-        assert pred(15) is True
-        assert pred(-15) is False
+        assert pred(42) is pred.func(42) is True
+        assert pred(-42) is pred.func(-42) is True
+        assert pred(15) is pred.func(15) is True
+        assert pred(-15) is pred.func(-15) is False
         assert pred("A") is False  # suppressed TypeError
 
     def test_predicate_or_non_callable_raises_error(self):
@@ -173,9 +183,10 @@ class TestOverloadedOperators:
             return n % 2 == 0
 
         pred = ~is_even
+        assert type(pred.func) is not Predicate
 
-        assert pred(42) is False
-        assert pred(15) is True
+        assert pred(42) is pred.func(42) is False
+        assert pred(15) is pred.func(15) is True
         assert pred("A") is False  # suppressed TypeError
 
     def test_not_not_predicate(self):
@@ -186,9 +197,10 @@ class TestOverloadedOperators:
             return n % 2 == 0
 
         pred = ~(~is_even)
+        assert type(pred.func) is not Predicate
 
-        assert pred(42) is True
-        assert pred(15) is False
+        assert pred(42) is pred.func(42) is True
+        assert pred(15) is pred.func(15) is False
         assert pred("A") is False  # suppressed TypeError
 
     def test_and_or_not(self):
@@ -207,11 +219,12 @@ class TestOverloadedOperators:
             return int(str(n)[::-1]) == n
 
         pred = is_even & (~is_positive | is_palindromic)
+        assert type(pred.func) is not Predicate
 
-        assert pred(-42) is True
-        assert pred(252) is True
-        assert pred(42) is False
-        assert pred(15) is False
+        assert pred(-42) is pred.func(-42) is True
+        assert pred(252) is pred.func(252) is True
+        assert pred(42) is pred.func(42) is False
+        assert pred(15) is pred.func(15) is False
         assert pred("A") is False  # suppressed TypeError
 
 
