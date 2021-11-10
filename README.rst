@@ -416,6 +416,30 @@ IS_MAPPING
 
 Predicate that returns True for dictionaries and other mappings.
 
+INT_STR
+-------
+
+*handpick.INT_STR*
+
+Predicate that returns True for strings that can be converted
+to int.
+
+FLOAT_STR
+---------
+
+*handpick.FLOAT_STR*
+
+Predicate that returns True for strings that can be converted
+to float.
+
+NUM_STR
+-------
+
+*handpick.NUM_STR*
+
+Predicate that returns True for strings that can be converted
+to a number (i.e. an int, float or complex).
+
 values_for_key
 --------------
 

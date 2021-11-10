@@ -191,6 +191,18 @@ objects. Strings and bytes-like objects are not treated as collections.
 IS_MAPPING = is_type(Mapping)
 """Predicate that returns True for dictionaries and other mappings."""
 
+INT_STR = is_type(str) & no_error(int)
+"""Predicate that returns True for strings that can be converted
+to int."""
+
+FLOAT_STR = is_type(str) & no_error(float)
+"""Predicate that returns True for strings that can be converted
+to float."""
+
+NUM_STR = is_type(str) & no_error(complex)
+"""Predicate that returns True for strings that can be converted
+to a number (i.e. an int, float or complex)."""
+
 
 # useful functions
 

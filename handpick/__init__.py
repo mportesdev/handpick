@@ -11,6 +11,9 @@ from .core import (
     no_error,
     IS_COLLECTION,
     IS_MAPPING,
+    INT_STR,
+    FLOAT_STR,
+    NUM_STR,
     values_for_key,
     max_depth,
 )
@@ -26,6 +29,9 @@ __all__ = [
     "no_error",
     "IS_COLLECTION",
     "IS_MAPPING",
+    "INT_STR",
+    "FLOAT_STR",
+    "NUM_STR",
     "values_for_key",
     "max_depth",
 ]
