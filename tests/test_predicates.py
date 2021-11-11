@@ -1,6 +1,6 @@
 import pytest
 
-from handpick import Predicate, is_type, not_type, IS_COLLECTION, IS_MAPPING
+from handpick import Predicate, is_type, not_type, no_error, IS_COLLECTION, IS_MAPPING
 
 from tests import is_even, is_positive
 
@@ -256,6 +256,20 @@ class TestPredicateFactories:
         assert pred(42) is False
         assert pred(42.15) is False
         assert pred("A") is True
+
+    def test_no_error_int(self):
+        pred = no_error(int)
+
+        assert pred("42") is True
+        assert pred("4.2") is False
+        assert pred([]) is False
+
+    def test_no_error_len(self):
+        pred = no_error(len)
+
+        assert pred("A") is True
+        assert pred([]) is True
+        assert pred(42) is False
 
 
 class TestBuiltinPredicates:

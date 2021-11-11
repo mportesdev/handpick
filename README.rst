@@ -392,6 +392,15 @@ object is not an instance of specified type(s).
 
 ``type_or_types`` must be a type or tuple of types.
 
+no_error
+--------
+
+*handpick.no_error(func)*
+
+Predicate factory. Return a predicate that returns True if ``func``
+can be applied on object without an exception being raised,
+False otherwise.
+
 IS_COLLECTION
 -------------
 

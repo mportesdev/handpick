@@ -1,9 +1,17 @@
 import pytest
 
 from handpick import values_for_key, max_depth
-from handpick.core import _iter_depth
+from handpick.core import _error, _iter_depth
 
 from tests import SEQUENCES, SEQS_DICTS, COLLECTIONS
+
+
+def test_error():
+    assert _error(int, "42") is None
+    assert _error(int, None).__class__ is TypeError
+    assert _error(int, "A").__class__ is ValueError
+    assert _error(int, "4.2e15").__class__ is ValueError
+    assert _error(float, "4.2e15") is None
 
 
 class TestValuesForKey:

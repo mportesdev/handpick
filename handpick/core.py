@@ -159,6 +159,28 @@ def not_type(type_or_types):
     return new_predicate
 
 
+def _error(func, *args, **kwargs):
+    try:
+        func(*args, **kwargs)
+    except Exception as err:
+        return err
+    else:
+        return None
+
+
+def no_error(func):
+    """Predicate factory. Return a predicate that returns True if `func`
+    can be applied on object without an exception being raised,
+    False otherwise.
+    """
+
+    @Predicate
+    def pred(obj):
+        return _error(func, obj) is None
+
+    return pred
+
+
 # built-in predicates
 
 IS_COLLECTION = is_type(Iterable) & not_type((str, bytes, bytearray))
