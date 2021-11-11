@@ -59,9 +59,7 @@ class TestCollectionHandling:
         ]
 
     def test_collections_in_dict_keys_excluded_optionally(self):
-        picked = list(
-            pick(SEQS_DICTS, collections=False, dict_keys=True)
-        )
+        picked = list(pick(SEQS_DICTS, collections=False, dict_keys=True))
         assert picked == [
             "hand",
             b"pick",

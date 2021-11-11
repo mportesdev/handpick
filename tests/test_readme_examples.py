@@ -107,12 +107,41 @@ class TestReadmeExamples:
         data = {
             "node_id": 4,
             "child_nodes": [
-                {"node_id": 8, "child_nodes": [{"node_id": 16}]},
-                {"node_id": 9},
+                {
+                    "node_id": 8,
+                    "child_nodes": [
+                        {
+                            "node_id": 16,
+                        },
+                    ],
+                },
+                {
+                    "node_id": 9,
+                },
             ],
         }
-        node_ids = values_for_key(data, key="node_id")
 
+        node_ids = values_for_key(data, key="node_id")
+        assert list(node_ids) == [4, 8, 16, 9]
+
+        data = {
+            "node_id": 4,
+            "child_nodes": [
+                {
+                    "id": 8,
+                    "child_nodes": [
+                        {
+                            "id": 16,
+                        },
+                    ],
+                },
+                {
+                    "node_id": 9,
+                },
+            ],
+        }
+
+        node_ids = values_for_key(data, key=["node_id", "id"])
         assert list(node_ids) == [4, 8, 16, 9]
 
     def test_example_10(self):
@@ -127,7 +156,7 @@ class TestReadmeExamples:
         assert max_depth([0, [1, []]]) == 2
 
     def test_example_11(self):
-        """Examples from 'Flattening nested data'."""
+        """Example from 'Flattening nested data'."""
 
         data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
         flat_data = pick(data, collections=False)

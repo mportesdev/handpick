@@ -237,8 +237,8 @@ scenarios. For example:
 **Note:** Despite being iterable, strings and bytes-like objects are
 not treated as collections of other objects by ``IS_COLLECTION``.
 
-(Also note that the same as above can be achieved by omitting ``predicate``
-and passing ``collections=False``:
+(Also note that the same as above can be achieved by omitting the predicate
+and excluding collections, i.e.
 ``pick(data, collections=False)``.
 See also `Flattening nested data`_.)
 
@@ -259,12 +259,52 @@ are stored. Values are retrieved lazily by an iterator. For example:
 
     from handpick import values_for_key
 
-    data = {'node_id': 4,
-            'child_nodes': [{'node_id': 8,
-                             'child_nodes': [{'node_id': 16}]},
-                            {'node_id': 9}]}
+    data = {
+        "node_id": 4,
+        "child_nodes": [
+            {
+                "node_id": 8,
+                "child_nodes": [
+                    {
+                        "node_id": 16,
+                    },
+                ],
+            },
+            {
+                "node_id": 9,
+            },
+        ],
+    }
 
     node_ids = values_for_key(data, key='node_id')
+
+.. code::
+
+    >>> list(node_ids)
+    [4, 8, 16, 9]
+
+Multiple keys may be specified at a time. For example:
+
+.. code-block:: python
+
+    data = {
+        "node_id": 4,
+        "child_nodes": [
+            {
+                "id": 8,
+                "child_nodes": [
+                    {
+                        "id": 16,
+                    },
+                ],
+            },
+            {
+                "node_id": 9,
+            },
+        ],
+    }
+
+    node_ids = values_for_key(data, key=["node_id", "id"])
 
 .. code::
 
