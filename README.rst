@@ -1,4 +1,4 @@
-|build| |coverage| |version| |pyversions| |license| |format| |downloads|
+|build| |coverage| |version| |black| |pyversions| |license| |downloads|
 
 ==========
  Handpick
@@ -40,7 +40,7 @@ predicate. For example:
 
     from handpick import pick
 
-    data = [[1, 'Py'], [-2, ['', 3.0]], -4]
+    data = [[1, "Py"], [-2, ["", 3.0]], -4]
 
     non_empty_strings = pick(data, lambda s: isinstance(s, str) and s)
 
@@ -60,9 +60,9 @@ criteria. For example:
 
     from handpick import pick
 
-    data = [1, [1.0, [2, 1.]], [{'1': 1}, [3]]]
+    data = [1, [1.0, [2, 1.0]], [{"1": 1}, [3]]]
 
-    ones = pick(data, 1)    # equivalent to pick(data, lambda n: n == 1)
+    ones = pick(data, 1)  # equivalent to pick(data, lambda n: n == 1)
 
 .. code::
 
@@ -82,10 +82,10 @@ dictionary values are inspected. For example:
 
     from handpick import pick
 
-    data = {'foo': {'name': 'foo'}, 'bar': {'name': 'bar'}}
+    data = {"foo": {"name": "foo"}, "bar": {"name": "bar"}}
 
-    default = pick(data, lambda s: 'a' in s)
-    keys_included = pick(data, lambda s: 'a' in s, dict_keys=True)
+    default = pick(data, lambda s: "a" in s)
+    keys_included = pick(data, lambda s: "a" in s, dict_keys=True)
 
 .. code::
 
@@ -151,7 +151,7 @@ predicates and regular undecorated functions. For example:
     def is_list(obj):
         return isinstance(obj, list)
 
-    data = [('1', [2]), {('x',): [(3, [4]), '5']}, ['x', ['6']], {7: ('x',)}]
+    data = [("1", [2]), {("x",): [(3, [4]), "5"]}, ["x", ["6"]], {7: ("x",)}]
 
     # compound predicate
     short_list = (lambda obj: len(obj) < 2) & is_list
@@ -184,9 +184,9 @@ not meet the picking criteria. For example:
 
     >>> above_zero(1)
     True
-    >>> above_zero('a')
+    >>> above_zero("a")
     False
-    >>> positive_numbers = pick([[1, 'Py', -2], [None, 3.0]], above_zero)
+    >>> positive_numbers = pick([[1, "Py", -2], [None, 3.0]], above_zero)
     >>> list(positive_numbers)
     [1, 3.0]
 
@@ -204,7 +204,7 @@ predicates based on an object's type. For example:
 
     from handpick import pick, is_type, not_type
 
-    data = [[1.0, [2, True]], [False, [3]], ['4', {5, True}]]
+    data = [[1.0, [2, True]], [False, [3]], ["4", {5, True}]]
 
     strictly_integers = pick(data, is_type(int) & not_type(bool))
 
@@ -224,7 +224,7 @@ scenarios. For example:
 
     from handpick import pick, IS_COLLECTION
 
-    data = [[], [0], [['1'], b'2']]
+    data = [[], [0], [["1"], b"2"]]
 
     # pick only objects that are not collections of other objects
     only_values = pick(data, ~IS_COLLECTION)
@@ -276,7 +276,7 @@ are stored. Values are retrieved lazily by an iterator. For example:
         ],
     }
 
-    node_ids = values_for_key(data, key='node_id')
+    node_ids = values_for_key(data, key="node_id")
 
 .. code::
 
@@ -508,11 +508,11 @@ i.e. the direct elements of ``data`` are in depth 0.
     :target: https://codecov.io/gh/mportesdev/handpick
 .. |version| image:: https://img.shields.io/pypi/v/handpick
     :target: https://pypi.org/project/handpick
+.. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://github.com/psf/black
 .. |pyversions| image:: https://img.shields.io/pypi/pyversions/handpick
     :target: https://pypi.org/project/handpick
 .. |license| image:: https://img.shields.io/github/license/mportesdev/handpick
     :target: https://github.com/mportesdev/handpick/blob/main/LICENSE
-.. |format| image:: https://img.shields.io/pypi/format/handpick
-    :target: https://pypi.org/project/handpick/#files
 .. |downloads| image:: https://pepy.tech/badge/handpick
     :target: https://pepy.tech/project/handpick

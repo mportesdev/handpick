@@ -1,4 +1,4 @@
-name: Build & test
+name: Build
 
 on:
   push:
@@ -46,7 +46,7 @@ jobs:
         echo "::set-output name=WHEEL_PATH::$WHEEL_PATH"
         echo "::set-output name=INSTALLED_PATH::$INSTALLED_PATH"
 
-    - name: Run tests
+    - name: Run tests and coverage against installed package
       id: run_tests
       run: |
         CODE_PATH=${{ steps.build_wheel.outputs.INSTALLED_PATH }}

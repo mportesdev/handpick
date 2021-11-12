@@ -24,7 +24,7 @@ jobs:
     - name: Build wheel and publish to PyPI
       id: build_wheel
       run: |
-        poetry build --format wheel
+        poetry build
         poetry publish --username=${{ secrets.PYPI_USERNAME }} --password=${{ secrets.PYPI_PASSWORD }}
         echo "::set-output name=BUILD_VERSION::$(poetry version --short)"
         echo "::set-output name=WHEEL_PATH::$(ls -1r dist/* | head -n 1)"
