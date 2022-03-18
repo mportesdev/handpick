@@ -11,27 +11,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.10'
 
-    - name: Install poetry
-      run: curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python -
-
-    - name: Build wheel and publish to PyPI
-      id: build_wheel
+    - name: Install poetry, build, publish to PyPI
+      id: build_publish
       run: |
+        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python -
         poetry build
         poetry publish --username=${{ secrets.PYPI_USERNAME }} --password=${{ secrets.PYPI_PASSWORD }}
-        echo "::set-output name=BUILD_VERSION::$(poetry version --short)"
+        echo "::set-output name=VERSION::$(poetry version --short)"
         echo "::set-output name=WHEEL_PATH::$(ls -1r dist/* | head -n 1)"
 
     - name: Create GitHub release
       uses: softprops/action-gh-release@v1
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: version ${{ steps.build_wheel.outputs.BUILD_VERSION }}
-        files: ${{ steps.build_wheel.outputs.WHEEL_PATH }}
+        name: version ${{ steps.build_publish.outputs.VERSION }}
+        files: ${{ steps.build_publish.outputs.WHEEL_PATH }}

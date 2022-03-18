@@ -14,49 +14,36 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-         python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
+         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11.0-a - 3.11']
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install poetry
-      run: curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python -
-
-    - name: Install dependencies
+    - name: Install poetry, build, run tests
+      id: build_test
       run: |
+        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python -
         poetry run pip install --upgrade pip setuptools
         poetry install --no-root
-
-    - name: Build wheel, delete source, install wheel
-      id: build_wheel
-      run: |
         poetry build --format=wheel
         rm -rf handpick
         WHEEL_PATH="$(ls -1r dist/* | head -n 1)"
-        echo "Wheel path: $WHEEL_PATH"
+        echo "WHEEL PATH: $WHEEL_PATH"
         poetry run pip install $WHEEL_PATH
-        INSTALLED_PATH="$(poetry run pip show handpick | grep -Po '(?<=Location: ).*$')/handpick"
-        echo "Wheel installed at $INSTALLED_PATH"
-        echo "::set-output name=WHEEL_PATH::$WHEEL_PATH"
-        echo "::set-output name=INSTALLED_PATH::$INSTALLED_PATH"
-
-    - name: Run tests and coverage against installed package
-      id: run_tests
-      run: |
-        CODE_PATH=${{ steps.build_wheel.outputs.INSTALLED_PATH }}
-        echo "Code path for coverage: $CODE_PATH"
-        COV_REPORT="$HOME/coverage.xml"
-        poetry run pytest --cov=$CODE_PATH --cov-report=xml":$COV_REPORT"
-        echo "::set-output name=COV_REPORT::$COV_REPORT"
+        INSTALLED_PATH="$(poetry run pip show handpick | grep Location | cut -d' ' -f2)/handpick"
+        echo "WHEEL INSTALLED TO: $INSTALLED_PATH"
+        COV_REPORT_PATH="${{ github.workspace }}/coverage.xml"
+        poetry run pytest --cov=$INSTALLED_PATH --cov-report=xml":$COV_REPORT_PATH" --cov-report=term
+        echo "::set-output name=COV_REPORT_PATH::$COV_REPORT_PATH"
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
-      if: matrix.python-version == '3.9'
+      uses: codecov/codecov-action@v3
+      if: matrix.python-version == '3.10'
       with:
-        files: ${{ steps.run_tests.outputs.COV_REPORT }}
+        files: ${{ steps.build_test.outputs.COV_REPORT_PATH }}
