@@ -242,6 +242,7 @@ class TestPredicateFactories:
     def test_is_type_single_type(self):
         pred = is_type(int)
 
+        assert isinstance(pred, Predicate)
         assert pred(42) is True
         assert pred(42.15) is False
         assert pred("A") is False
@@ -249,6 +250,7 @@ class TestPredicateFactories:
     def test_is_type_tuple_of_types(self):
         pred = is_type((int, float))
 
+        assert isinstance(pred, Predicate)
         assert pred(42) is True
         assert pred(42.15) is True
         assert pred("A") is False
@@ -256,6 +258,7 @@ class TestPredicateFactories:
     def test_not_type_single_type(self):
         pred = not_type(int)
 
+        assert isinstance(pred, Predicate)
         assert pred(42) is False
         assert pred(42.15) is True
         assert pred("A") is True
@@ -263,6 +266,7 @@ class TestPredicateFactories:
     def test_not_type_tuple_of_types(self):
         pred = not_type((int, float))
 
+        assert isinstance(pred, Predicate)
         assert pred(42) is False
         assert pred(42.15) is False
         assert pred("A") is True
@@ -270,6 +274,7 @@ class TestPredicateFactories:
     def test_no_error_int(self):
         pred = no_error(int)
 
+        assert isinstance(pred, Predicate)
         assert pred("42") is True
         assert pred("4.2") is False
         assert pred([]) is False
@@ -277,6 +282,7 @@ class TestPredicateFactories:
     def test_no_error_len(self):
         pred = no_error(len)
 
+        assert isinstance(pred, Predicate)
         assert pred("A") is True
         assert pred([]) is True
         assert pred(42) is False

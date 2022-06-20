@@ -60,6 +60,7 @@ class TestMaxDepthIterDepth:
             pytest.param(COLLECTIONS, 3, id="collections"),
             pytest.param([], 0, id="[]"),
             pytest.param([[]], 1, id="[[]]"),
+            pytest.param(42, 0, id="non-iterable"),
         ),
     )
     def test_max_depth(self, root, expected):
