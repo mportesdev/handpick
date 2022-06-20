@@ -1,4 +1,4 @@
-|build| |coverage| |version| |black| |pyversions| |license| |downloads|
+|ukraine| |build| |coverage| |version| |black| |pyversions| |license| |downloads|
 
 ==========
  Handpick
@@ -502,6 +502,8 @@ Return maximum nested depth of ``data``.
 i.e. the direct elements of ``data`` are in depth 0.
 
 
+.. |ukraine| image:: https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg
+    :target: https://stand-with-ukraine.pp.ua
 .. |build| image:: https://github.com/mportesdev/handpick/actions/workflows/build-test.yml/badge.svg
     :target: https://github.com/mportesdev/handpick/actions
 .. |coverage| image:: https://img.shields.io/codecov/c/gh/mportesdev/handpick
