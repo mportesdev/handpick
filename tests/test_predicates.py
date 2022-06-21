@@ -17,17 +17,13 @@ from tests import is_even, is_positive
 
 class TestDecoratorUsage:
     def test_stacked_decorator(self):
-        @Predicate
-        @Predicate
-        def is_even(n):
-            return n % 2 == 0
+        _is_even = Predicate(Predicate(is_even))
 
-        assert type(is_even.func) is Predicate
-        assert type(is_even.func.func) is not Predicate
-
-        assert is_even(42) is is_even.func(42) is is_even.func.func(42) is True
-        assert is_even(15) is is_even.func(15) is is_even.func.func(15) is False
-        assert is_even("A") is is_even.func("A") is False  # suppressed TypeError
+        assert type(_is_even.func) is Predicate
+        assert type(_is_even.func.func) is not Predicate
+        assert _is_even(42) is _is_even.func(42) is _is_even.func.func(42) is True
+        assert _is_even(15) is _is_even.func(15) is _is_even.func.func(15) is False
+        assert _is_even("A") is _is_even.func("A") is False  # suppressed TypeError
 
 
 class TestFromFunctionFactoryMethod:
@@ -40,7 +36,6 @@ class TestFromFunctionFactoryMethod:
 
         assert type(pred) is Predicate
         assert pred.func is function_or_predicate
-
         assert pred(42) is pred.func(42) is True
         assert pred(0) is pred.func(0) is False
         assert pred("A") is False  # suppressed TypeError
@@ -51,18 +46,11 @@ class TestOverloadedOperators:
 
     def test_predicate_and_predicate(self):
         """Test predicate & predicate."""
+        _is_even = Predicate(is_even)
+        _is_positive = Predicate(is_positive)
+        pred = _is_even & _is_positive
 
-        @Predicate
-        def is_even(n):
-            return n % 2 == 0
-
-        @Predicate
-        def is_positive(n):
-            return n > 0
-
-        pred = is_even & is_positive
         assert type(pred.func) is not Predicate
-
         assert pred(42) is pred.func(42) is True
         assert pred(-42) is pred.func(-42) is False
         assert pred(15) is pred.func(15) is False
@@ -71,17 +59,10 @@ class TestOverloadedOperators:
 
     def test_predicate_and_function(self):
         """Test predicate & function."""
+        _is_even = Predicate(is_even)
+        pred = _is_even & is_positive
 
-        @Predicate
-        def is_even(n):
-            return n % 2 == 0
-
-        def is_positive(n):
-            return n > 0
-
-        pred = is_even & is_positive
         assert type(pred.func) is not Predicate
-
         assert pred(42) is pred.func(42) is True
         assert pred(-42) is pred.func(-42) is False
         assert pred(15) is pred.func(15) is False
@@ -90,17 +71,10 @@ class TestOverloadedOperators:
 
     def test_function_and_predicate(self):
         """Test function & predicate."""
+        _is_positive = Predicate(is_positive)
+        pred = is_even & _is_positive
 
-        def is_even(n):
-            return n % 2 == 0
-
-        @Predicate
-        def is_positive(n):
-            return n > 0
-
-        pred = is_even & is_positive
         assert type(pred.func) is not Predicate
-
         assert pred(42) is pred.func(42) is True
         assert pred(-42) is pred.func(-42) is False
         assert pred(15) is pred.func(15) is False
@@ -109,28 +83,17 @@ class TestOverloadedOperators:
 
     def test_predicate_and_non_callable_raises_error(self):
         """Test predicate & non-callable is not implemented."""
-
-        @Predicate
-        def is_even(n):
-            return n % 2 == 0
-
+        _is_even = Predicate(is_even)
         with pytest.raises(TypeError, match="unsupported"):
-            is_even & None
+            _is_even & None
 
     def test_predicate_or_predicate(self):
         """Test predicate | predicate."""
+        _is_even = Predicate(is_even)
+        _is_positive = Predicate(is_positive)
+        pred = _is_even | _is_positive
 
-        @Predicate
-        def is_even(n):
-            return n % 2 == 0
-
-        @Predicate
-        def is_positive(n):
-            return n > 0
-
-        pred = is_even | is_positive
         assert type(pred.func) is not Predicate
-
         assert pred(42) is pred.func(42) is True
         assert pred(-42) is pred.func(-42) is True
         assert pred(15) is pred.func(15) is True
@@ -139,17 +102,10 @@ class TestOverloadedOperators:
 
     def test_predicate_or_function(self):
         """Test predicate | function."""
+        _is_even = Predicate(is_even)
+        pred = _is_even | is_positive
 
-        @Predicate
-        def is_even(n):
-            return n % 2 == 0
-
-        def is_positive(n):
-            return n > 0
-
-        pred = is_even | is_positive
         assert type(pred.func) is not Predicate
-
         assert pred(42) is pred.func(42) is True
         assert pred(-42) is pred.func(-42) is True
         assert pred(15) is pred.func(15) is True
@@ -158,17 +114,10 @@ class TestOverloadedOperators:
 
     def test_function_or_predicate(self):
         """Test function | predicate."""
+        _is_positive = Predicate(is_positive)
+        pred = is_even | _is_positive
 
-        def is_even(n):
-            return n % 2 == 0
-
-        @Predicate
-        def is_positive(n):
-            return n > 0
-
-        pred = is_even | is_positive
         assert type(pred.func) is not Predicate
-
         assert pred(42) is pred.func(42) is True
         assert pred(-42) is pred.func(-42) is True
         assert pred(15) is pred.func(15) is True
@@ -177,60 +126,42 @@ class TestOverloadedOperators:
 
     def test_predicate_or_non_callable_raises_error(self):
         """Test predicate | non-callable is not implemented."""
-
-        @Predicate
-        def is_even(n):
-            return n % 2 == 0
-
+        _is_even = Predicate(is_even)
         with pytest.raises(TypeError, match="unsupported"):
-            is_even | None
+            _is_even | None
 
     def test_not_predicate(self):
         """Test ~predicate."""
+        _is_even = Predicate(is_even)
+        pred = ~_is_even
 
-        @Predicate
-        def is_even(n):
-            return n % 2 == 0
-
-        pred = ~is_even
         assert type(pred.func) is not Predicate
-
         assert pred(42) is pred.func(42) is False
         assert pred(15) is pred.func(15) is True
         assert pred("A") is False  # suppressed TypeError
 
     def test_not_not_predicate(self):
         """Test ~(~predicate)."""
+        _is_even = Predicate(is_even)
+        pred = ~(~_is_even)
 
-        @Predicate
-        def is_even(n):
-            return n % 2 == 0
-
-        pred = ~(~is_even)
         assert type(pred.func) is not Predicate
-
         assert pred(42) is pred.func(42) is True
         assert pred(15) is pred.func(15) is False
         assert pred("A") is False  # suppressed TypeError
 
     def test_and_or_not(self):
         """Test predicate & (~predicate | predicate)."""
-
-        @Predicate
-        def is_even(n):
-            return n % 2 == 0
-
-        @Predicate
-        def is_positive(n):
-            return n > 0
+        _is_even = Predicate(is_even)
+        _is_positive = Predicate(is_positive)
 
         @Predicate
         def is_palindromic(n):
             return int(str(n)[::-1]) == n
 
-        pred = is_even & (~is_positive | is_palindromic)
-        assert type(pred.func) is not Predicate
+        pred = _is_even & (~_is_positive | is_palindromic)
 
+        assert type(pred.func) is not Predicate
         assert pred(-42) is pred.func(-42) is True
         assert pred(252) is pred.func(252) is True
         assert pred(42) is pred.func(42) is False
