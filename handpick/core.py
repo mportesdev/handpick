@@ -92,7 +92,7 @@ class Predicate:
 
         if not callable(other):
             return NotImplemented
-        if isinstance(other, self.__class__):
+        if isinstance(other, type(self)):
             other = other.func
 
         def fn(obj):
@@ -108,7 +108,7 @@ class Predicate:
 
         if not callable(other):
             return NotImplemented
-        if isinstance(other, self.__class__):
+        if isinstance(other, type(self)):
             other = other.func
 
         def fn(obj):

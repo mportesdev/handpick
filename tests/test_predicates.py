@@ -38,7 +38,7 @@ class TestFromFunctionFactoryMethod:
     def test_from_function(self, class_or_instance, function_or_predicate):
         pred = class_or_instance.from_function(function_or_predicate)
 
-        assert pred.__class__ is Predicate
+        assert type(pred) is Predicate
         assert pred.func is function_or_predicate
 
         assert pred(42) is pred.func(42) is True
