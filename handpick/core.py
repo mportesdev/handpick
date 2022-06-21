@@ -100,8 +100,7 @@ class Predicate:
 
         return self.from_function(fn)
 
-    def __rand__(self, other):
-        return self & other
+    __rand__ = __and__
 
     def __or__(self, other):
         """Override the `|` operator."""
@@ -116,8 +115,7 @@ class Predicate:
 
         return self.from_function(fn)
 
-    def __ror__(self, other):
-        return self | other
+    __ror__ = __or__
 
     def __invert__(self):
         """Override the `~` operator."""
