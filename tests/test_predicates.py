@@ -16,14 +16,39 @@ from tests import is_even, is_positive
 
 
 class TestDecoratorUsage:
-    def test_stacked_decorator(self):
-        _is_even = Predicate(Predicate(is_even))
+    def test_decorator(self):
+        """Test `@Predicate` decorator usage."""
+        pred = Predicate(is_even)
+        assert pred.func is is_even
+        assert pred(42) is pred.func(42) is True
+        assert pred(15) is pred.func(15) is False
+        assert pred("A") is False  # suppressed TypeError
+        with pytest.raises(TypeError):
+            pred.func("A")
 
-        assert type(_is_even.func) is Predicate
-        assert type(_is_even.func.func) is not Predicate
-        assert _is_even(42) is _is_even.func(42) is _is_even.func.func(42) is True
-        assert _is_even(15) is _is_even.func(15) is _is_even.func.func(15) is False
-        assert _is_even("A") is _is_even.func("A") is False  # suppressed TypeError
+    def test_decorator_call(self):
+        """Test `@Predicate()` decorator usage."""
+        pred = Predicate()(is_even)
+        assert type(pred) is Predicate
+        assert pred.func is is_even
+        assert pred(42) is pred.func(42) is True
+        assert pred(15) is pred.func(15) is False
+        assert pred("A") is False  # suppressed TypeError
+        with pytest.raises(TypeError):
+            pred.func("A")
+
+    def test_underlying_function_identity(self):
+        from_decorator = Predicate(is_even)
+        from_decorator_call = Predicate()(is_even)
+        assert from_decorator.func is from_decorator_call.func is is_even
+
+    def test_stacked_decorator(self):
+        pred = Predicate(Predicate(is_even))
+        assert type(pred.func) is Predicate
+        assert type(pred.func.func) is not Predicate
+        assert pred(42) is pred.func(42) is pred.func.func(42) is True
+        assert pred(15) is pred.func(15) is pred.func.func(15) is False
+        assert pred("A") is pred.func("A") is False  # suppressed TypeError
 
 
 class TestFromFunctionFactoryMethod:

@@ -73,11 +73,16 @@ class Predicate:
     argument to the `pick` function.
     """
 
-    def __init__(self, func):
+    def __init__(self, func=None):
         self.func = func
 
     def __call__(self, obj):
+        if self.func is None:
+            # instance called as decorator
+            self.func = obj
+            return self
         try:
+            # instance called as predicate
             return self.func(obj)
         except _ERRORS:
             # exception indicates that object does not meet predicate
