@@ -1,6 +1,5 @@
 import string
 
-import pytest
 from hypothesis import given
 import hypothesis.strategies as st
 
@@ -11,11 +10,11 @@ keys = strings
 values = st.none() | st.booleans() | st.integers() | st.floats() | strings
 
 
-def containers(children):
+def collections(children):
     return st.lists(children) | st.dictionaries(keys, children)
 
 
-nested = st.recursive(values, containers)
+nested = st.recursive(values, collections)
 
 
 @given(nested)
@@ -25,8 +24,11 @@ def test_excluded_collections(data):
     assert list(picked_1) == list(picked_2)
 
 
-@given(values)
-@pytest.mark.parametrize("type_", (str, int))
+types = st.sampled_from((bool, int, float, str, list, dict))
+values_and_collections = values | collections(values)
+
+
+@given(types, values_and_collections)
 def test_is_type_not_type(type_, value):
     pred_1 = is_type(type_)
     pred_2 = not_type(type_)
