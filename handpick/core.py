@@ -137,10 +137,10 @@ def is_type(type_or_types):
     """
 
     @Predicate
-    def new_predicate(obj):
+    def pred(obj):
         return isinstance(obj, type_or_types)
 
-    return new_predicate
+    return pred
 
 
 def not_type(type_or_types):
@@ -149,12 +149,7 @@ def not_type(type_or_types):
 
     `type_or_types` must be a type or tuple of types.
     """
-
-    @Predicate
-    def new_predicate(obj):
-        return not isinstance(obj, type_or_types)
-
-    return new_predicate
+    return ~is_type(type_or_types)
 
 
 def _error(func, *args, **kwargs):
