@@ -73,8 +73,9 @@ class Predicate:
     argument to the `pick` function.
     """
 
-    def __init__(self, func=None):
+    def __init__(self, func=None, suppressed_errors=_ERRORS):
         self.func = func
+        self.suppressed_errors = suppressed_errors
 
     def __call__(self, obj):
         if self.func is None:
@@ -84,7 +85,7 @@ class Predicate:
         try:
             # instance called as predicate
             return self.func(obj)
-        except _ERRORS:
+        except self.suppressed_errors:
             # exception indicates that object does not meet predicate
             return False
 

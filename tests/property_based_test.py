@@ -43,3 +43,10 @@ def test_predicate_decorator_call(value):
     pred_1 = Predicate(is_even)
     pred_2 = Predicate()(is_even)
     assert pred_1(value) is pred_2(value)
+
+
+@given(values)
+def test_predicate_decorator_call_with_kwarg(value):
+    pred_1 = Predicate(is_even, suppressed_errors=(TypeError, ValueError))
+    pred_2 = Predicate(suppressed_errors=(TypeError, ValueError))(is_even)
+    assert pred_1(value) is pred_2(value)
