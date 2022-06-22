@@ -51,6 +51,34 @@ class TestDecoratorUsage:
         assert pred("A") is pred.func("A") is False  # suppressed TypeError
 
 
+class TestErrorHandling:
+    def test_predicate_suppresses_errors_by_default(self):
+        @Predicate
+        def pred(obj):
+            return obj[0] > 0
+
+        assert type(pred) is Predicate
+        assert pred([42]) is pred.func([42]) is True
+        assert pred([-15]) is pred.func([-15]) is False
+        # suppressed IndexError and TypeError
+        assert pred([]) is False
+        assert pred(["A"]) is False
+
+    def test_predicate_propagates_errors_optionally(self):
+        @Predicate(suppressed_errors=())
+        def pred(obj):
+            return obj[0] > 0
+
+        assert type(pred) is Predicate
+        assert pred([42]) is pred.func([42]) is True
+        assert pred([-15]) is pred.func([-15]) is False
+        # propagated IndexError and TypeError
+        with pytest.raises(IndexError):
+            pred([])
+        with pytest.raises(TypeError):
+            pred(["A"])
+
+
 class TestFromFunctionFactoryMethod:
     @pytest.mark.parametrize("class_or_instance", (Predicate, Predicate(is_even)))
     @pytest.mark.parametrize(
