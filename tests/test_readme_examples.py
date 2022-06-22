@@ -3,7 +3,7 @@ from handpick import (
     Predicate,
     is_type,
     not_type,
-    IS_COLLECTION,
+    NUM_STR,
     values_for_key,
     max_depth,
 )
@@ -92,14 +92,10 @@ class TestReadmeExamples:
     def test_example_8(self):
         """Example from 'Built-in predicates'."""
 
-        data = [[], [0], [["1"], b"2"]]
-        only_values = pick(data, ~IS_COLLECTION)
+        data = {"id": "01353", "price": 15.42, "quantity": 68, "year": "2011"}
+        numeric_strings = pick(data, NUM_STR)
 
-        assert list(only_values) == [0, "1", b"2"]
-
-        only_values = pick(data, collections=False)
-
-        assert list(only_values) == [0, "1", b"2"]
+        assert list(numeric_strings) == ["01353", "2011"]
 
     def test_example_9(self):
         """Examples from 'The values_for_key function'."""

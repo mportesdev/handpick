@@ -222,25 +222,17 @@ scenarios. For example:
 
 .. code-block:: python
 
-    from handpick import pick, IS_COLLECTION
+    from handpick import pick, NUM_STR
 
-    data = [[], [0], [["1"], b"2"]]
+    data = {"id": "01353", "price": 15.42, "quantity": 68, "year": "2011"}
 
-    # pick only objects that are not collections of other objects
-    only_values = pick(data, ~IS_COLLECTION)
+    # pick strings that can be cast to numbers
+    numeric_strings = pick(data, NUM_STR)
 
 .. code::
 
-    >>> list(only_values)
-    [0, '1', b'2']
-
-**Note:** Despite being iterable, strings and bytes-like objects are
-not treated as collections of other objects by ``IS_COLLECTION``.
-
-(Also note that the same as above can be achieved by omitting the predicate
-and excluding collections, i.e.
-``pick(data, collections=False)``.
-See also `Flattening nested data`_.)
+    >>> list(numeric_strings)
+    ['01353', '2011']
 
 
 Useful functions
