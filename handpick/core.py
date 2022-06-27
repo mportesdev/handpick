@@ -6,6 +6,7 @@ _ERRORS = (TypeError, ValueError, LookupError, AttributeError)
 def pick(
     data,
     predicate=lambda obj: True,
+    *,
     collections=True,
     dict_keys=False,
     strings=False,
@@ -57,7 +58,14 @@ def pick(
             if test:
                 yield obj
         # inspect object recursively
-        yield from pick(obj, predicate, collections, dict_keys, strings, bytes_like)
+        yield from pick(
+            obj,
+            predicate,
+            collections=collections,
+            dict_keys=dict_keys,
+            strings=strings,
+            bytes_like=bytes_like,
+        )
 
 
 class Predicate:
@@ -74,7 +82,7 @@ class Predicate:
     argument to the `pick` function.
     """
 
-    def __init__(self, func=None, suppressed_errors=_ERRORS):
+    def __init__(self, func=None, *, suppressed_errors=_ERRORS):
         self.func = func
         self.suppressed_errors = suppressed_errors
 

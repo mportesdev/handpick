@@ -361,7 +361,7 @@ API reference
 pick
 ----
 
-*handpick.pick(data, predicate=lambda obj: True, collections=True, dict_keys=False, strings=False, bytes_like=False)*
+*handpick.pick(data, predicate=lambda obj: True, *, collections=True, dict_keys=False, strings=False, bytes_like=False)*
 
 Pick objects from ``data`` based on ``predicate``.
 
@@ -393,7 +393,7 @@ by the recursive algorithm. This can be changed by passing
 Predicate
 ---------
 
-*@handpick.Predicate(func=None, suppressed_errors=(TypeError, ValueError, LookupError, AttributeError))*
+*@handpick.Predicate(func=None, *, suppressed_errors=(TypeError, ValueError, LookupError, AttributeError))*
 
 Decorator wrapping a function in a predicate object.
 
