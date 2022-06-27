@@ -1,6 +1,6 @@
 from collections.abc import Mapping, Iterable
 
-_ERRORS = (TypeError, ValueError, IndexError, KeyError, AttributeError)
+_ERRORS = (TypeError, ValueError, LookupError, AttributeError)
 
 
 def pick(
@@ -53,10 +53,8 @@ def pick(
             obj = (obj, data[obj]) if dict_keys else (data[obj],)
         elif collections or not IS_COLLECTION(obj):
             # test object against predicate
-            if predicate_callable:
-                if predicate(obj):
-                    yield obj
-            elif obj == predicate:
+            test = predicate(obj) if predicate_callable else obj == predicate
+            if test:
                 yield obj
         # inspect object recursively
         yield from pick(obj, predicate, collections, dict_keys, strings, bytes_like)

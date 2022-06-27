@@ -20,7 +20,7 @@ from .core import (
 
 __version__ = "0.10.0"
 
-__all__ = [
+__all__ = (
     "__version__",
     "pick",
     "Predicate",
@@ -34,4 +34,4 @@ __all__ = [
     "NUM_STR",
     "values_for_key",
     "max_depth",
-]
+)
