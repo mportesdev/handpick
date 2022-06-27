@@ -393,13 +393,16 @@ by the recursive algorithm. This can be changed by passing
 Predicate
 ---------
 
-*@handpick.Predicate(func)*
+*@handpick.Predicate(func=None, suppressed_errors=(TypeError, ValueError, LookupError, AttributeError))*
 
 Decorator wrapping a function in a predicate object.
 
 The decorated function can be combined with other predicates using
 the operators ``&`` (and) and ``|`` (or), as well as negated using the
 operator ``~`` (not).
+
+``suppressed_errors`` can be used to customize which exception classes
+will be suppressed by the predicate.
 
 Predicate objects are intended to be used as the ``predicate``
 argument to the ``pick`` function.
