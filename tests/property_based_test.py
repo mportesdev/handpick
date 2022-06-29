@@ -38,13 +38,28 @@ def test_is_type_not_type(type_, value):
     assert (~pred_1)(value) is pred_2(value)
 
 
-pred_1 = Predicate(is_even)
-pred_2 = Predicate()(is_even)
-pred_3 = Predicate(is_even, suppressed_errors=(TypeError, ValueError))
-pred_4 = Predicate(suppressed_errors=(TypeError, ValueError))(is_even)
+def _same_result_or_error(predicate_1, predicate_2, arg):
+    try:
+        result_1 = predicate_1(arg)
+    except Exception as e:
+        result_1 = e
+    try:
+        result_2 = predicate_2(arg)
+    except Exception as e:
+        result_2 = e
+    # same bool returned or same error raised
+    return result_1 is result_2 or (
+        type(result_1) is type(result_2) and result_1.args == result_2.args
+    )
+
+
+pred = Predicate(is_even)
+pred_call = Predicate()(is_even)
+pred_errors = Predicate(is_even, suppressed_errors=())
+pred_call_errors = Predicate(suppressed_errors=())(is_even)
 
 
 @given(values)
 def test_predicate_decorator_vs_decorator_call(value):
-    assert pred_1(value) is pred_2(value)
-    assert pred_3(value) is pred_4(value)
+    assert _same_result_or_error(pred, pred_call, value)
+    assert _same_result_or_error(pred_errors, pred_call_errors, value)
