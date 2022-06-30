@@ -1,6 +1,6 @@
 """
-Handpick is a tool to traverse nested data structures recursively and
-find all objects that meet certain criteria.
+Handpick is a tool to traverse nested data structures and pick all
+objects that meet certain criteria.
 """
 
 from .core import (
