@@ -19,8 +19,8 @@ python = "^3.7"
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
 pytest-cov = "^3.0.0"
-black = "^22.3.0"
-hypothesis = "^6.47.3"
+black = "^22.6.0"
+hypothesis = "^6.48.2"
 mutmut = "^2.4.0"
 
 [build-system]
