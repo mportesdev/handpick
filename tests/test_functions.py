@@ -1,9 +1,31 @@
 import pytest
 
 from handpick import values_for_key, max_depth
-from handpick.core import _error, _iter_depth
+from handpick.core import _is_collection, _error, _iter_depth
 
 from tests import SEQUENCES, SEQS_DICTS, COLLECTIONS
+
+
+class TestIsCollection:
+    def test_default(self):
+        assert _is_collection([])
+        assert not _is_collection(1)
+
+        assert not _is_collection("")
+        assert not _is_collection("a")
+        assert not _is_collection("ab")
+
+        assert not _is_collection(b"")
+        assert not _is_collection(b"a")
+
+    def test_strings_true(self):
+        assert not _is_collection("", strings=True)
+        assert not _is_collection("a", strings=True)
+        assert _is_collection("ab", strings=True)
+
+    def test_bytes_like_true(self):
+        assert _is_collection(b"", bytes_like=True)
+        assert _is_collection(b"a", bytes_like=True)
 
 
 def test_error():

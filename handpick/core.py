@@ -31,19 +31,15 @@ def pick(
 
     By default, strings are not treated as collections of other objects
     and therefore not iterated by the recursive algorithm. This can be
-    changed by passing `strings=True`. Strings of length 1 are never
-    iterated.
+    changed by passing `strings=True`. Empty strings and strings of
+    length 1 are never iterated.
 
     By default, bytes-like sequences (bytes and bytearrays) are not
     treated as collections of other objects and therefore not iterated
     by the recursive algorithm. This can be changed by passing
     `bytes_like=True`.
     """
-    if not isinstance(data, Iterable):
-        return
-    if isinstance(data, str) and (not strings or len(data) == 1):
-        return
-    if isinstance(data, (bytes, bytearray)) and not bytes_like:
+    if not _is_collection(data, strings, bytes_like):
         return
 
     is_mapping = IS_MAPPING(data)
@@ -52,7 +48,7 @@ def pick(
         if is_mapping:
             # (key, value) or just (value,)
             obj = (obj, data[obj]) if dict_keys else (data[obj],)
-        elif collections or not IS_COLLECTION(obj):
+        elif collections or not _is_collection(obj, strings, bytes_like):
             # test object against predicate
             test = predicate(obj) if predicate_callable else obj == predicate
             if test:
@@ -66,6 +62,16 @@ def pick(
             strings=strings,
             bytes_like=bytes_like,
         )
+
+
+def _is_collection(obj, strings=False, bytes_like=False):
+    return all(
+        (
+            isinstance(obj, Iterable),
+            not isinstance(obj, str) or (strings and len(obj) > 1),
+            not isinstance(obj, (bytes, bytearray)) or bytes_like,
+        )
+    )
 
 
 class Predicate:
@@ -241,7 +247,7 @@ def max_depth(data):
 
 
 def _iter_depth(data, depth=0):
-    if not IS_COLLECTION(data):
+    if not _is_collection(data):
         return
 
     yield depth

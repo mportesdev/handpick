@@ -382,8 +382,8 @@ To inspect both keys and values of mappings, pass ``dict_keys=True``.
 
 By default, strings are not treated as collections of other objects
 and therefore not iterated by the recursive algorithm. This can be
-changed by passing ``strings=True``. Strings of length 1 are never
-iterated.
+changed by passing ``strings=True``. Empty strings and strings of
+length 1 are never iterated.
 
 By default, bytes-like sequences (bytes and bytearrays) are not
 treated as collections of other objects and therefore not iterated
