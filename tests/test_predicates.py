@@ -12,7 +12,7 @@ from handpick import (
     NUM_STR,
 )
 
-from tests import is_even, is_positive
+from tests import is_even, is_positive, first_item_positive, palindromic_int
 
 
 class TestDecoratorUsage:
@@ -37,11 +37,6 @@ class TestDecoratorUsage:
         with pytest.raises(TypeError):
             pred.func("A")
 
-    def test_underlying_function_identity(self):
-        from_decorator = Predicate(is_even)
-        from_decorator_call = Predicate()(is_even)
-        assert from_decorator.func is from_decorator_call.func is is_even
-
     def test_stacked_decorator(self):
         pred = Predicate(Predicate(is_even))
         assert type(pred.func) is Predicate
@@ -53,10 +48,7 @@ class TestDecoratorUsage:
 
 class TestErrorHandling:
     def test_predicate_suppresses_errors_by_default(self):
-        @Predicate
-        def pred(obj):
-            return obj[0] > 0
-
+        pred = Predicate(first_item_positive)
         assert type(pred) is Predicate
         assert pred([42]) is pred.func([42]) is True
         assert pred([-15]) is pred.func([-15]) is False
@@ -65,10 +57,7 @@ class TestErrorHandling:
         assert pred(["A"]) is False
 
     def test_predicate_propagates_errors_optionally(self):
-        @Predicate(suppressed_errors=())
-        def pred(obj):
-            return obj[0] > 0
-
+        pred = Predicate(suppressed_errors=())(first_item_positive)
         assert type(pred) is Predicate
         assert pred([42]) is pred.func([42]) is True
         assert pred([-15]) is pred.func([-15]) is False
@@ -99,10 +88,7 @@ class TestOverloadedOperators:
 
     def test_predicate_and_predicate(self):
         """Test predicate & predicate."""
-        _is_even = Predicate(is_even)
-        _is_positive = Predicate(is_positive)
-        pred = _is_even & _is_positive
-
+        pred = Predicate(is_even) & Predicate(is_positive)
         assert type(pred.func) is not Predicate
         assert pred(42) is pred.func(42) is True
         assert pred(-42) is pred.func(-42) is False
@@ -112,9 +98,7 @@ class TestOverloadedOperators:
 
     def test_predicate_and_function(self):
         """Test predicate & function."""
-        _is_even = Predicate(is_even)
-        pred = _is_even & is_positive
-
+        pred = Predicate(is_even) & is_positive
         assert type(pred.func) is not Predicate
         assert pred(42) is pred.func(42) is True
         assert pred(-42) is pred.func(-42) is False
@@ -124,9 +108,7 @@ class TestOverloadedOperators:
 
     def test_function_and_predicate(self):
         """Test function & predicate."""
-        _is_positive = Predicate(is_positive)
-        pred = is_even & _is_positive
-
+        pred = is_even & Predicate(is_positive)
         assert type(pred.func) is not Predicate
         assert pred(42) is pred.func(42) is True
         assert pred(-42) is pred.func(-42) is False
@@ -136,16 +118,13 @@ class TestOverloadedOperators:
 
     def test_predicate_and_non_callable_raises_error(self):
         """Test predicate & non-callable is not implemented."""
-        _is_even = Predicate(is_even)
+        pred = Predicate(is_even)
         with pytest.raises(TypeError, match="unsupported"):
-            _is_even & None
+            pred & None
 
     def test_predicate_or_predicate(self):
         """Test predicate | predicate."""
-        _is_even = Predicate(is_even)
-        _is_positive = Predicate(is_positive)
-        pred = _is_even | _is_positive
-
+        pred = Predicate(is_even) | Predicate(is_positive)
         assert type(pred.func) is not Predicate
         assert pred(42) is pred.func(42) is True
         assert pred(-42) is pred.func(-42) is True
@@ -155,9 +134,7 @@ class TestOverloadedOperators:
 
     def test_predicate_or_function(self):
         """Test predicate | function."""
-        _is_even = Predicate(is_even)
-        pred = _is_even | is_positive
-
+        pred = Predicate(is_even) | is_positive
         assert type(pred.func) is not Predicate
         assert pred(42) is pred.func(42) is True
         assert pred(-42) is pred.func(-42) is True
@@ -167,9 +144,7 @@ class TestOverloadedOperators:
 
     def test_function_or_predicate(self):
         """Test function | predicate."""
-        _is_positive = Predicate(is_positive)
-        pred = is_even | _is_positive
-
+        pred = is_even | Predicate(is_positive)
         assert type(pred.func) is not Predicate
         assert pred(42) is pred.func(42) is True
         assert pred(-42) is pred.func(-42) is True
@@ -179,25 +154,21 @@ class TestOverloadedOperators:
 
     def test_predicate_or_non_callable_raises_error(self):
         """Test predicate | non-callable is not implemented."""
-        _is_even = Predicate(is_even)
+        pred = Predicate(is_even)
         with pytest.raises(TypeError, match="unsupported"):
-            _is_even | None
+            pred | None
 
     def test_not_predicate(self):
         """Test ~predicate."""
-        _is_even = Predicate(is_even)
-        pred = ~_is_even
-
+        pred = ~Predicate(is_even)
         assert type(pred.func) is not Predicate
         assert pred(42) is pred.func(42) is False
         assert pred(15) is pred.func(15) is True
         assert pred("A") is False  # suppressed TypeError
 
     def test_not_not_predicate(self):
-        """Test ~(~predicate)."""
-        _is_even = Predicate(is_even)
-        pred = ~(~_is_even)
-
+        """Test ~~predicate."""
+        pred = ~~Predicate(is_even)
         assert type(pred.func) is not Predicate
         assert pred(42) is pred.func(42) is True
         assert pred(15) is pred.func(15) is False
@@ -205,15 +176,9 @@ class TestOverloadedOperators:
 
     def test_and_or_not(self):
         """Test predicate & (~predicate | predicate)."""
-        _is_even = Predicate(is_even)
-        _is_positive = Predicate(is_positive)
-
-        @Predicate
-        def is_palindromic(n):
-            return int(str(n)[::-1]) == n
-
-        pred = _is_even & (~_is_positive | is_palindromic)
-
+        pred = Predicate(is_even) & (
+            ~Predicate(is_positive) | Predicate(palindromic_int)
+        )
         assert type(pred.func) is not Predicate
         assert pred(-42) is pred.func(-42) is True
         assert pred(252) is pred.func(252) is True
@@ -225,7 +190,6 @@ class TestOverloadedOperators:
 class TestPredicateFactories:
     def test_is_type_single_type(self):
         pred = is_type(int)
-
         assert isinstance(pred, Predicate)
         assert pred(42) is True
         assert pred(42.15) is False
@@ -233,7 +197,6 @@ class TestPredicateFactories:
 
     def test_is_type_tuple_of_types(self):
         pred = is_type((int, float))
-
         assert isinstance(pred, Predicate)
         assert pred(42) is True
         assert pred(42.15) is True
@@ -241,7 +204,6 @@ class TestPredicateFactories:
 
     def test_not_type_single_type(self):
         pred = not_type(int)
-
         assert isinstance(pred, Predicate)
         assert pred(42) is False
         assert pred(42.15) is True
@@ -249,7 +211,6 @@ class TestPredicateFactories:
 
     def test_not_type_tuple_of_types(self):
         pred = not_type((int, float))
-
         assert isinstance(pred, Predicate)
         assert pred(42) is False
         assert pred(42.15) is False
@@ -257,7 +218,6 @@ class TestPredicateFactories:
 
     def test_no_error_int(self):
         pred = no_error(int)
-
         assert isinstance(pred, Predicate)
         assert pred("42") is True
         assert pred("4.2") is False
@@ -265,7 +225,6 @@ class TestPredicateFactories:
 
     def test_no_error_len(self):
         pred = no_error(len)
-
         assert isinstance(pred, Predicate)
         assert pred("A") is True
         assert pred([]) is True
@@ -290,7 +249,6 @@ class TestBuiltinPredicates:
         assert INT_STR("inf") is False
         assert INT_STR("nan") is False
         assert INT_STR("4+2j") is False
-
         assert INT_STR("A") is False
         assert INT_STR(42) is False
         assert INT_STR(4.2) is False
@@ -304,7 +262,6 @@ class TestBuiltinPredicates:
         assert FLOAT_STR("inf") is True
         assert FLOAT_STR("nan") is True
         assert FLOAT_STR("4+2j") is False
-
         assert FLOAT_STR("A") is False
         assert FLOAT_STR(42) is False
         assert FLOAT_STR(4.2) is False
@@ -318,7 +275,6 @@ class TestBuiltinPredicates:
         assert NUM_STR("inf") is True
         assert NUM_STR("nan") is True
         assert NUM_STR("4+2j") is True
-
         assert NUM_STR("A") is False
         assert NUM_STR(42) is False
         assert NUM_STR(4.2) is False

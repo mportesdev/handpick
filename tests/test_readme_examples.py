@@ -14,27 +14,21 @@ class TestReadmeExamples:
 
     def test_example_1(self):
         """Example from 'Simple predicate functions'."""
-
         data = [[1, "Py"], [-2, ["", 3.0]], -4]
         non_empty_strings = pick(data, lambda s: isinstance(s, str) and s)
-
         assert list(non_empty_strings) == ["Py"]
 
     def test_example_2(self):
         """Example from 'Non-callable predicates'."""
-
         data = [1, [1.0, [2, 1.0]], [{"1": 1}, [3]]]
         ones = pick(data, 1)
-
         assert list(ones) == [1, 1.0, 1.0, 1]
 
     def test_example_3(self):
         """Example from 'Handling dictionary keys'."""
-
         data = {"foo": {"name": "foo"}, "bar": {"name": "bar"}}
         default = pick(data, lambda s: "a" in s)
         keys_included = pick(data, lambda s: "a" in s, dict_keys=True)
-
         assert list(default) == ["bar"]
         assert list(keys_included) == ["name", "bar", "name", "bar"]
 
@@ -52,7 +46,6 @@ class TestReadmeExamples:
         data = [[4, [5.0, 1], 3.0], [[15, []], {17: [7, [8], 0]}]]
         non_even_int = is_int & ~is_even
         odd_integers = pick(data, non_even_int)
-
         assert list(odd_integers) == [1, 15, 7]
 
     def test_example_5(self):
@@ -65,7 +58,6 @@ class TestReadmeExamples:
         data = [("1", [2]), {("x",): [(3, [4]), "5"]}, ["x", ["6"]], {7: ("x",)}]
         short_list = (lambda obj: len(obj) < 2) & is_list
         short_lists = pick(data, short_list)
-
         assert list(short_lists) == [[2], [4], ["6"]]
 
     def test_example_6(self):
@@ -77,29 +69,23 @@ class TestReadmeExamples:
 
         assert above_zero(1) is True
         assert above_zero("a") is False
-
         positive_numbers = pick([[1, "Py", -2], [None, 3.0]], above_zero)
         assert list(positive_numbers) == [1, 3.0]
 
     def test_example_7(self):
         """Example from 'Predicate factories'."""
-
         data = [[1.0, [2, True]], [False, [3]], ["4", {5, True}]]
         strictly_integers = pick(data, is_type(int) & not_type(bool))
-
         assert list(strictly_integers) == [2, 3, 5]
 
     def test_example_8(self):
         """Example from 'Built-in predicates'."""
-
         data = {"id": "01353", "price": 15.42, "quantity": 68, "year": "2011"}
         numeric_strings = pick(data, NUM_STR)
-
         assert list(numeric_strings) == ["01353", "2011"]
 
     def test_example_9(self):
         """Examples from 'The values_for_key function'."""
-
         data = {
             "node_id": 4,
             "child_nodes": [
@@ -116,7 +102,6 @@ class TestReadmeExamples:
                 },
             ],
         }
-
         node_ids = values_for_key(data, key="node_id")
         assert list(node_ids) == [4, 8, 16, 9]
 
@@ -136,25 +121,19 @@ class TestReadmeExamples:
                 },
             ],
         }
-
         node_ids = values_for_key(data, key=["node_id", "id"])
         assert list(node_ids) == [4, 8, 16, 9]
 
     def test_example_10(self):
         """Examples from 'The max_depth function'."""
-
         nested_list = [0, [1, [2]]]
         nested_dict = {0: {1: {2: {3: {4: 4}}}}}
-
         assert max_depth(nested_list) == 2
         assert max_depth(nested_dict) == 4
-
         assert max_depth([0, [1, []]]) == 2
 
     def test_example_11(self):
         """Example from 'Flattening nested data'."""
-
         data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
         flat_data = pick(data, collections=False)
-
         assert list(flat_data) == [0, 1, 2, 3, 4, 5]

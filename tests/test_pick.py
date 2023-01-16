@@ -130,7 +130,7 @@ class TestSpecialCases:
     def test_non_callable_predicate(self):
         assert list(pick(COLLECTIONS, b"pick")) == [b"pick", bytearray(b"pick")]
 
-    def test_predicate_not_specified(self):
+    def test_omitted_predicate_yields_everything(self):
         assert list(pick([{1: 2}])) == [{1: 2}, 2]
         assert list(pick([{1: 2}], collections=False)) == [2]
         assert list(pick([{1: 2}], dict_keys=True)) == [{1: 2}, 1, 2]
@@ -155,9 +155,11 @@ class TestStringsAndBytesLike:
         (
             pytest.param(["hand"], ["hand", "h", "a", "n", "d"], id="string len > 1"),
             pytest.param(["a"], ["a"], id="string len 1"),
+            pytest.param([""], [""], id="empty string"),
             pytest.param(["ab", ["cd"]], ["ab", "a", "b", "cd", "c", "d"], id="nested"),
             pytest.param("pick", ["p", "i", "c", "k"], id="top-level string len > 1"),
             pytest.param("a", [], id="top-level string len 1"),
+            pytest.param("", [], id="top-level empty string"),
         ),
     )
     def test_strings_iterated_optionally(self, data, expected):
