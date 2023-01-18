@@ -436,13 +436,6 @@ Predicate factory. Return a predicate that returns True if ``func``
 can be applied on object without an exception being raised,
 False otherwise.
 
-IS_MAPPING
-----------
-
-*handpick.IS_MAPPING*
-
-Predicate that returns True for dictionaries and other mappings.
-
 INT_STR
 -------
 

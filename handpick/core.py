@@ -201,9 +201,6 @@ def no_error(func):
 
 # built-in predicates
 
-IS_MAPPING = is_type(Mapping)
-"""Predicate that returns True for dictionaries and other mappings."""
-
 INT_STR = is_type(str) & no_error(int)
 """Predicate that returns True for strings that can be converted
 to int."""
