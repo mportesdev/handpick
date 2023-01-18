@@ -19,7 +19,6 @@ python = "^3.7"
 [tool.poetry.group.dev.dependencies]
 pytest = "^7"
 pytest-cov = "^4"
-black = "^22"
 hypothesis = "^6"
 mutmut = "^2"
 
