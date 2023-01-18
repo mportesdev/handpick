@@ -197,11 +197,6 @@ def no_error(func):
 
 # built-in predicates
 
-IS_COLLECTION = is_type(Iterable) & not_type((str, bytes, bytearray))
-"""Predicate that returns True for iterable collections of other
-objects. Strings and bytes-like objects are not treated as collections.
-"""
-
 IS_MAPPING = is_type(Mapping)
 """Predicate that returns True for dictionaries and other mappings."""
 

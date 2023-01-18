@@ -436,14 +436,6 @@ Predicate factory. Return a predicate that returns True if ``func``
 can be applied on object without an exception being raised,
 False otherwise.
 
-IS_COLLECTION
--------------
-
-*handpick.IS_COLLECTION*
-
-Predicate that returns True for iterable collections of other
-objects. Strings and bytes-like objects are not treated as collections.
-
 IS_MAPPING
 ----------
 

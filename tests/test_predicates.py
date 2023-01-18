@@ -5,7 +5,6 @@ from handpick import (
     is_type,
     not_type,
     no_error,
-    IS_COLLECTION,
     IS_MAPPING,
     INT_STR,
     FLOAT_STR,
@@ -232,11 +231,6 @@ class TestPredicateFactories:
 
 
 class TestBuiltinPredicates:
-    def test_is_collection(self):
-        assert IS_COLLECTION({"k": "v"}) is True
-        assert IS_COLLECTION([42, 15]) is True
-        assert IS_COLLECTION(42) is False
-
     def test_is_mapping(self):
         assert IS_MAPPING({"k": "v"}) is True
         assert IS_MAPPING([42, 15]) is False

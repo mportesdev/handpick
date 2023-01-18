@@ -3,7 +3,7 @@ import string
 from hypothesis import given
 import hypothesis.strategies as st
 
-from handpick import pick, Predicate, IS_COLLECTION, is_type, not_type
+from handpick import pick, Predicate, is_type, not_type
 
 from tests import is_even
 
@@ -14,16 +14,6 @@ values = st.none() | st.booleans() | st.integers() | st.floats() | strings
 
 def collections(children):
     return st.lists(children) | st.dictionaries(keys, children)
-
-
-nested = st.recursive(values, collections)
-
-
-@given(nested)
-def test_excluded_collections(data):
-    picked_1 = pick(data, collections=False)
-    picked_2 = pick(data, ~IS_COLLECTION)
-    assert list(picked_1) == list(picked_2)
 
 
 types = st.sampled_from((bool, int, float, str, list, dict))
