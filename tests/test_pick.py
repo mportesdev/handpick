@@ -165,6 +165,11 @@ class TestStringsAndBytesLike:
     def test_strings_iterated_optionally(self, data, expected):
         assert list(pick(data, lambda s: isinstance(s, str), strings=True)) == expected
 
+    def test_strings_not_picked_but_iterated_optionally(self):
+        data = ["foo", 42, b"bar"]
+        picked = list(pick(data, collections=False, strings=True))
+        assert picked == ["f", "o", "o", 42, b"bar"]
+
     @pytest.mark.parametrize(
         "data, expected",
         (
@@ -186,3 +191,8 @@ class TestStringsAndBytesLike:
     )
     def test_bytes_like_iterated_optionally(self, data, expected):
         assert list(pick(data, bytes_like=True)) == expected
+
+    def test_bytes_like_not_picked_but_iterated_optionally(self):
+        data = ["foo", 42, b"bar"]
+        picked = list(pick(data, collections=False, bytes_like=True))
+        assert picked == ["foo", 42, 98, 97, 114]
