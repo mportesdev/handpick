@@ -42,7 +42,7 @@ def pick(
     if not _is_collection(data, strings, bytes_like):
         return
 
-    is_mapping = IS_MAPPING(data)
+    is_mapping = _is_mapping(data)
     predicate_callable = callable(predicate)
     for obj in data:
         if is_mapping:
@@ -72,6 +72,10 @@ def _is_collection(obj, strings=False, bytes_like=False):
             not isinstance(obj, (bytes, bytearray)) or bytes_like,
         )
     )
+
+
+def _is_mapping(obj):
+    return isinstance(obj, Mapping)
 
 
 class Predicate:
@@ -226,7 +230,7 @@ def values_for_key(data, key):
     if not isinstance(key, list):
         key = [key]
 
-    for mapping in pick([data], IS_MAPPING):
+    for mapping in pick([data], _is_mapping):
         for k in key:
             if k in mapping:
                 yield mapping[k]
@@ -247,7 +251,7 @@ def _iter_depth(data, depth=0):
 
     yield depth
 
-    is_mapping = IS_MAPPING(data)
+    is_mapping = _is_mapping(data)
     for obj in data:
         if is_mapping:
             # switch from key to value and proceed

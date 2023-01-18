@@ -1,6 +1,6 @@
 import pytest
 
-from handpick.core import _is_collection, _error, _iter_depth
+from handpick.core import _is_collection, _is_mapping, _error, _iter_depth
 from tests import SEQUENCES, SEQS_DICTS, COLLECTIONS
 
 
@@ -24,6 +24,12 @@ class TestIsCollection:
     def test_bytes_like_true(self):
         assert _is_collection(b"", bytes_like=True)
         assert _is_collection(b"a", bytes_like=True)
+
+
+def test_is_mapping():
+    assert _is_mapping({})
+    assert not _is_mapping(42)
+    assert not _is_mapping([])
 
 
 def test_error():
