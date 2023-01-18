@@ -184,8 +184,12 @@ class TestStringsAndBytesLike:
     @pytest.mark.parametrize(
         "data, expected",
         (
-            pytest.param([b"hand"], [b"hand", 104, 97, 110, 100], id="bytes"),
-            pytest.param([[b"P"], b"Y"], [[b"P"], b"P", 80, b"Y", 89], id="nested"),
+            pytest.param(
+                [b"hand"], [b"hand", ord("h"), ord("a"), ord("n"), ord("d")], id="bytes"
+            ),
+            pytest.param(
+                [[b"P"], b"Y"], [[b"P"], b"P", ord("P"), b"Y", ord("Y")], id="nested"
+            ),
             pytest.param(bytearray([4, 2]), [4, 2], id="top-level bytes"),
         ),
     )
@@ -195,4 +199,4 @@ class TestStringsAndBytesLike:
     def test_bytes_like_not_picked_but_iterated_optionally(self):
         data = ["foo", 42, b"bar"]
         picked = list(pick(data, collections=False, bytes_like=True))
-        assert picked == ["foo", 42, 98, 97, 114]
+        assert picked == ["foo", 42, ord("b"), ord("a"), ord("r")]
