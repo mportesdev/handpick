@@ -108,10 +108,6 @@ class Predicate:
             # exception indicates that object does not meet predicate
             return False
 
-    @classmethod
-    def from_function(cls, func):
-        return cls(func)
-
     def __and__(self, other):
         """Override the `&` operator."""
 
@@ -123,7 +119,7 @@ class Predicate:
         def fn(obj):
             return self.func(obj) and other(obj)
 
-        return self.from_function(fn)
+        return type(self)(fn)
 
     __rand__ = __and__
 
@@ -138,7 +134,7 @@ class Predicate:
         def fn(obj):
             return self.func(obj) or other(obj)
 
-        return self.from_function(fn)
+        return type(self)(fn)
 
     __ror__ = __or__
 
@@ -148,7 +144,7 @@ class Predicate:
         def fn(obj):
             return not self.func(obj)
 
-        return self.from_function(fn)
+        return type(self)(fn)
 
 
 # predicate factories

@@ -65,21 +65,6 @@ class TestErrorHandling:
             pred(["A"])
 
 
-class TestFromFunctionFactoryMethod:
-    @pytest.mark.parametrize("class_or_instance", (Predicate, Predicate(is_even)))
-    @pytest.mark.parametrize(
-        "function_or_predicate", (is_positive, Predicate(is_positive))
-    )
-    def test_from_function(self, class_or_instance, function_or_predicate):
-        pred = class_or_instance.from_function(function_or_predicate)
-
-        assert type(pred) is Predicate
-        assert pred.func is function_or_predicate
-        assert pred(42) is pred.func(42) is True
-        assert pred(0) is pred.func(0) is False
-        assert pred("A") is False  # suppressed TypeError
-
-
 class TestOverloadedOperators:
     """Test the `&`, `|`, `~` overloaded operations of predicates."""
 
