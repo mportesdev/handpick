@@ -1,4 +1,4 @@
-|ukraine| |build| |coverage| |version| |black| |pyversions| |license| |downloads|
+|ukraine| |tests| |coverage| |version| |black| |pyversions| |license| |downloads|
 
 ==========
  Handpick
@@ -474,7 +474,7 @@ i.e. the direct elements of ``data`` are in depth 0.
 
 .. |ukraine| image:: https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg
     :target: https://stand-with-ukraine.pp.ua
-.. |build| image:: https://github.com/mportesdev/handpick/actions/workflows/build-test.yml/badge.svg
+.. |tests| image:: https://github.com/mportesdev/handpick/actions/workflows/tests.yml/badge.svg
     :target: https://github.com/mportesdev/handpick/actions
 .. |coverage| image:: https://img.shields.io/codecov/c/gh/mportesdev/handpick
     :target: https://codecov.io/gh/mportesdev/handpick
