@@ -164,15 +164,6 @@ def is_type(type_or_types):
     return pred
 
 
-def not_type(type_or_types):
-    """Predicate factory. Return a predicate that returns True if
-    object is not an instance of specified type(s).
-
-    `type_or_types` must be a type or tuple of types.
-    """
-    return ~is_type(type_or_types)
-
-
 def _error(func, *args, **kwargs):
     try:
         func(*args, **kwargs)

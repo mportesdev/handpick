@@ -3,7 +3,6 @@ import pytest
 from handpick import (
     Predicate,
     is_type,
-    not_type,
     no_error,
     INT_STR,
     FLOAT_STR,
@@ -183,20 +182,6 @@ class TestPredicateFactories:
         assert pred(42) is True
         assert pred(42.15) is True
         assert pred("A") is False
-
-    def test_not_type_single_type(self):
-        pred = not_type(int)
-        assert isinstance(pred, Predicate)
-        assert pred(42) is False
-        assert pred(42.15) is True
-        assert pred("A") is True
-
-    def test_not_type_tuple_of_types(self):
-        pred = not_type((int, float))
-        assert isinstance(pred, Predicate)
-        assert pred(42) is False
-        assert pred(42.15) is False
-        assert pred("A") is True
 
     def test_no_error_int(self):
         pred = no_error(int)

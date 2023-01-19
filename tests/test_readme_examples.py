@@ -2,7 +2,6 @@ from handpick import (
     pick,
     Predicate,
     is_type,
-    not_type,
     NUM_STR,
     values_for_key,
     max_depth,
@@ -75,7 +74,7 @@ class TestReadmeExamples:
     def test_example_7(self):
         """Example from 'Predicate factories'."""
         data = [[1.0, [2, True]], [False, [3]], ["4", {5, True}]]
-        strictly_integers = pick(data, is_type(int) & not_type(bool))
+        strictly_integers = pick(data, is_type(int) & ~is_type(bool))
         assert list(strictly_integers) == [2, 3, 5]
 
     def test_example_8(self):

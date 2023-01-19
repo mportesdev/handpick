@@ -3,28 +3,11 @@ import string
 import hypothesis.strategies as st
 from hypothesis import given
 
-from handpick import Predicate, is_type, not_type
+from handpick import Predicate
 from tests import is_even
 
 strings = st.text(string.printable)
-keys = strings
 values = st.none() | st.booleans() | st.integers() | st.floats() | strings
-
-
-def collections(children):
-    return st.lists(children) | st.dictionaries(keys, children)
-
-
-types = st.sampled_from((bool, int, float, str, list, dict))
-values_and_collections = values | collections(values)
-
-
-@given(types, values_and_collections)
-def test_is_type_not_type(type_, value):
-    pred_1 = is_type(type_)
-    pred_2 = not_type(type_)
-    assert pred_1(value) is (~pred_2)(value)
-    assert (~pred_1)(value) is pred_2(value)
 
 
 def _same_result_or_error(predicate_1, predicate_2, arg):

@@ -197,16 +197,16 @@ but no ``TypeError`` propagated up to the code that called ``above_zero``.
 Predicate factories
 ~~~~~~~~~~~~~~~~~~~
 
-The ``is_type`` and ``not_type`` functions can be used to create
+The ``is_type`` function can be used to create
 predicates based on an object's type. For example:
 
 .. code-block:: python
 
-    from handpick import pick, is_type, not_type
+    from handpick import pick, is_type
 
     data = [[1.0, [2, True]], [False, [3]], ["4", {5, True}]]
 
-    strictly_integers = pick(data, is_type(int) & not_type(bool))
+    strictly_integers = pick(data, is_type(int) & ~is_type(bool))
 
 .. code::
 
@@ -414,16 +414,6 @@ is_type
 
 Predicate factory. Return a predicate that returns True if
 object is an instance of specified type(s).
-
-``type_or_types`` must be a type or tuple of types.
-
-not_type
---------
-
-*handpick.not_type(type_or_types)*
-
-Predicate factory. Return a predicate that returns True if
-object is not an instance of specified type(s).
 
 ``type_or_types`` must be a type or tuple of types.
 
