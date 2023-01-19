@@ -1,10 +1,9 @@
 import string
 
-from hypothesis import given
 import hypothesis.strategies as st
+from hypothesis import given
 
-from handpick import pick, Predicate, is_type, not_type
-
+from handpick import Predicate, is_type, not_type
 from tests import is_even
 
 strings = st.text(string.printable)

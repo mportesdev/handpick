@@ -1,7 +1,6 @@
 import pytest
 
 from handpick import pick, Predicate
-
 from tests import SEQUENCES, COLLECTIONS, SEQS_DICTS
 
 

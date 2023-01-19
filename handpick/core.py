@@ -1,4 +1,4 @@
-from collections.abc import Mapping, Iterable
+from collections.abc import Iterable, Mapping
 
 _ERRORS = (TypeError, ValueError, LookupError, AttributeError)
 

@@ -9,7 +9,6 @@ from handpick import (
     FLOAT_STR,
     NUM_STR,
 )
-
 from tests import is_even, is_positive, first_item_positive, palindromic_int
 
 
