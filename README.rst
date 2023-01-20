@@ -50,26 +50,6 @@ predicate. For example:
     ['Py']
 
 
-Non-callable predicates
-~~~~~~~~~~~~~~~~~~~~~~~
-
-If ``predicate`` is not callable, equality will be used as the picking
-criteria. For example:
-
-.. code-block:: python
-
-    from handpick import pick
-
-    data = [1, [1.0, [2, 1.0]], [{"1": 1}, [3]]]
-
-    ones = pick(data, 1)  # equivalent to pick(data, lambda n: n == 1)
-
-.. code::
-
-    >>> list(ones)
-    [1, 1.0, 1.0, 1]
-
-
 Handling dictionary keys
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -367,12 +347,11 @@ Pick objects from ``data`` based on ``predicate``.
 
 Traverse ``data`` recursively and yield all objects for which
 ``predicate(obj)`` is True or truthy. ``data`` should be an iterable
-collection. ``predicate`` should be a callable taking one argument
-and returning a Boolean value.
+collection.
 
-If ``predicate`` is omitted, all objects are picked. If ``predicate``
-is not callable, equality is used as criteria, i.e. objects for
-which ``obj == predicate`` are picked.
+``predicate`` must be callable, must take one argument, and should
+return a Boolean value. If ``predicate`` is omitted, all objects are
+picked.
 
 By default, collections of other objects are yielded just like any
 other objects. To exclude collections, pass ``collections=False``.

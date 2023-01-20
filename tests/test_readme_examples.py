@@ -17,12 +17,6 @@ class TestReadmeExamples:
         non_empty_strings = pick(data, lambda s: isinstance(s, str) and s)
         assert list(non_empty_strings) == ["Py"]
 
-    def test_example_2(self):
-        """Example from 'Non-callable predicates'."""
-        data = [1, [1.0, [2, 1.0]], [{"1": 1}, [3]]]
-        ones = pick(data, 1)
-        assert list(ones) == [1, 1.0, 1.0, 1]
-
     def test_example_3(self):
         """Example from 'Handling dictionary keys'."""
         data = {"foo": {"name": "foo"}, "bar": {"name": "bar"}}

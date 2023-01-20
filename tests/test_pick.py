@@ -127,7 +127,8 @@ class TestSpecialCases:
         assert list(pick(None)) == []
 
     def test_non_callable_predicate(self):
-        assert list(pick(COLLECTIONS, b"pick")) == [b"pick", bytearray(b"pick")]
+        with pytest.raises(TypeError, match="predicate must be callable"):
+            list(pick(COLLECTIONS, 42))
 
     def test_omitted_predicate_yields_everything(self):
         assert list(pick([{1: 2}])) == [{1: 2}, 2]

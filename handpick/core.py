@@ -16,12 +16,11 @@ def pick(
 
     Traverse `data` recursively and yield all objects for which
     `predicate(obj)` is True or truthy. `data` should be an iterable
-    collection. `predicate` should be a callable taking one argument
-    and returning a Boolean value.
+    collection.
 
-    If `predicate` is omitted, all objects are picked. If `predicate`
-    is not callable, equality is used as criteria, i.e. objects for
-    which `obj == predicate` are picked.
+    `predicate` must be callable, must take one argument, and should
+    return a Boolean value. If `predicate` is omitted, all objects are
+    picked.
 
     By default, collections of other objects are yielded just like any
     other objects. To exclude collections, pass `collections=False`.
@@ -39,19 +38,19 @@ def pick(
     by the recursive algorithm. This can be changed by passing
     `bytes_like=True`.
     """
+    if not callable(predicate):
+        raise TypeError("predicate must be callable")
     if not _is_collection(data, strings, bytes_like):
         return
 
     is_mapping = _is_mapping(data)
-    predicate_callable = callable(predicate)
     for obj in data:
         if is_mapping:
             # (key, value) or just (value,)
             obj = (obj, data[obj]) if dict_keys else (data[obj],)
         elif collections or not _is_collection(obj, strings, bytes_like):
             # test object against predicate
-            test = predicate(obj) if predicate_callable else obj == predicate
-            if test:
+            if predicate(obj):
                 yield obj
         # inspect object recursively
         yield from pick(
