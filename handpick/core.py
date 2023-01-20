@@ -5,7 +5,7 @@ _ERRORS = (TypeError, ValueError, LookupError, AttributeError)
 
 def pick(
     data,
-    predicate=lambda obj: True,
+    predicate=None,
     *,
     collections=True,
     dict_keys=False,
@@ -19,8 +19,8 @@ def pick(
     collection.
 
     `predicate` must be callable, must take one argument, and should
-    return a Boolean value. If `predicate` is omitted, all objects are
-    picked.
+    return a Boolean value. If `predicate` is omitted or None, all objects
+    are picked.
 
     By default, collections of other objects are yielded just like any
     other objects. To exclude collections, pass `collections=False`.
@@ -38,6 +38,8 @@ def pick(
     by the recursive algorithm. This can be changed by passing
     `bytes_like=True`.
     """
+    if predicate is None:
+        predicate = _default_predicate
     if not callable(predicate):
         raise TypeError("predicate must be callable")
     if not _is_collection(data, strings, bytes_like):
@@ -61,6 +63,10 @@ def pick(
             strings=strings,
             bytes_like=bytes_like,
         )
+
+
+def _default_predicate(_):
+    return True
 
 
 def _is_collection(obj, strings=False, bytes_like=False):

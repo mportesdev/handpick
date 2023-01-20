@@ -341,7 +341,7 @@ API reference
 pick
 ----
 
-*handpick.pick(data, predicate=lambda obj: True, *, collections=True, dict_keys=False, strings=False, bytes_like=False)*
+*handpick.pick(data, predicate=None, *, collections=True, dict_keys=False, strings=False, bytes_like=False)*
 
 Pick objects from ``data`` based on ``predicate``.
 
@@ -350,8 +350,8 @@ Traverse ``data`` recursively and yield all objects for which
 collection.
 
 ``predicate`` must be callable, must take one argument, and should
-return a Boolean value. If ``predicate`` is omitted, all objects are
-picked.
+return a Boolean value. If ``predicate`` is omitted or None, all objects
+are picked.
 
 By default, collections of other objects are yielded just like any
 other objects. To exclude collections, pass ``collections=False``.
