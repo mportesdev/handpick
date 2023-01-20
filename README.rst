@@ -1,4 +1,6 @@
-|ukraine| |tests| |coverage| |version| |black| |pyversions| |license| |downloads|
+|ukraine|
+
+|tests| |coverage| |version| |black| |pyversions| |license| |downloads|
 
 ==========
  Handpick
