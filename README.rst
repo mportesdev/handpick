@@ -1,6 +1,6 @@
 |ukraine|
 
-|tests| |coverage| |version| |black| |pyversions| |license| |downloads|
+|version| |tests| |coverage| |pyversions| |pre-commit| |black| |bandit|
 
 ==========
  Handpick
@@ -35,21 +35,24 @@ Simple predicate functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The predicate function is passed to ``pick`` as the ``predicate``
-argument. In simple cases, you can use a lambda function as a
-predicate. For example:
+argument. For example:
 
 .. code-block:: python
 
     from handpick import pick
 
-    data = [[1, "Py"], [-2, ["", 3.0]], -4]
+    def is_non_empty_string(obj):
+        return isinstance(obj, str) and obj
 
-    non_empty_strings = pick(data, lambda s: isinstance(s, str) and s)
+    data = [[1, ""], [-2, ["foo", 3.0]], -4, "bar"]
 
 .. code::
 
-    >>> list(non_empty_strings)
-    ['Py']
+    >>> for s in pick(data, is_non_empty_string):
+    ...     print(s)
+    ...
+    foo
+    bar
 
 
 Handling dictionary keys
@@ -66,15 +69,19 @@ dictionary values are inspected. For example:
 
     data = {"foo": {"name": "foo"}, "bar": {"name": "bar"}}
 
-    default = pick(data, lambda s: "a" in s)
-    keys_included = pick(data, lambda s: "a" in s, dict_keys=True)
-
 .. code::
 
-    >>> list(default)
-    ['bar']
-    >>> list(keys_included)
-    ['name', 'bar', 'name', 'bar']
+    >>> for s in pick(data, lambda obj: "a" in obj):
+    ...     print(s)
+    ...
+    bar
+    >>> for s in pick(data, lambda obj: "a" in obj, dict_keys=True):
+    ...     print(s)
+    ...
+    name
+    bar
+    name
+    bar
 
 
 Predicates
@@ -99,24 +106,26 @@ For example:
     from handpick import pick, Predicate
 
     @Predicate
-    def is_int(n):
-        return isinstance(n, int)
+    def is_integer(obj):
+        return isinstance(obj, int)
 
     @Predicate
-    def is_even(n):
-        return n % 2 == 0
+    def is_even(number):
+        return number % 2 == 0
 
     data = [[4, [5.0, 1], 3.0], [[15, []], {17: [7, [8], 0]}]]
 
     # compound predicate
-    non_even_int = is_int & ~is_even
-
-    odd_integers = pick(data, non_even_int)
+    odd_int = is_integer & ~is_even
 
 .. code::
 
-    >>> list(odd_integers)
-    [1, 15, 7]
+    >>> for n in pick(data, odd_int):
+    ...     print(n)
+    ...
+    1
+    15
+    7
 
 
 Combining predicates with functions
@@ -138,12 +147,14 @@ predicates and regular undecorated functions. For example:
     # compound predicate
     short_list = (lambda obj: len(obj) < 2) & is_list
 
-    short_lists = pick(data, short_list)
-
 .. code::
 
-    >>> list(short_lists)
-    [[2], [4], ['6']]
+    >>> for l in pick(data, short_list):
+    ...     print(l)
+    ...
+    [2]
+    [4]
+    ['6']
 
 
 Suppressing errors
@@ -159,8 +170,8 @@ not meet the picking criteria. For example:
     from handpick import pick, Predicate
 
     @Predicate
-    def above_zero(n):
-        return n > 0
+    def above_zero(number):
+        return number > 0
 
 .. code::
 
@@ -168,9 +179,11 @@ not meet the picking criteria. For example:
     True
     >>> above_zero("a")
     False
-    >>> positive_numbers = pick([[1, "Py", -2], [None, 3.0]], above_zero)
-    >>> list(positive_numbers)
-    [1, 3.0]
+    >>> for n in pick([[1, "Py", -2], [None, 3.0]], above_zero):
+    ...     print(n)
+    ...
+    1
+    3.0
 
 In the example above, several lists and strings were internally compared to ``0``
 but no ``TypeError`` propagated up to the code that called ``above_zero``.
@@ -179,21 +192,24 @@ but no ``TypeError`` propagated up to the code that called ``above_zero``.
 Predicate factories
 ~~~~~~~~~~~~~~~~~~~
 
-The ``is_type`` function can be used to create
+The `is_type`_ function can be used to create
 predicates based on an object's type. For example:
 
 .. code-block:: python
 
     from handpick import pick, is_type
 
-    data = [[1.0, [2, True]], [False, [3]], ["4", {5, True}]]
+    data = [[1.0, [2, True]], [False, [3]], ["4"]]
 
-    strictly_integers = pick(data, is_type(int) & ~is_type(bool))
+    strictly_int = is_type(int) & ~is_type(bool)
 
 .. code::
 
-    >>> list(strictly_integers)
-    [2, 3, 5]
+    >>> for n in pick(data, strictly_int):
+    ...     print(n)
+    ...
+    2
+    3
 
 
 Built-in predicates
@@ -213,8 +229,11 @@ scenarios. For example:
 
 .. code::
 
-    >>> list(numeric_strings)
-    ['01353', '2011']
+    >>> for s in numeric_strings:
+    ...     print(s)
+    ...
+    01353
+    2011
 
 
 Useful functions
@@ -225,7 +244,7 @@ The ``values_for_key`` function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When inspecting data structures that contain dictionaries or other
-mappings, you can use this function to retrieve values associated with
+mappings, you can use `values_for_key`_ to retrieve values associated with
 a specific key, regardless of the nested depth in which these values
 are stored. Values are retrieved lazily by an iterator. For example:
 
@@ -245,45 +264,31 @@ are stored. Values are retrieved lazily by an iterator. For example:
                 ],
             },
             {
-                "node_id": 9,
+                "id": 9,
             },
         ],
     }
 
-    node_ids = values_for_key(data, key="node_id")
-
 .. code::
 
-    >>> list(node_ids)
-    [4, 8, 16, 9]
+    >>> for i in values_for_key(data, key="node_id"):
+    ...     print(i)
+    ...
+    4
+    8
+    16
 
 Multiple keys may be specified at a time. For example:
 
-.. code-block:: python
-
-    data = {
-        "node_id": 4,
-        "child_nodes": [
-            {
-                "id": 8,
-                "child_nodes": [
-                    {
-                        "id": 16,
-                    },
-                ],
-            },
-            {
-                "node_id": 9,
-            },
-        ],
-    }
-
-    node_ids = values_for_key(data, key=["node_id", "id"])
-
 .. code::
 
-    >>> list(node_ids)
-    [4, 8, 16, 9]
+    >>> for i in values_for_key(data, key=["node_id", "id"]):
+    ...     print(i)
+    ...
+    4
+    8
+    16
+    9
 
 
 The ``max_depth`` function
@@ -292,18 +297,12 @@ The ``max_depth`` function
 This function returns the maximum nested depth of a data structure. For
 example:
 
-.. code-block:: python
-
-    from handpick import max_depth
-
-    nested_list = [0, [1, [2]]]
-    nested_dict = {0: {1: {2: {3: {4: 4}}}}}
-
 .. code::
 
-    >>> max_depth(nested_list)
+    >>> from handpick import max_depth
+    >>> max_depth([0, [1, [2]]])
     2
-    >>> max_depth(nested_dict)
+    >>> max_depth({0: {1: {2: {3: {4: 4}}}}})
     4
 
 **Note:** Just like non-empty collections, empty collections constitute
@@ -322,18 +321,18 @@ Recipes
 Flattening nested data
 ----------------------
 
-For example:
+Use the `pick`_ function, omitting the ``predicate`` argument and passing
+``collections=False``. For example:
 
 .. code-block:: python
 
     from handpick import pick
 
     data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
-    flat_data = pick(data, collections=False)
 
 .. code::
 
-    >>> list(flat_data)
+    >>> list(pick(data, collections=False))
     [0, 1, 2, 3, 4, 5]
 
 
@@ -453,19 +452,19 @@ Return maximum nested depth of ``data``.
 i.e. the direct elements of ``data`` are in depth 0.
 
 
+.. |version| image:: https://img.shields.io/pypi/v/handpick
+    :target: https://pypi.org/project/handpick
 .. |ukraine| image:: https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg
     :target: https://stand-with-ukraine.pp.ua
 .. |tests| image:: https://github.com/mportesdev/handpick/actions/workflows/tests.yml/badge.svg
     :target: https://github.com/mportesdev/handpick/actions
 .. |coverage| image:: https://img.shields.io/codecov/c/gh/mportesdev/handpick
     :target: https://codecov.io/gh/mportesdev/handpick
-.. |version| image:: https://img.shields.io/pypi/v/handpick
-    :target: https://pypi.org/project/handpick
-.. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
-   :target: https://github.com/psf/black
 .. |pyversions| image:: https://img.shields.io/pypi/pyversions/handpick
     :target: https://pypi.org/project/handpick
-.. |license| image:: https://img.shields.io/github/license/mportesdev/handpick
-    :target: https://github.com/mportesdev/handpick/blob/main/LICENSE
-.. |downloads| image:: https://pepy.tech/badge/handpick
-    :target: https://pepy.tech/project/handpick
+.. |pre-commit| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit
+    :target: https://github.com/pre-commit/pre-commit
+.. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://github.com/psf/black
+.. |bandit| image:: https://img.shields.io/badge/security-bandit-yellow.svg
+    :target: https://github.com/PyCQA/bandit

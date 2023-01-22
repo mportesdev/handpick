@@ -11,74 +11,65 @@ from handpick import (
 class TestReadmeExamples:
     """Test examples from README."""
 
-    def test_example_1(self):
-        """Example from 'Simple predicate functions'."""
-        data = [[1, "Py"], [-2, ["", 3.0]], -4]
-        non_empty_strings = pick(data, lambda s: isinstance(s, str) and s)
-        assert list(non_empty_strings) == ["Py"]
+    def test_example_simple_predicate(self):
+        def is_non_empty_string(obj):
+            return isinstance(obj, str) and obj
 
-    def test_example_3(self):
-        """Example from 'Handling dictionary keys'."""
+        data = [[1, ""], [-2, ["foo", 3.0]], -4, "bar"]
+        assert list(pick(data, is_non_empty_string)) == ["foo", "bar"]
+
+    def test_example_dict_keys(self):
         data = {"foo": {"name": "foo"}, "bar": {"name": "bar"}}
-        default = pick(data, lambda s: "a" in s)
-        keys_included = pick(data, lambda s: "a" in s, dict_keys=True)
-        assert list(default) == ["bar"]
-        assert list(keys_included) == ["name", "bar", "name", "bar"]
+        assert list(pick(data, lambda obj: "a" in obj)) == ["bar"]
+        assert list(pick(data, lambda obj: "a" in obj, dict_keys=True)) == [
+            "name",
+            "bar",
+            "name",
+            "bar",
+        ]
 
-    def test_example_4(self):
-        """Example from 'Combining predicates'."""
+    def test_example_combining_predicates(self):
+        @Predicate
+        def is_integer(obj):
+            return isinstance(obj, int)
 
         @Predicate
-        def is_int(n):
-            return isinstance(n, int)
-
-        @Predicate
-        def is_even(n):
-            return n % 2 == 0
+        def is_even(number):
+            return number % 2 == 0
 
         data = [[4, [5.0, 1], 3.0], [[15, []], {17: [7, [8], 0]}]]
-        non_even_int = is_int & ~is_even
-        odd_integers = pick(data, non_even_int)
-        assert list(odd_integers) == [1, 15, 7]
+        odd_int = is_integer & ~is_even
+        assert list(pick(data, odd_int)) == [1, 15, 7]
 
-    def test_example_5(self):
-        """Example from 'Combining predicates with functions'."""
-
+    def test_example_predicates_with_functions(self):
         @Predicate
         def is_list(obj):
             return isinstance(obj, list)
 
         data = [("1", [2]), {("x",): [(3, [4]), "5"]}, ["x", ["6"]], {7: ("x",)}]
         short_list = (lambda obj: len(obj) < 2) & is_list
-        short_lists = pick(data, short_list)
-        assert list(short_lists) == [[2], [4], ["6"]]
+        assert list(pick(data, short_list)) == [[2], [4], ["6"]]
 
-    def test_example_6(self):
-        """Example from 'Suppressing errors'."""
-
+    def test_example_suppressing_errors(self):
         @Predicate
-        def above_zero(n):
-            return n > 0
+        def above_zero(number):
+            return number > 0
 
         assert above_zero(1) is True
         assert above_zero("a") is False
-        positive_numbers = pick([[1, "Py", -2], [None, 3.0]], above_zero)
-        assert list(positive_numbers) == [1, 3.0]
+        assert list(pick([[1, "Py", -2], [None, 3.0]], above_zero)) == [1, 3.0]
 
-    def test_example_7(self):
-        """Example from 'Predicate factories'."""
-        data = [[1.0, [2, True]], [False, [3]], ["4", {5, True}]]
-        strictly_integers = pick(data, is_type(int) & ~is_type(bool))
-        assert list(strictly_integers) == [2, 3, 5]
+    def test_example_predicate_factories(self):
+        data = [[1.0, [2, True]], [False, [3]], ["4"]]
+        strictly_int = is_type(int) & ~is_type(bool)
+        assert list(pick(data, strictly_int)) == [2, 3]
 
-    def test_example_8(self):
-        """Example from 'Built-in predicates'."""
+    def test_example_built_in_predicates(self):
         data = {"id": "01353", "price": 15.42, "quantity": 68, "year": "2011"}
         numeric_strings = pick(data, NUM_STR)
         assert list(numeric_strings) == ["01353", "2011"]
 
-    def test_example_9(self):
-        """Examples from 'The values_for_key function'."""
+    def test_example_values_for_key(self):
         data = {
             "node_id": 4,
             "child_nodes": [
@@ -91,42 +82,18 @@ class TestReadmeExamples:
                     ],
                 },
                 {
-                    "node_id": 9,
+                    "id": 9,
                 },
             ],
         }
-        node_ids = values_for_key(data, key="node_id")
-        assert list(node_ids) == [4, 8, 16, 9]
+        assert list(values_for_key(data, key="node_id")) == [4, 8, 16]
+        assert list(values_for_key(data, key=["node_id", "id"])) == [4, 8, 16, 9]
 
-        data = {
-            "node_id": 4,
-            "child_nodes": [
-                {
-                    "id": 8,
-                    "child_nodes": [
-                        {
-                            "id": 16,
-                        },
-                    ],
-                },
-                {
-                    "node_id": 9,
-                },
-            ],
-        }
-        node_ids = values_for_key(data, key=["node_id", "id"])
-        assert list(node_ids) == [4, 8, 16, 9]
-
-    def test_example_10(self):
-        """Examples from 'The max_depth function'."""
-        nested_list = [0, [1, [2]]]
-        nested_dict = {0: {1: {2: {3: {4: 4}}}}}
-        assert max_depth(nested_list) == 2
-        assert max_depth(nested_dict) == 4
+    def test_example_max_depth(self):
+        assert max_depth([0, [1, [2]]]) == 2
+        assert max_depth({0: {1: {2: {3: {4: 4}}}}}) == 4
         assert max_depth([0, [1, []]]) == 2
 
-    def test_example_11(self):
-        """Example from 'Flattening nested data'."""
+    def test_example_flattening(self):
         data = [[], [0], [[[], 1], [2, [3, [4]], []], [5]]]
-        flat_data = pick(data, collections=False)
-        assert list(flat_data) == [0, 1, 2, 3, 4, 5]
+        assert list(pick(data, collections=False)) == [0, 1, 2, 3, 4, 5]
