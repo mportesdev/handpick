@@ -16,12 +16,12 @@ class TestReadmeExamples:
             return isinstance(obj, str) and obj
 
         data = [[1, ""], [-2, ["foo", 3.0]], -4, "bar"]
-        assert list(pick(data, is_non_empty_string)) == ["foo", "bar"]
+        assert list(pick(data, predicate=is_non_empty_string)) == ["foo", "bar"]
 
     def test_example_dict_keys(self):
         data = {"foo": {"name": "foo"}, "bar": {"name": "bar"}}
-        assert list(pick(data, lambda obj: "a" in obj)) == ["bar"]
-        assert list(pick(data, lambda obj: "a" in obj, dict_keys=True)) == [
+        assert list(pick(data, predicate=lambda obj: "a" in obj)) == ["bar"]
+        assert list(pick(data, predicate=lambda obj: "a" in obj, dict_keys=True)) == [
             "name",
             "bar",
             "name",
@@ -39,7 +39,7 @@ class TestReadmeExamples:
 
         data = [[4, [5.0, 1], 3.0], [[15, []], {17: [7, [8], 0]}]]
         odd_int = is_integer & ~is_even
-        assert list(pick(data, odd_int)) == [1, 15, 7]
+        assert list(pick(data, predicate=odd_int)) == [1, 15, 7]
 
     def test_example_predicates_with_functions(self):
         @Predicate
@@ -48,7 +48,7 @@ class TestReadmeExamples:
 
         data = [("1", [2]), {("x",): [(3, [4]), "5"]}, ["x", ["6"]], {7: ("x",)}]
         short_list = (lambda obj: len(obj) < 2) & is_list
-        assert list(pick(data, short_list)) == [[2], [4], ["6"]]
+        assert list(pick(data, predicate=short_list)) == [[2], [4], ["6"]]
 
     def test_example_suppressing_errors(self):
         @Predicate
@@ -57,16 +57,19 @@ class TestReadmeExamples:
 
         assert above_zero(1) is True
         assert above_zero("a") is False
-        assert list(pick([[1, "Py", -2], [None, 3.0]], above_zero)) == [1, 3.0]
+        assert list(pick([[1, "Py", -2], [None, 3.0]], predicate=above_zero)) == [
+            1,
+            3.0,
+        ]
 
     def test_example_predicate_factories(self):
         data = [[1.0, [2, True]], [False, [3]], ["4"]]
         strictly_int = is_type(int) & ~is_type(bool)
-        assert list(pick(data, strictly_int)) == [2, 3]
+        assert list(pick(data, predicate=strictly_int)) == [2, 3]
 
     def test_example_built_in_predicates(self):
         data = {"id": "01353", "price": 15.42, "quantity": 68, "year": "2011"}
-        numeric_strings = pick(data, NUM_STR)
+        numeric_strings = pick(data, predicate=NUM_STR)
         assert list(numeric_strings) == ["01353", "2011"]
 
     def test_example_values_for_key(self):

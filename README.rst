@@ -6,8 +6,7 @@
  Handpick
 ==========
 
-Handpick is a tool to traverse nested data structures and pick all
-objects that meet certain criteria.
+Handpick is a tool to work with nested data structures.
 
 
 Installation
@@ -25,10 +24,10 @@ Quick introduction
 The ``pick`` function
 ---------------------
 
-The `pick`_ generator function performs the recursive traversal of a
-(presumably nested) data structure and applies the picking criteria provided
-in the form of a predicate function (see below for various examples). Picked
-objects are retrieved lazily by an iterator.
+The `pick`_ generator function performs the recursive traversal
+of a nested data structure and picks all objects that meet certain
+criteria provided in the form of a predicate function.
+Picked objects are retrieved lazily by an iterator.
 
 
 Simple predicate functions
@@ -48,7 +47,7 @@ argument. For example:
 
 .. code::
 
-    >>> for s in pick(data, is_non_empty_string):
+    >>> for s in pick(data, predicate=is_non_empty_string):
     ...     print(s)
     ...
     foo
@@ -71,11 +70,11 @@ dictionary values are inspected. For example:
 
 .. code::
 
-    >>> for s in pick(data, lambda obj: "a" in obj):
+    >>> for s in pick(data, predicate=lambda obj: "a" in obj):
     ...     print(s)
     ...
     bar
-    >>> for s in pick(data, lambda obj: "a" in obj, dict_keys=True):
+    >>> for s in pick(data, predicate=lambda obj: "a" in obj, dict_keys=True):
     ...     print(s)
     ...
     name
@@ -120,7 +119,7 @@ For example:
 
 .. code::
 
-    >>> for n in pick(data, odd_int):
+    >>> for n in pick(data, predicate=odd_int):
     ...     print(n)
     ...
     1
@@ -149,7 +148,7 @@ predicates and regular undecorated functions. For example:
 
 .. code::
 
-    >>> for l in pick(data, short_list):
+    >>> for l in pick(data, predicate=short_list):
     ...     print(l)
     ...
     [2]
@@ -160,8 +159,8 @@ predicates and regular undecorated functions. For example:
 Suppressing errors
 ~~~~~~~~~~~~~~~~~~
 
-One important thing to note: when the predicate's underlying function raises
-an exception, the exception is suppressed and instead the call to the predicate
+The important thing to note is that when the predicate's underlying
+function raises an exception, the exception is suppressed and the predicate
 returns False. In other words, it is assumed that the object in question does
 not meet the picking criteria. For example:
 
@@ -179,7 +178,7 @@ not meet the picking criteria. For example:
     True
     >>> above_zero("a")
     False
-    >>> for n in pick([[1, "Py", -2], [None, 3.0]], above_zero):
+    >>> for n in pick([[1, "Py", -2], [None, 3.0]], predicate=above_zero):
     ...     print(n)
     ...
     1
@@ -205,7 +204,7 @@ predicates based on an object's type. For example:
 
 .. code::
 
-    >>> for n in pick(data, strictly_int):
+    >>> for n in pick(data, predicate=strictly_int):
     ...     print(n)
     ...
     2
@@ -225,7 +224,7 @@ scenarios. For example:
     data = {"id": "01353", "price": 15.42, "quantity": 68, "year": "2011"}
 
     # pick strings that can be cast to numbers
-    numeric_strings = pick(data, NUM_STR)
+    numeric_strings = pick(data, predicate=NUM_STR)
 
 .. code::
 
