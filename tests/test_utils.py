@@ -25,6 +25,9 @@ class TestIsCollection:
         assert _is_collection(b"", bytes_like=True)
         assert _is_collection(b"a", bytes_like=True)
 
+    def test_custom_sequence(self, custom_sequence):
+        assert _is_collection(custom_sequence)
+
 
 def test_is_mapping():
     assert _is_mapping({})

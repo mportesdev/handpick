@@ -135,6 +135,12 @@ class TestSpecialCases:
         assert list(pick([{1: 2}], collections=False)) == [2]
         assert list(pick([{1: 2}], dict_keys=True)) == [{1: 2}, 1, 2]
 
+    def test_custom_sequence(self, custom_sequence):
+        assert list(pick(custom_sequence, bool)) == [1, 2]
+
+    def test_custom_sequence_no_predicate(self, custom_sequence):
+        assert list(pick(custom_sequence)) == [0, 1, 2]
+
 
 class TestStringsAndBytesLike:
     @pytest.mark.parametrize(

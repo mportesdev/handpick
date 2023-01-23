@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Mapping
+from collections.abc import Mapping
 
 _ERRORS = (TypeError, ValueError, LookupError, AttributeError)
 
@@ -70,9 +70,12 @@ def _default_predicate(_):
 
 
 def _is_collection(obj, strings=False, bytes_like=False):
+    try:
+        iter(obj)
+    except TypeError:
+        return False
     return all(
         (
-            isinstance(obj, Iterable),
             not isinstance(obj, str) or (strings and len(obj) > 1),
             not isinstance(obj, (bytes, bytearray)) or bytes_like,
         )
