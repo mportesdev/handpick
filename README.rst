@@ -191,8 +191,8 @@ but no ``TypeError`` propagated up to the code that called ``above_zero``.
 Predicate factories
 ~~~~~~~~~~~~~~~~~~~
 
-The `is_type`_ function can be used to create
-predicates based on an object's type. For example:
+The `is_type`_ function can be used to create predicates based on
+an object's type. For example:
 
 .. code-block:: python
 
@@ -211,27 +211,24 @@ predicates based on an object's type. For example:
     3
 
 
-Built-in predicates
-~~~~~~~~~~~~~~~~~~~
-
-Handpick provides some predefined predicates to be used in common
-scenarios. For example:
+The `no_error`_ function can be used to create predicates based on
+whether a function applied to an object raises an error.
 
 .. code-block:: python
 
-    from handpick import pick, NUM_STR
+    from handpick import pick, is_type, no_error
 
-    data = {"id": "01353", "price": 15.42, "quantity": 68, "year": "2011"}
+    data = {"id": 42, "price": "15.42", "quantity": 68, "year": "2011"}
 
-    # pick strings that can be cast to numbers
-    numeric_strings = pick(data, predicate=NUM_STR)
+    # strings that can be cast to floats
+    numeric_str = is_type(str) & no_error(float)
 
 .. code::
 
-    >>> for s in numeric_strings:
+    >>> for s in pick(data, predicate=numeric_str):
     ...     print(s)
     ...
-    01353
+    15.42
     2011
 
 
@@ -404,30 +401,6 @@ no_error
 Predicate factory. Return a predicate that returns True if ``func``
 can be applied on object without an exception being raised,
 False otherwise.
-
-INT_STR
--------
-
-*handpick.INT_STR*
-
-Predicate that returns True for strings that can be converted
-to int.
-
-FLOAT_STR
----------
-
-*handpick.FLOAT_STR*
-
-Predicate that returns True for strings that can be converted
-to float.
-
-NUM_STR
--------
-
-*handpick.NUM_STR*
-
-Predicate that returns True for strings that can be converted
-to a number (i.e. an int, float or complex).
 
 values_for_key
 --------------

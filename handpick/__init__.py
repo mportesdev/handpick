@@ -8,9 +8,6 @@ from .core import (
     Predicate,
     is_type,
     no_error,
-    INT_STR,
-    FLOAT_STR,
-    NUM_STR,
     values_for_key,
     max_depth,
 )
@@ -23,9 +20,6 @@ __all__ = (
     "Predicate",
     "is_type",
     "no_error",
-    "INT_STR",
-    "FLOAT_STR",
-    "NUM_STR",
     "values_for_key",
     "max_depth",
 )

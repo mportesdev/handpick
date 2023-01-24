@@ -2,7 +2,7 @@ from handpick import (
     pick,
     Predicate,
     is_type,
-    NUM_STR,
+    no_error,
     values_for_key,
     max_depth,
 )
@@ -62,15 +62,15 @@ class TestReadmeExamples:
             3.0,
         ]
 
-    def test_example_predicate_factories(self):
+    def test_example_is_type(self):
         data = [[1.0, [2, True]], [False, [3]], ["4"]]
         strictly_int = is_type(int) & ~is_type(bool)
         assert list(pick(data, predicate=strictly_int)) == [2, 3]
 
-    def test_example_built_in_predicates(self):
-        data = {"id": "01353", "price": 15.42, "quantity": 68, "year": "2011"}
-        numeric_strings = pick(data, predicate=NUM_STR)
-        assert list(numeric_strings) == ["01353", "2011"]
+    def test_example_no_error(self):
+        data = {"id": 42, "price": "15.42", "quantity": 68, "year": "2011"}
+        numeric_str = is_type(str) & no_error(float)
+        assert list(pick(data, predicate=numeric_str)) == ["15.42", "2011"]
 
     def test_example_values_for_key(self):
         data = {

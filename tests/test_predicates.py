@@ -4,9 +4,6 @@ from handpick import (
     Predicate,
     is_type,
     no_error,
-    INT_STR,
-    FLOAT_STR,
-    NUM_STR,
 )
 from tests import is_even, is_positive, first_item_positive, palindromic_int
 
@@ -196,44 +193,3 @@ class TestPredicateFactories:
         assert pred("A") is True
         assert pred([]) is True
         assert pred(42) is False
-
-
-class TestBuiltinPredicates:
-    def test_int_str(self):
-        assert INT_STR("42") is True
-        assert INT_STR("4.2") is False
-        assert INT_STR("1.5e3") is False
-        assert INT_STR("inf") is False
-        assert INT_STR("nan") is False
-        assert INT_STR("4+2j") is False
-        assert INT_STR("A") is False
-        assert INT_STR(42) is False
-        assert INT_STR(4.2) is False
-        assert INT_STR(1.5e3) is False
-        assert INT_STR(4 + 2j) is False
-
-    def test_float_str(self):
-        assert FLOAT_STR("42") is True
-        assert FLOAT_STR("4.2") is True
-        assert FLOAT_STR("1.5e3") is True
-        assert FLOAT_STR("inf") is True
-        assert FLOAT_STR("nan") is True
-        assert FLOAT_STR("4+2j") is False
-        assert FLOAT_STR("A") is False
-        assert FLOAT_STR(42) is False
-        assert FLOAT_STR(4.2) is False
-        assert FLOAT_STR(1.5e3) is False
-        assert FLOAT_STR(4 + 2j) is False
-
-    def test_num_str(self):
-        assert NUM_STR("42") is True
-        assert NUM_STR("4.2") is True
-        assert NUM_STR("1.5e3") is True
-        assert NUM_STR("inf") is True
-        assert NUM_STR("nan") is True
-        assert NUM_STR("4+2j") is True
-        assert NUM_STR("A") is False
-        assert NUM_STR(42) is False
-        assert NUM_STR(4.2) is False
-        assert NUM_STR(1.5e3) is False
-        assert NUM_STR(4 + 2j) is False
