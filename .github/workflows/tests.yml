@@ -30,12 +30,8 @@ jobs:
       run: |
         curl -sSL https://install.python-poetry.org | python -
         poetry install
-        COV_REPORT_PATH="${{ github.workspace }}/coverage.xml"
-        poetry run pytest --cov --cov-report=xml":$COV_REPORT_PATH" --cov-report=term
-        echo "REPORT=$COV_REPORT_PATH" >> $GITHUB_OUTPUT
+        poetry run pytest --cov --cov-report=xml --cov-report=term
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       if: matrix.python-version == '3.11'
-      with:
-        files: ${{ steps.run_tests.outputs.REPORT }}
