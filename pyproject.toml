@@ -17,10 +17,7 @@ classifiers = [
 python = "^3.7"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7"
-pytest-cov = "^4"
-hypothesis = "^6"
-mutmut = "^2"
+tox = "^4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
