@@ -29,7 +29,7 @@ jobs:
       id: run_tests
       run: |
         curl -sSL https://install.python-poetry.org | python -
-        poetry install
+        poetry install --with=test --without=dev
         poetry run pytest --cov --cov-report=xml --cov-report=term
 
     - name: Upload coverage to Codecov
