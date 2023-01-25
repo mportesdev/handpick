@@ -57,10 +57,10 @@ argument. For example:
 Handling dictionary keys
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-When inspecting dictionaries or other mappings, you can configure
-whether or not ``pick`` will inspect dictionary keys using the
-``dict_keys`` keyword argument. Default is False, which means only
-dictionary values are inspected. For example:
+When traversing mappings like dictionaries, you can configure
+whether or not ``pick`` will examine dictionary keys by specifying
+the ``dict_keys`` keyword argument. Default is False, which means
+only dictionary values are examined. For example:
 
 .. code-block:: python
 
@@ -218,7 +218,7 @@ whether a function applied to an object raises an error.
 
     from handpick import pick, is_type, no_error
 
-    data = {"id": 42, "price": "15.42", "quantity": 68, "year": "2011"}
+    data = {"name": "spam", "price": "15.42", "quantity": 68, "year": "2011"}
 
     # strings that can be cast to floats
     numeric_str = is_type(str) & no_error(float)
@@ -317,8 +317,8 @@ Recipes
 Flattening nested data
 ----------------------
 
-Use the `pick`_ function, omitting the ``predicate`` argument and passing
-``collections=False``. For example:
+To flatten a list of lists, use the `pick`_ function without
+the ``predicate`` argument and pass ``collections=False``. For example:
 
 .. code-block:: python
 

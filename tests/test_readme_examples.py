@@ -68,7 +68,7 @@ class TestReadmeExamples:
         assert list(pick(data, predicate=strictly_int)) == [2, 3]
 
     def test_example_no_error(self):
-        data = {"id": 42, "price": "15.42", "quantity": 68, "year": "2011"}
+        data = {"name": "spam", "price": "15.42", "quantity": 68, "year": "2011"}
         numeric_str = is_type(str) & no_error(float)
         assert list(pick(data, predicate=numeric_str)) == ["15.42", "2011"]
 
