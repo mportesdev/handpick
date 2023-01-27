@@ -115,42 +115,20 @@ class TestStringsAndBytesLike:
     @pytest.mark.parametrize(
         "data, expected",
         (
-            pytest.param(["hand"], ["hand"], id="string len > 1"),
-            pytest.param(["a"], ["a"], id="string len 1"),
-            pytest.param(["ab", ["cd"]], ["ab", "cd"], id="nested"),
-            pytest.param("pick", [], id="top-level string len > 1"),
-            pytest.param("a", [], id="top-level string len 1"),
+            pytest.param(["foo"], ["foo"], id="string"),
+            pytest.param(["ab", ["cd"]], ["ab", ["cd"], "cd"], id="nested"),
+            pytest.param("foo", [], id="top-level string"),
         ),
     )
-    def test_strings_not_iterated_by_default(self, data, expected):
-        assert list(pick(data, lambda s: isinstance(s, str))) == expected
+    def test_strings_not_iterated(self, data, expected):
+        assert list(pick(data)) == expected
 
     @pytest.mark.parametrize(
         "data, expected",
         (
-            pytest.param(["hand"], ["hand", "h", "a", "n", "d"], id="string len > 1"),
-            pytest.param(["a"], ["a"], id="string len 1"),
-            pytest.param([""], [""], id="empty string"),
-            pytest.param(["ab", ["cd"]], ["ab", "a", "b", "cd", "c", "d"], id="nested"),
-            pytest.param("pick", ["p", "i", "c", "k"], id="top-level string len > 1"),
-            pytest.param("a", [], id="top-level string len 1"),
-            pytest.param("", [], id="top-level empty string"),
-        ),
-    )
-    def test_strings_iterated_optionally(self, data, expected):
-        assert list(pick(data, lambda s: isinstance(s, str), strings=True)) == expected
-
-    def test_strings_not_picked_but_iterated_optionally(self):
-        data = ["foo", 42, b"bar"]
-        picked = list(pick(data, collections=False, strings=True))
-        assert picked == ["f", "o", "o", 42, b"bar"]
-
-    @pytest.mark.parametrize(
-        "data, expected",
-        (
-            pytest.param([b"hand"], [b"hand"], id="bytes"),
-            pytest.param([[b"PY"], b"12"], [[b"PY"], b"PY", b"12"], id="nested"),
-            pytest.param(bytearray([4, 2]), [], id="top-level bytes"),
+            pytest.param([b"foo"], [b"foo"], id="bytes"),
+            pytest.param([b"ab", [b"cd"]], [b"ab", [b"cd"], b"cd"], id="nested"),
+            pytest.param(b"foo", [], id="top-level bytes"),
         ),
     )
     def test_bytes_like_not_iterated_by_default(self, data, expected):
@@ -159,11 +137,11 @@ class TestStringsAndBytesLike:
     @pytest.mark.parametrize(
         "data, expected",
         (
+            pytest.param([b"foo"], [b"foo", ord("f"), ord("o"), ord("o")], id="bytes"),
             pytest.param(
-                [b"hand"], [b"hand", ord("h"), ord("a"), ord("n"), ord("d")], id="bytes"
-            ),
-            pytest.param(
-                [[b"P"], b"Y"], [[b"P"], b"P", ord("P"), b"Y", ord("Y")], id="nested"
+                [b"ab", [b"cd"]],
+                [b"ab", ord("a"), ord("b"), [b"cd"], b"cd", ord("c"), ord("d")],
+                id="nested",
             ),
             pytest.param(bytearray([4, 2]), [4, 2], id="top-level bytes"),
         ),

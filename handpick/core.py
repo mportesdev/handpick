@@ -3,15 +3,7 @@ from collections.abc import Mapping
 _ERRORS = (TypeError, ValueError, LookupError, AttributeError)
 
 
-def pick(
-    data,
-    predicate=None,
-    *,
-    collections=True,
-    dict_keys=False,
-    strings=False,
-    bytes_like=False,
-):
+def pick(data, predicate=None, *, collections=True, dict_keys=False, bytes_like=False):
     """Pick objects from `data` based on `predicate`.
 
     Traverse `data` recursively and yield all objects for which
@@ -28,21 +20,19 @@ def pick(
     When traversing a mapping, only its values are inspected by default.
     To inspect both keys and values of mappings, pass `dict_keys=True`.
 
-    By default, strings are not treated as collections of other objects
-    and therefore not iterated by the recursive algorithm. This can be
-    changed by passing `strings=True`. Empty strings and strings of
-    length 1 are never iterated.
-
     By default, bytes-like sequences (bytes and bytearrays) are not
     treated as collections of other objects and therefore not iterated
     by the recursive algorithm. This can be changed by passing
     `bytes_like=True`.
+
+    Strings are not treated as collections of other objects and
+    therefore not iterated by the recursive algorithm.
     """
     if predicate is None:
         predicate = _default_predicate
     if not callable(predicate):
         raise TypeError("predicate must be callable")
-    if not _is_collection(data, strings, bytes_like):
+    if not _is_collection(data, bytes_like):
         return
 
     is_mapping = _is_mapping(data)
@@ -50,7 +40,7 @@ def pick(
         if is_mapping:
             # (key, value) or just (value,)
             obj = (obj, data[obj]) if dict_keys else (data[obj],)
-        elif collections or not _is_collection(obj, strings, bytes_like):
+        elif collections or not _is_collection(obj, bytes_like):
             # test object against predicate
             if predicate(obj):
                 yield obj
@@ -60,7 +50,6 @@ def pick(
             predicate,
             collections=collections,
             dict_keys=dict_keys,
-            strings=strings,
             bytes_like=bytes_like,
         )
 
@@ -69,15 +58,15 @@ def _default_predicate(_):
     return True
 
 
-def _is_collection(obj, strings=False, bytes_like=False):
+def _is_collection(obj, bytes_like=False):
     try:
         iter(obj)
     except TypeError:
         return False
     return all(
         (
-            not isinstance(obj, str) or (strings and len(obj) > 1),
-            not isinstance(obj, (bytes, bytearray)) or bytes_like,
+            bytes_like or not isinstance(obj, (bytes, bytearray)),
+            not isinstance(obj, str),
         )
     )
 

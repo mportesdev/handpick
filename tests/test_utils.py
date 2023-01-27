@@ -7,18 +7,10 @@ class TestIsCollection:
     def test_default(self):
         assert _is_collection([])
         assert not _is_collection(1)
-
         assert not _is_collection("")
-        assert not _is_collection("a")
-        assert not _is_collection("ab")
 
         assert not _is_collection(b"")
         assert not _is_collection(b"a")
-
-    def test_strings_true(self):
-        assert not _is_collection("", strings=True)
-        assert not _is_collection("a", strings=True)
-        assert _is_collection("ab", strings=True)
 
     def test_bytes_like_true(self):
         assert _is_collection(b"", bytes_like=True)
