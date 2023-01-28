@@ -1,122 +1,91 @@
 import pytest
 
 from handpick import pick, Predicate
-from tests import SEQUENCES, COLLECTIONS, SEQS_DICTS
 
 
 class TestCollectionHandling:
-    def test_collections_included_by_default(self):
-        picked = list(pick(SEQUENCES))
+    def test_collections_included_by_default(self, sample_sequences):
+        picked = list(pick(sample_sequences))
         assert picked == [
-            [["hand"], b"pick", (42, b"hand")],
-            ["hand"],
-            "hand",
-            b"pick",
-            (42, b"hand"),
-            42,
-            b"hand",
-            ("3.14", (1.414,), ["15", bytearray(b"pick")]),
+            [["ab"], b"cd", (b"ef",)],
+            ["ab"],
+            "ab",
+            b"cd",
+            (b"ef",),
+            b"ef",
+            ("3.14", "15"),
             "3.14",
-            (1.414,),
-            1.414,
-            ["15", bytearray(b"pick")],
             "15",
-            bytearray(b"pick"),
         ]
 
-    def test_collections_excluded_optionally(self):
-        picked = list(pick(SEQUENCES, collections=False))
+    def test_collections_excluded_optionally(self, sample_sequences):
+        picked = list(pick(sample_sequences, collections=False))
+        assert picked == ["ab", b"cd", b"ef", "3.14", "15"]
+
+    def test_collections_in_dict_keys_included_by_default(self, sample_subscriptables):
+        picked = list(pick(sample_subscriptables, dict_keys=True))
         assert picked == [
-            "hand",
-            b"pick",
-            42,
-            b"hand",
+            [["ab"], b"cd", {("ef",): b"gh"}],
+            ["ab"],
+            "ab",
+            b"cd",
+            {("ef",): b"gh"},
+            ("ef",),
+            "ef",
+            b"gh",
+            {"ij": "kl"},
+            "ij",
+            "kl",
+            ("3.14", "15"),
             "3.14",
-            1.414,
             "15",
-            bytearray(b"pick"),
         ]
 
-    def test_collections_in_dict_keys_included_by_default(self):
-        picked = list(pick(SEQS_DICTS, dict_keys=True))
-        assert picked == [
-            [["hand"], b"pick", {42: b"hand"}],
-            ["hand"],
-            "hand",
-            b"pick",
-            {42: b"hand"},
-            42,
-            b"hand",
-            ("3.14", (1.414,), {("15",): bytearray(b"pick")}),
-            "3.14",
-            (1.414,),
-            1.414,
-            {("15",): bytearray(b"pick")},
-            ("15",),
-            "15",
-            bytearray(b"pick"),
-        ]
-
-    def test_collections_in_dict_keys_excluded_optionally(self):
-        picked = list(pick(SEQS_DICTS, collections=False, dict_keys=True))
-        assert picked == [
-            "hand",
-            b"pick",
-            42,
-            b"hand",
-            "3.14",
-            1.414,
-            "15",
-            bytearray(b"pick"),
-        ]
+    def test_collections_in_dict_keys_excluded_optionally(self, sample_subscriptables):
+        picked = list(pick(sample_subscriptables, collections=False, dict_keys=True))
+        assert picked == ["ab", b"cd", "ef", b"gh", "ij", "kl", "3.14", "15"]
 
 
 class TestFunctionsAndPredicates:
-    def test_simple_function(self):
-        picked = list(pick(COLLECTIONS, lambda s: hasattr(s, "count")))
+    def test_simple_function(self, sample_collections):
+        picked = list(pick(sample_collections, lambda s: hasattr(s, "count")))
         assert picked == [
-            [{"hand"}, b"pick", {42: b"hand"}],
-            "hand",
-            b"pick",
-            b"hand",
-            ("3.14", (frozenset({1.414}),), {("15",): bytearray(b"pick")}),
+            [{"ab"}, b"cd", {("ef",): b"gh"}],
+            "ab",
+            b"cd",
+            b"gh",
+            (frozenset({"3.14"}), "15"),
             "3.14",
-            (frozenset({1.414}),),
-            bytearray(b"pick"),
+            "15",
         ]
 
-    def test_function_raises_error(self):
+    def test_function_raises_error(self, sample_collections):
         with pytest.raises(TypeError):
-            list(pick(COLLECTIONS, lambda s: s[1]))
+            list(pick(sample_collections, lambda s: s[1]))
 
-    def test_predicate_suppresses_errors(self):
-        picked = list(pick(COLLECTIONS, Predicate(lambda s: s[1])))
+    def test_predicate_suppresses_errors(self, sample_collections):
+        picked = list(pick(sample_collections, Predicate(lambda s: s[1])))
         assert picked == [
-            [{"hand"}, b"pick", {42: b"hand"}],
-            "hand",
-            b"pick",
-            b"hand",
-            ("3.14", (frozenset({1.414}),), {("15",): bytearray(b"pick")}),
+            [{"ab"}, b"cd", {("ef",): b"gh"}],
+            "ab",
+            b"cd",
+            b"gh",
+            (frozenset({"3.14"}), "15"),
             "3.14",
-            bytearray(b"pick"),
+            "15",
         ]
 
 
 class TestDictKeyHandling:
-    def test_dict_keys_excluded_by_default(self):
-        picked = list(pick(SEQS_DICTS, lambda t: isinstance(t, tuple)))
-        assert picked == [
-            ("3.14", (1.414,), {("15",): bytearray(b"pick")}),
-            (1.414,),
-        ]
+    def test_dict_keys_excluded_by_default(self, sample_subscriptables):
+        picked = list(pick(sample_subscriptables, lambda t: isinstance(t, tuple)))
+        assert picked == [("3.14", "15")]
 
-    def test_dict_keys_included_optionally(self):
-        picked = list(pick(SEQS_DICTS, lambda t: isinstance(t, tuple), dict_keys=True))
-        assert picked == [
-            ("3.14", (1.414,), {("15",): bytearray(b"pick")}),
-            (1.414,),
-            ("15",),
-        ]
+    def test_dict_keys_included_optionally(self, sample_subscriptables):
+        picked = list(
+            pick(sample_subscriptables, lambda t: isinstance(t, tuple), dict_keys=True)
+        )
+        assert picked == [("ef",), ("3.14", "15")]
 
 
 class TestSpecialCases:
@@ -126,9 +95,9 @@ class TestSpecialCases:
     def test_non_iterable_root_yields_nothing(self):
         assert list(pick(None)) == []
 
-    def test_non_callable_predicate(self):
+    def test_non_callable_predicate_raises_error(self, sample_collections):
         with pytest.raises(TypeError, match="predicate must be callable"):
-            list(pick(COLLECTIONS, 42))
+            list(pick(sample_collections, 42))
 
     def test_omitted_predicate_yields_everything(self):
         assert list(pick([{1: 2}])) == [{1: 2}, 2]

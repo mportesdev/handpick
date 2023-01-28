@@ -1,7 +1,6 @@
 import pytest
 
 from handpick import values_for_key, max_depth
-from tests import SEQUENCES, SEQS_DICTS, COLLECTIONS
 
 
 class TestValuesForKey:
@@ -44,9 +43,17 @@ class TestValuesForKey:
 @pytest.mark.parametrize(
     "root, expected",
     (
-        pytest.param(SEQUENCES, 2, id="sequences"),
-        pytest.param(SEQS_DICTS, 2, id="seqs & dicts"),
-        pytest.param(COLLECTIONS, 3, id="collections"),
+        pytest.param(([["ab"], b"cd", (b"ef",)], ("3.14", "15")), 2, id="sequences"),
+        pytest.param(
+            ([["ab"], b"cd", {("ef",): b"gh"}], {"ij": "kl"}, ("3.14", "15")),
+            2,
+            id="sequences+dicts",
+        ),
+        pytest.param(
+            ([{"ab"}, b"cd", {("ef",): b"gh"}], (frozenset({"3.14"}), "15")),
+            2,
+            id="collections",
+        ),
         pytest.param([], 0, id="[]"),
         pytest.param([[]], 1, id="[[]]"),
         pytest.param(42, 0, id="non-iterable"),

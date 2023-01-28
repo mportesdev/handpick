@@ -1,7 +1,6 @@
 import pytest
 
 from handpick.core import _is_collection, _is_mapping, _error, _iter_depth
-from tests import SEQUENCES, SEQS_DICTS, COLLECTIONS
 
 
 class TestIsCollection:
@@ -46,9 +45,21 @@ def test_error():
 @pytest.mark.parametrize(
     "root, expected",
     (
-        pytest.param(SEQUENCES, [0, 1, 2, 2, 1, 2, 2], id="sequences"),
-        pytest.param(SEQS_DICTS, [0, 1, 2, 2, 1, 2, 2], id="seqs & dicts"),
-        pytest.param(COLLECTIONS, [0, 1, 2, 2, 1, 2, 3, 2], id="collections"),
+        pytest.param(
+            ([["ab"], b"cd", (b"ef",)], ("3.14", "15")),
+            [0, 1, 2, 2, 1],
+            id="sequences",
+        ),
+        pytest.param(
+            ([["ab"], b"cd", {("ef",): b"gh"}], {"ij": "kl"}, ("3.14", "15")),
+            [0, 1, 2, 2, 1, 1],
+            id="sequences+dicts",
+        ),
+        pytest.param(
+            ([{"ab"}, b"cd", {("ef",): b"gh"}], (frozenset({"3.14"}), "15")),
+            [0, 1, 2, 2, 1, 2],
+            id="collections",
+        ),
         pytest.param([], [0], id="[]"),
         pytest.param([[]], [0, 1], id="[[]]"),
     ),
