@@ -22,9 +22,6 @@ hypothesis = "^6"
 pytest-cov = "^4"
 pytest-randomly = "^3"
 
-[tool.poetry.group.dev.dependencies]
-tox = "^4"
-
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
