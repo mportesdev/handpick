@@ -18,18 +18,23 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install poetry, build, publish to PyPI
-      id: build_publish
+    - name: Install poetry, build
+      id: build
       env:
         POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_API_TOKEN }}
       run: |
         curl -sSL https://install.python-poetry.org | python -
         poetry build
-        poetry publish
         echo "VERSION=$(poetry version --short)" >> $GITHUB_OUTPUT
+
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@v1.8.5
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
 
     - name: Create GitHub release
       uses: softprops/action-gh-release@v1
       with:
-        name: version ${{ steps.build_publish.outputs.VERSION }}
+        name: version ${{ steps.build.outputs.VERSION }}
         files: 'dist/*'
