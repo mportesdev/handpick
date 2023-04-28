@@ -5,7 +5,7 @@ from handpick import (
     is_type,
     no_error,
 )
-from tests import is_even, is_positive, first_item_positive, palindromic_int
+from . import is_even, is_positive, first_item_positive, palindromic_int
 
 
 class TestDecoratorUsage:

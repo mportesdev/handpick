@@ -4,7 +4,7 @@ import hypothesis.strategies as st
 from hypothesis import given
 
 from handpick import Predicate
-from tests import is_even
+from . import is_even
 
 strings = st.text(string.printable)
 values = st.none() | st.booleans() | st.integers() | st.floats() | strings
