@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "handpick"
-version = "0.15.0"
+version = "0.16.0"
 description = "Traverse nested data structures."
 license = "MIT"
 authors = ["Michal Porteš <michalportes1@gmail.com>"]
