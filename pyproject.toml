@@ -29,3 +29,10 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 addopts = "-ra"
 xfail_strict = true
+
+[tool.coverage.run]
+branch = true
+source = ["handpick"]
+
+[tool.coverage.report]
+show_missing = true
