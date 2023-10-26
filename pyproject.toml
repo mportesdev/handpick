@@ -36,3 +36,6 @@ source = ["handpick"]
 
 [tool.coverage.report]
 show_missing = true
+
+[tool.bandit.assert_used]
+skips = ["tests/*"]

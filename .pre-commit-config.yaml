@@ -8,4 +8,4 @@ repos:
   rev: 1.7.5
   hooks:
   - id: bandit
-    args: ["--configfile=bandit.yaml"]
+    args: ["--configfile=pyproject.toml"]
