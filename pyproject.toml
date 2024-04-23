@@ -17,9 +17,9 @@ classifiers = [
 python = "^3.8"
 
 [tool.poetry.group.test.dependencies]
-pytest = "^7"
+pytest = "^8"
 hypothesis = "^6"
-pytest-cov = "^4"
+pytest-cov = "^5"
 pytest-randomly = "^3"
 
 [build-system]
