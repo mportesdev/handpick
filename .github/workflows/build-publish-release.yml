@@ -23,7 +23,7 @@ jobs:
       env:
         POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_API_TOKEN }}
       run: |
-        curl -sSL https://install.python-poetry.org | python -
+        pip install poetry
         poetry build
         echo "VERSION=$(poetry version --short)" >> $GITHUB_OUTPUT
 

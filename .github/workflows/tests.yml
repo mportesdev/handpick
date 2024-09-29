@@ -28,7 +28,7 @@ jobs:
 
     - name: Install poetry, run tests
       run: |
-        curl -sSL https://install.python-poetry.org | python -
+        pip install poetry
         poetry install --with=test
         poetry run pytest --cov --cov-report=xml --cov-report=term
 
